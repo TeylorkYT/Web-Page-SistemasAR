@@ -32,6 +32,8 @@ sistemasar/
 ├── database/         # Scripts SQL
 │   ├── ddl.sql           # Estructura de la base de datos
 │   └── datos_prueba.sql  # Datos de prueba
+├── docs/             # Documentación del proyecto
+│   └── dailies/          # Actas y seguimiento de dailies
 ├── .gitignore
 └── README.md
 ```
