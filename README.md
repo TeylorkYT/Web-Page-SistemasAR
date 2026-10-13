@@ -1,61 +1,107 @@
-# 🌐 SistemasAR - Web Page & Sistema de Gestión (sistemasar.net)
+# Sistemas AR — Sistema de Gestión de Tickets de Soporte Técnico
 
-Repositorio oficial del proyecto **sistemasar.net**.
+Plataforma web para la gestión de tickets de soporte técnico, desarrollada como proyecto formativo del programa ADSO.
 
----
+## Descripción
 
-## 📁 Estructura del Proyecto
+Sistemas AR permite a los clientes crear tickets de soporte, a los técnicos gestionar las reparaciones y a los administradores supervisar todo el proceso. Incluye seguimiento de equipos, historial de acciones, reportes técnicos y calificación del servicio.
 
-```text
-├── database/            # Scripts SQL (Esquema y datos de prueba)
-│   ├── schema.sql       # Creación de base de datos y las 8 tablas
-│   └── datos_prueba.sql # Datos iniciales con un usuario por rol
-├── backend/             # API REST con FastAPI (Python)
-├── frontend/            # Interfaz de usuario con React + Vite
-├── .gitignore           # Exclusiones de Git
-└── README.md            # Documentación del proyecto
+## Tecnologías
+
+| Capa | Tecnología |
+| --- | --- |
+| **Base de datos** | MySQL 8.0 (servidor compartido en la nube) |
+| **Backend** | Python · FastAPI · Uvicorn · PyMySQL |
+| **Frontend** | React · Vite · React Router DOM |
+
+## Estructura del proyecto
+
+```
+sistemasar/
+├── backend/          # API REST con FastAPI
+│   ├── main.py
+│   ├── database.py
+│   ├── .env          # Variables de entorno (NO se sube)
+│   ├── .env.example  # Plantilla de variables
+│   └── requirements.txt
+├── frontend/         # Aplicación React con Vite
+│   └── src/
+│       ├── components/
+│       ├── pages/
+│       └── services/
+├── database/         # Scripts SQL
+│   ├── ddl.sql           # Estructura de la base de datos
+│   └── datos_prueba.sql  # Datos de prueba
+├── .gitignore
+└── README.md
 ```
 
----
+## Requisitos previos
 
-## 🗄️ Configuración de la Base de Datos (MySQL)
+- **Git** — control de versiones
+- **Python 3.10+** — para el backend
+- **Node.js LTS** — para el frontend
+- **MySQL Workbench** o **phpMyAdmin** — para administrar la base de datos
 
-Cada integrante del equipo debe ejecutar los scripts en su servidor MySQL local:
+## Instalación
 
-1. **Crear la base de datos y tablas:**
-   ```bash
-   mysql -u root -p < database/schema.sql
-   ```
+### 1. Clonar el repositorio
 
-2. **Cargar datos de prueba:**
-   ```bash
-   mysql -u root -p < database/datos_prueba.sql
-   ```
+```bash
+git clone https://github.com/<usuario>/sistemasar.git
+cd sistemasar
+```
 
-3. **Verificar la instalación:**
-   ```sql
-   USE sistemasar_db;
-   SHOW TABLES;
-   SELECT * FROM usuarios;
-   ```
+### 2. Backend
 
----
+```bash
+cd backend
+python -m venv venv
+# Windows:
+venv\Scripts\activate
+# Linux/Mac:
+source venv/bin/activate
 
-## 👥 Equipo y Roles
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
 
-| Integrante | Rol / Capa | Responsabilidad Principal |
-|---|---|---|
-| **Teylork** | DevOps & Base de Datos | Repositorio base, diseño de BD y scripts iniciales |
-| **Magleony** | Backend Core | Estructura FastAPI, CORS, ruta `/health` |
-| **Cristian** | Backend BD | Conexión PyMySQL, `.env`, ruta `/db-check` |
-| **Vidal** | Frontend Core | Proyecto React + Vite, rutas, página `Estado.jsx` |
-| **Jaider** | Frontend UI/UX | Variables de diseño, Layout base y componentes |
+El backend corre en `http://127.0.0.1:8000`. Documentación interactiva en `/docs`.
 
----
+### 3. Frontend
 
-## 🌿 Flujo de Trabajo con Git
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-* **`main`**: Rama protegida de producción. Solo recibe código probado y aprobado desde `develop`.
-* **`develop`**: Rama principal de desarrollo donde se integran las funcionalidades.
-* **`feature/<capa>-<tarea>`**: Ramas de trabajo individuales (ej: `feature/backend-base`, `feature/frontend-base`).
-* **Regla de oro:** El archivo `.env` **NUNCA** se sube al repositorio. Usar `.env.example`.
+El frontend corre en `http://localhost:5173`.
+
+### 4. Variables de entorno
+
+Copiar `backend/.env.example` a `backend/.env` y completar con los datos de conexión a la base de datos compartida.
+
+## Ramas
+
+| Rama | Uso |
+| --- | --- |
+| `main` | Código estable y revisado |
+| `develop` | Integración de features en desarrollo |
+| `feature/*` | Ramas individuales por tarea |
+
+> **Regla:** Nadie sube directo a `main`. Todo pasa por pull request a `develop`.
+
+## Equipo
+
+| Integrante | Rol en el proyecto |
+| --- | --- |
+| Teylork | Base de datos y repositorio |
+| Magleony | Backend base (FastAPI) |
+| Cristian | Conexión a base de datos |
+| Vidal | Frontend base (React) |
+| Jaider | Layout y diseño visual |
+
+## Licencia
+
+Proyecto formativo — uso educativo.
