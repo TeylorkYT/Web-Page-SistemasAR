@@ -1,0 +1,395 @@
+/**
+ * ==============================================================================
+ * SISTEMASAR - ESTILOS DEL LAYOUT PRINCIPAL (Layout.css)
+ * ==============================================================================
+ * Desarrollado por: Jaider (Layout base del frontend)
+ * Estructura fija adaptable a los 3 roles: Administrador, Técnico y Cliente.
+ * ==============================================================================
+ */
+
+/* 1. Contenedor maestro de toda la aplicación */
+.layout-contenedor {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--color-fondo-app);
+  font-family: var(--fuente-principal);
+  color: var(--color-texto-principal);
+}
+
+/* 2. BARRA LATERAL FIJA (Sidebar) */
+.layout-sidebar {
+  width: var(--ancho-sidebar);
+  background-color: var(--color-sidebar-fondo);
+  color: var(--color-sidebar-texto);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Encabezado del menú lateral (Marca o Panel) */
+.sidebar-header {
+  height: var(--alto-header);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-logo-icono {
+  width: 32px;
+  height: 32px;
+  background-color: var(--color-sidebar-activo);
+  border-radius: var(--radio-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.sidebar-titulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #ffffff;
+  margin: 0;
+  text-transform: capitalize;
+}
+
+/* Contenedor de la lista de navegación */
+.sidebar-nav {
+  flex: 1;
+  padding: 16px 12px;
+  overflow-y: auto;
+}
+
+.sidebar-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Elemento individual de navegación */
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  color: var(--color-sidebar-texto);
+  border-radius: var(--radio-boton);
+  text-decoration: none;
+  font-size: var(--tamano-texto-sm);
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+/* Estado hover de los ítems */
+.sidebar-item:hover {
+  background-color: var(--color-sidebar-hover);
+  color: #ffffff;
+}
+
+/* Estado ACTIVO del ítem (según el mockup con fondo azul claro) */
+.sidebar-item.activo {
+  background-color: var(--color-sidebar-activo);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-item-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  width: 20px;
+}
+
+/* Pie de la barra lateral (usuario / rol) */
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.8rem;
+  color: var(--color-sidebar-texto-mute);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 3. COLUMNA PRINCIPAL (Header + Contenido dinámico) */
+.layout-principal {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: var(--ancho-sidebar);
+  min-height: 100vh;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+/* 4. ENCABEZADO SUPERIOR (Header) */
+.layout-header {
+  height: var(--alto-header);
+  background-color: var(--color-superficie);
+  border-bottom: 1px solid var(--color-borde);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  box-shadow: var(--sombra-header);
+  gap: 16px;
+}
+
+.header-izquierda {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Botón hamburguesa para móviles */
+.header-boton-menu {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  color: var(--color-texto-principal);
+  cursor: pointer;
+  padding: 4px;
+}
+
+.header-marca {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-primario);
+  letter-spacing: -0.3px;
+}
+
+/* Barra de búsqueda para el Header (Típica de la vista del Técnico en los mockups) */
+.header-centro {
+  flex: 1;
+  max-width: 420px;
+  margin: 0 16px;
+}
+
+.header-buscador-contenedor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #f1f5f9;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-boton);
+  padding: 6px 14px;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.header-buscador-contenedor:focus-within {
+  border-color: var(--color-primario);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(10, 54, 157, 0.15);
+}
+
+.header-buscador-icono {
+  color: var(--color-texto-secundario);
+  display: flex;
+  align-items: center;
+}
+
+.header-buscador-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: var(--tamano-texto-sm);
+  color: var(--color-texto-principal);
+  width: 100%;
+}
+
+.header-derecha {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+/* Selector interactivo de rol para probar las 3 vistas */
+.header-selector-roles {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #f1f5f9;
+  padding: 3px;
+  border-radius: var(--radio-boton);
+  border: 1px solid var(--color-borde);
+}
+
+.selector-rol-boton {
+  background: transparent;
+  border: none;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 6px;
+  color: var(--color-texto-secundario);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.selector-rol-boton:hover {
+  color: var(--color-texto-principal);
+}
+
+.selector-rol-boton.activo {
+  background-color: #ffffff;
+  color: var(--color-primario);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Botón de notificaciones con insignia (Badge) */
+.header-icono-alerta {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radio-completo);
+  color: var(--color-texto-secundario);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.header-icono-alerta:hover {
+  background-color: var(--color-fondo-app);
+  color: var(--color-texto-principal);
+}
+
+.header-badge-notificacion {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-peligro);
+  border-radius: var(--radio-completo);
+  border: 2px solid var(--color-superficie);
+}
+
+/* Avatar del usuario */
+.header-avatar-perfil {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px;
+}
+
+.header-avatar-circulo {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radio-completo);
+  background-color: var(--color-primario);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.header-usuario-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.header-usuario-nombre {
+  font-size: var(--tamano-texto-sm);
+  font-weight: 600;
+  color: var(--color-texto-principal);
+}
+
+.header-usuario-rol {
+  font-size: 0.75rem;
+  color: var(--color-texto-secundario);
+}
+
+/* 5. ZONA PRINCIPAL DE CONTENIDO (Main) */
+.layout-contenido {
+  flex: 1;
+  padding: 28px;
+  max-width: 1400px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Overlay para fondo móvil cuando el sidebar está abierto */
+.layout-overlay {
+  display: none;
+}
+
+/* 6. DISEÑO RESPONSIVO (Móviles y Tablets) */
+@media (max-width: 900px) {
+  .header-centro {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .layout-sidebar.abierto {
+    transform: translateX(0);
+  }
+
+  .layout-principal {
+    margin-left: 0;
+  }
+
+  .header-boton-menu {
+    display: block;
+  }
+
+  .layout-overlay.activo {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 95;
+  }
+
+  .layout-contenido {
+    padding: 16px;
+  }
+
+  .header-usuario-info {
+    display: none;
+  }
+
+  .header-selector-roles {
+    display: none;
+  }
+}

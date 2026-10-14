@@ -1,0 +1,76 @@
+/**
+ * ==============================================================================
+ * SISTEMASAR - ESTILOS GLOBALES DE LA APLICACIÓN (index.css)
+ * ==============================================================================
+ * Importa las variables CSS de diseño y define el reseteo base.
+ * ==============================================================================
+ */
+
+@import './styles/variables.css';
+
+/* Reseteo general de márgenes y sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  font-family: var(--fuente-principal);
+  background-color: var(--color-fondo-app);
+  color: var(--color-texto-principal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Contenedor raíz de React */
+#root {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tipografía global */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-texto-principal);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+p {
+  color: var(--color-texto-secundario);
+  line-height: 1.5;
+}
+
+/* Enlaces */
+a {
+  color: var(--color-primario);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Scrollbar personalizado sutil */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
