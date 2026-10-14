@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { iniciarSesion } from "../services/auth";
+import { iniciarSesion } from "../../services/auth";
 
 export default function Login() {
   const [correo, setCorreo] = useState("");
