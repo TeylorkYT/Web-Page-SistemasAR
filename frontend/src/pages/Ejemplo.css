@@ -1,0 +1,60 @@
+/**
+ * ==============================================================================
+ * SISTEMASAR - ESTILOS DE LA PÁGINA DE EJEMPLO (Ejemplo.css)
+ * ==============================================================================
+ */
+
+.vista-ejemplo {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.vista-encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.vista-titulo {
+  font-size: var(--tamano-texto-2xl);
+  color: var(--color-texto-principal);
+  margin-bottom: 4px;
+}
+
+.vista-subtitulo {
+  font-size: var(--tamano-texto-sm);
+  color: var(--color-texto-secundario);
+}
+
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: var(--radio-sm);
+  text-align: center;
+}
+
+.badge-rojo {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.badge-amarillo {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.badge-verde {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.badge-azul {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
