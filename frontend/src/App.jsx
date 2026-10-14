@@ -3,19 +3,19 @@
  * SISTEMASAR - COMPONENTE PRINCIPAL (App.jsx)
  * ==============================================================================
  * Desarrollado por: Jaider (Layout base del frontend)
- * 
+ *
  * En este archivo montamos el componente Layout con soporte para los 3 roles:
  * - Cliente
  * - Técnico
  * - Administrador
- * 
+ *
  * Puedes alternar entre ellos usando el selector en el encabezado superior.
  * ==============================================================================
  */
 
 import React, { useState } from 'react';
 import Layout from './components/Layout';
-import Ejemplo from './pages/Ejemplo';
+import Estado from './pages/Estado';
 
 /**
  * Componente principal de la aplicación
@@ -42,7 +42,7 @@ function App() {
       nombreUsuario="Jaider Joan Getial"
     >
       {/* Contenido principal inyectado dentro del Layout */}
-      <Ejemplo rol={rolActivo} />
+      <Estado />
     </Layout>
   );
 }
