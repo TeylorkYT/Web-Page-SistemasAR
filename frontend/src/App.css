@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+/* Estilos específicos de App si se requieren en el futuro */
+=======
 .counter {
   font-size: 16px;
   padding: 5px 10px;
@@ -182,3 +185,4 @@
     border-right-color: var(--border);
   }
 }
+>>>>>>> f29ee3165d8f8583ab0dab6635b71849cfe86de5

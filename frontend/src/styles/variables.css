@@ -1,0 +1,86 @@
+/**
+ * ==============================================================================
+ * SISTEMASAR - VARIABLES GLOBALES DE CSS (variables.css)
+ * ==============================================================================
+ * Definición del estándar visual basado en los mockups del proyecto sistemasar.net:
+ * - Paleta de colores institucionales (tonos azules, fondos y acentos)
+ * - Tipografía y jerarquía visual
+ * - Radios de bordes y sombras para tarjetas y botones
+ * ==============================================================================
+ */
+
+:root {
+  /* --------------------------------------------------------------------------
+   * 1. COLORES PRINCIPALES DE MARCA (Brand Colors)
+   * Extraídos de los mockups para botones de acción y encabezados
+   * -------------------------------------------------------------------------- */
+  --color-primario: #0a369d;        /* Azul institucional de SistemasAR */
+  --color-primario-hover: #082875;  /* Azul más oscuro para efecto hover */
+  --color-primario-suave: #e8f0fe;  /* Azul pastel muy suave para estados activos y badges */
+
+  /* --------------------------------------------------------------------------
+   * 2. COLORES DE LA BARRA LATERAL (Sidebar Colors)
+   * Fondo azul marino oscuro y elementos de navegación
+   * -------------------------------------------------------------------------- */
+  --color-sidebar-fondo: #072146;   /* Fondo azul oscuro del menú lateral */
+  --color-sidebar-activo: #1b5ebf;  /* Fondo del ítem seleccionado en el menú */
+  --color-sidebar-hover: #0f2e5e;   /* Fondo al pasar el cursor sobre un ítem */
+  --color-sidebar-texto: #ffffff;   /* Texto blanco para máxima legibilidad */
+  --color-sidebar-texto-mute: #94a3b8; /* Texto gris suave para elementos secundarios */
+
+  /* --------------------------------------------------------------------------
+   * 3. COLORES DE SUPERFICIE Y FONDOS
+   * -------------------------------------------------------------------------- */
+  --color-fondo-app: #f4f6f9;       /* Fondo general del área de contenido */
+  --color-superficie: #ffffff;      /* Fondo de tarjetas, header y ventanas modales */
+  --color-borde: #e2e8f0;           /* Borde sutil para separar tarjetas y tablas */
+  --color-borde-focus: #0a369d;     /* Borde al enfocar inputs */
+
+  /* --------------------------------------------------------------------------
+   * 4. JERARQUÍA DE TEXTO Y CONTRASTE
+   * -------------------------------------------------------------------------- */
+  --color-texto-principal: #0f172a; /* Títulos y textos principales */
+  --color-texto-secundario: #475569; /* Subtítulos, etiquetas y textos secundarios */
+  --color-texto-deshabilitado: #94a3b8; /* Textos de elementos inactivos */
+
+  /* --------------------------------------------------------------------------
+   * 5. COLORES DE ESTADO (Badges y Prioridades)
+   * Vistos en las listas de tickets y calificaciones
+   * -------------------------------------------------------------------------- */
+  --color-exito: #16a34a;           /* Resuelto / Activo (Verde) */
+  --color-advertencia: #f59e0b;     /* En progreso / Media prioridad (Amarillo/Naranja) */
+  --color-peligro: #ef4444;         /* Alta prioridad / Alerta de ticket (Rojo) */
+  --color-info: #0284c7;            /* Abierto / Información (Celeste) */
+
+  /* --------------------------------------------------------------------------
+   * 6. TIPOGRAFÍA
+   * -------------------------------------------------------------------------- */
+  --fuente-principal: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  --tamano-texto-sm: 0.875rem;      /* 14px */
+  --tamano-texto-base: 1rem;        /* 16px */
+  --tamano-texto-lg: 1.125rem;      /* 18px */
+  --tamano-texto-xl: 1.5rem;        /* 24px */
+  --tamano-texto-2xl: 1.875rem;     /* 30px */
+
+  /* --------------------------------------------------------------------------
+   * 7. BORDES REDONDEADOS (Border Radius)
+   * -------------------------------------------------------------------------- */
+  --radio-sm: 4px;
+  --radio-boton: 8px;              /* Bordes rectangulares redondeados según mockup */
+  --radio-tarjeta: 12px;           /* Bordes para contenedores y métricas */
+  --radio-completo: 9999px;        /* Bordes circulares para avatares e insignias */
+
+  /* --------------------------------------------------------------------------
+   * 8. SOMBRAS (Box Shadows)
+   * -------------------------------------------------------------------------- */
+  --sombra-header: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --sombra-tarjeta: 0 2px 8px rgba(15, 23, 42, 0.06);
+  --sombra-elevada: 0 8px 24px rgba(15, 23, 42, 0.12);
+
+  /* --------------------------------------------------------------------------
+   * 9. DIMENSIONES ESTRUCTURALES DEL LAYOUT
+   * -------------------------------------------------------------------------- */
+  --ancho-sidebar: 250px;           /* Ancho fijo de la barra lateral */
+  --ancho-sidebar-colapsado: 72px;  /* Ancho en caso de colapsar */
+  --alto-header: 64px;              /* Alto fijo del encabezado superior */
+}

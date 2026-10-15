@@ -15,7 +15,7 @@ import DetalleTicketCliente from "./pages/cliente/DetalleTicketCliente";
 import CalificarTicket from "./pages/cliente/CalificarTicket";
 import PerfilCliente from "./pages/cliente/PerfilCliente";
 
-// Técnico (Tus vistas)
+// Técnico
 import DashboardTecnico from "./pages/tecnico/DashboardTecnico";
 import DetalleTicketTecnico from "./pages/tecnico/DetalleTicketTecnico";
 import ActualizarAvance from "./pages/tecnico/ActualizarAvance";
