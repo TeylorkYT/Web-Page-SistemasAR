@@ -1,0 +1,272 @@
+/**
+ * ==============================================================================
+ * SISTEMASAR - ESTILOS DEL DASHBOARD ADMINISTRADOR (DashboardAdmin.css)
+ * ==============================================================================
+ * Basado estrictamente en el Mockup de la Vista 14.
+ * ==============================================================================
+ */
+
+.dashboard-admin-pagina {
+  padding: 8px 16px 40px 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Encabezado principal */
+.dashboard-admin-header {
+  margin-bottom: 24px;
+}
+
+.dashboard-admin-titulo {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+/* Cuadrícula de 3 tarjetas de métricas */
+.dashboard-metricas-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 768px) {
+  .dashboard-metricas-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* Tarjeta individual de métrica */
+.tarjeta-metrica {
+  background-color: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 22px 26px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tarjeta-metrica:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.metrica-etiqueta {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #475569;
+  margin-bottom: 12px;
+}
+
+.metrica-valor {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+/* Sección de gráfico: tickets abiertos vs cerrados */
+.dashboard-seccion-grafico {
+  margin-bottom: 36px;
+}
+
+.seccion-grafico-titulo {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 10px;
+}
+
+.grafico-card-contenedor {
+  background-color: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 28px 32px 20px 32px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+}
+
+/* Área de las barras del gráfico */
+.grafico-barras-area {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 28px;
+  height: 180px;
+  padding-bottom: 12px;
+  border-bottom: 1.5px solid #e2e8f0;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 600px) {
+  .grafico-barras-area {
+    gap: 16px;
+  }
+}
+
+/* Columna / Barra individual */
+.grafico-barra-columna {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  flex: 0 1 140px;
+  cursor: pointer;
+  position: relative;
+}
+
+.grafico-barra-visual {
+  width: 100%;
+  background-color: #cbd5e1;
+  border-radius: 6px 6px 0 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 14px;
+}
+
+.grafico-barra-columna:hover .grafico-barra-visual {
+  background-color: #94a3b8;
+  transform: scaleY(1.03);
+}
+
+.grafico-barra-columna.activa .grafico-barra-visual {
+  background-color: #64748b;
+}
+
+.grafico-barra-tooltip {
+  position: absolute;
+  top: -30px;
+  background-color: #0f172a;
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.grafico-barra-columna:hover .grafico-barra-tooltip {
+  opacity: 1;
+}
+
+.grafico-barra-etiqueta {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* Control inferior del gráfico (checkbox) */
+.grafico-control-inferior {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.grafico-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #334155;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+}
+
+.grafico-checkbox-input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #1e3a8a;
+}
+
+/* Sección de Técnicos activos */
+.dashboard-seccion-tecnicos {
+  margin-top: 12px;
+}
+
+.seccion-tecnicos-titulo {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 16px;
+}
+
+/* Tabla minimalista según el Mockup */
+.tabla-tecnicos-contenedor {
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.tabla-tecnicos {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.925rem;
+}
+
+.tabla-tecnicos th {
+  padding: 12px 18px;
+  font-weight: 600;
+  color: #334155;
+  background-color: #ffffff;
+  border-bottom: 1.5px solid #e2e8f0;
+}
+
+.tabla-tecnicos td {
+  padding: 14px 18px;
+  color: #1e293b;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.tabla-tecnicos tr:last-child td {
+  border-bottom: none;
+}
+
+.tabla-tecnicos tr:hover td {
+  background-color: #f8fafc;
+}
+
+/* Badges o estados de técnicos */
+.estado-tecnico-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.estado-tecnico-badge.libre {
+  color: #059669;
+}
+
+.estado-tecnico-badge.ocupado {
+  color: #d97706;
+}
+
+.ticket-enlace {
+  color: #1e3a8a;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.ticket-enlace:hover {
+  text-decoration: underline;
+  color: #0f2963;
+}
