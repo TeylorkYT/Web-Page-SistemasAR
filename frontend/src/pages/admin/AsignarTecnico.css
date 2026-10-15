@@ -1,0 +1,416 @@
+/**
+ * ==============================================================================
+ * SISTEMASAR - ESTILOS DE ASIGNACIÓN DE TÉCNICO (AsignarTecnico.css)
+ * ==============================================================================
+ * Basado estrictamente en el Mockup de la Vista 16.
+ * ==============================================================================
+ */
+
+.asignar-pagina {
+  padding: 8px 16px 40px 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Encabezado principal */
+.asignar-header-principal {
+  margin-bottom: 24px;
+}
+
+.asignar-titulo-principal {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+/* Alertas de notificación */
+.asignar-alerta {
+  padding: 12px 18px;
+  border-radius: 8px;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.925rem;
+  font-weight: 600;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.asignar-alerta-exito {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.asignar-alerta-error {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.asignar-alerta-cerrar {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: inherit;
+  font-weight: bold;
+}
+
+/* Cuadrícula de 2 columnas según el Mockup */
+.asignar-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .asignar-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+ * COLUMNA IZQUIERDA: TICKETS PENDIENTES
+ * ========================================================================== */
+
+.columna-tickets-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.columna-tickets-titulo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+/* Selector de filtro de prioridad */
+.filtro-prioridad-select {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+  background-color: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.filtro-prioridad-select:focus {
+  border-color: #1e3a8a;
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+}
+
+/* Lista de tarjetas de tickets */
+.tickets-pendientes-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Tarjeta individual de ticket */
+.tarjeta-ticket-pendiente {
+  background-color: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px 20px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tarjeta-ticket-pendiente:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Estado seleccionado / activo según Mockup (Borde azul resaltado) */
+.tarjeta-ticket-pendiente.seleccionado {
+  border: 2px solid #1e3a8a;
+  background-color: #ffffff;
+  box-shadow: 0 3px 10px rgba(30, 58, 138, 0.12);
+}
+
+/* Cabecera de la tarjeta (ID y Badge de Prioridad) */
+.tarjeta-ticket-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tarjeta-ticket-id {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Badges de Prioridad exactos al Mockup */
+.badge-prioridad {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+}
+
+.badge-prioridad.alta,
+.badge-prioridad.critica {
+  background-color: #b91c1c; /* Rojo oscuro según mockup */
+}
+
+.badge-prioridad.media {
+  background-color: #c27803; /* Mostaza / ámbar oscuro según mockup */
+}
+
+.badge-prioridad.baja {
+  background-color: #437a34; /* Verde oliva según mockup */
+}
+
+/* Cuerpo de la tarjeta */
+.tarjeta-ticket-cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #334155;
+}
+
+.tarjeta-ticket-linea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ticket-icono-sutil {
+  font-size: 1rem;
+}
+
+.ticket-etiqueta-gris {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.ticket-valor-destacado {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* ==========================================================================
+ * COLUMNA DERECHA: DETALLE Y ASIGNACIÓN
+ * ========================================================================== */
+
+.panel-detalle-asignacion {
+  background-color: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px 28px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.detalle-header-titulo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+/* Tabla de datos clave */
+.detalle-datos-tabla {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.detalle-dato-fila {
+  display: flex;
+  align-items: baseline;
+  padding: 5px 0;
+  font-size: 0.925rem;
+}
+
+.detalle-dato-clave {
+  width: 110px;
+  color: #475569;
+  font-weight: 600;
+}
+
+.detalle-dato-valor {
+  flex: 1;
+  color: #0f172a;
+  font-weight: 500;
+}
+
+.detalle-dato-valor.id-destacado {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Bloque de descripción */
+.detalle-bloque-descripcion {
+  margin-bottom: 24px;
+}
+
+.detalle-desc-titulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+.detalle-desc-parrafo {
+  font-size: 0.9rem;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0;
+  background-color: #f8fafc;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+/* Sección Seleccionar Técnico */
+.seccion-seleccionar-tecnico {
+  margin-bottom: 26px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 18px;
+}
+
+.seleccionar-tecnico-titulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 14px;
+}
+
+.lista-opciones-tecnicos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Opción individual de técnico */
+.opcion-tecnico-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.opcion-tecnico-item:hover {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.opcion-tecnico-item.seleccionado {
+  background-color: #f0f7ff;
+  border-color: #bfdbfe;
+}
+
+.tecnico-radio-contenedor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tecnico-radio-input {
+  width: 18px;
+  height: 18px;
+  accent-color: #1e3a8a;
+  cursor: pointer;
+}
+
+.tecnico-nombre-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+  cursor: pointer;
+}
+
+/* Badges de Carga / Disponibilidad */
+.tecnico-badge-disponibilidad {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.tecnico-badge-disponibilidad.libre {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.tecnico-badge-disponibilidad.ocupado {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+/* Botón principal de asignación */
+.boton-asignar-tecnico-accion {
+  width: 100%;
+  background-color: #1e3a8a;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 20px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(30, 58, 138, 0.2);
+  transition: all 0.2s ease;
+}
+
+.boton-asignar-tecnico-accion:hover:not(:disabled) {
+  background-color: #172554;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(30, 58, 138, 0.25);
+}
+
+.boton-asignar-tecnico-accion:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Estado vacío */
+.asignar-vacio {
+  background-color: #ffffff;
+  border: 2px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 32px 20px;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
