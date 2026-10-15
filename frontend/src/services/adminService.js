@@ -8,7 +8,7 @@
  * - Vista 14: Dashboard general del administrador (métricas, gráficos y técnicos)
  * - Vista 16: Asignación de técnico a tickets (tickets pendientes, técnicos y asignación)
  * - Vista 17: Gestión de categorías y servicios asociados
- * - Vista 20: Calificaciones recibidas
+ * - Vista 20: Calificaciones y feedback recibidos (métricas de satisfacción, filtros y alertas)
  *
  * Cumple con la regla del Daily 2: funciones async que simulan llamadas al backend.
  * ==============================================================================
@@ -160,6 +160,110 @@ let tecnicosCargaMemoria = [
   { id_tecnico: 6, nombre: "Sofía C.", estado: "Libre", cargaTickets: 0, especialidad: "Seguridad y Redes" }
 ];
 
+// Calificaciones fieles al Mockup 20 y al modelo de datos
+let calificacionesMemoria = [
+  {
+    id_calificacion: 1,
+    codigo_ticket: "TKT-1024",
+    id_ticket: 1024,
+    tecnico: "Diana M.",
+    id_tecnico: 2,
+    puntuacion: 5,
+    comentario_resumen: "Excelente soporte, muy...",
+    comentario_completo: "Excelente soporte, muy rápida la solución y el equipo quedó funcionando al 100%. Totalmente recomendada.",
+    cliente: "Tecnología Global",
+    contacto: "Carlos Gómez",
+    fecha: "2026-10-14",
+    rango: "este_mes"
+  },
+  {
+    id_calificacion: 2,
+    codigo_ticket: "TKT-1021",
+    id_ticket: 1021,
+    tecnico: "Carlos T.",
+    id_tecnico: 1,
+    puntuacion: 4,
+    comentario_resumen: "Resolvió el problema...",
+    comentario_completo: "Resolvió el problema del servidor a tiempo, aunque tardó un poco en responder las dudas iniciales.",
+    cliente: "Distribuidora del Norte",
+    contacto: "Jorge Martínez",
+    fecha: "2026-10-12",
+    rango: "este_mes"
+  },
+  {
+    id_calificacion: 3,
+    codigo_ticket: "TKT-1015",
+    id_ticket: 1015,
+    tecnico: "Diana M.",
+    id_tecnico: 2,
+    puntuacion: 5,
+    comentario_resumen: "Muy amable y...",
+    comentario_completo: "Muy amable y capacitó al personal sobre el uso correcto y mantenimiento de la red.",
+    cliente: "Colegio San José",
+    contacto: "Patricia Vélez",
+    fecha: "2026-10-08",
+    rango: "este_mes"
+  },
+  {
+    id_calificacion: 4,
+    codigo_ticket: "TKT-1010",
+    id_ticket: 1010,
+    tecnico: "Carlos T.",
+    id_tecnico: 1,
+    puntuacion: 1,
+    comentario_resumen: "No resolvió el...",
+    comentario_completo: "El técnico llegó 2 horas tarde, no trajo la herramienta adecuada y el router sigue presentando cortes de red.",
+    cliente: "Empresa S.A.",
+    contacto: "Ana Gómez",
+    fecha: "2026-10-05",
+    rango: "este_mes",
+    esAlerta: true
+  },
+  {
+    id_calificacion: 5,
+    codigo_ticket: "TKT-1008",
+    id_ticket: 1008,
+    tecnico: "Andrés R.",
+    id_tecnico: 5,
+    puntuacion: 4,
+    comentario_resumen: "Buena atención general...",
+    comentario_completo: "Buena atención y disposición, aunque faltó un informe más detallado por escrito.",
+    cliente: "Logística Express",
+    contacto: "Laura Restrepo",
+    fecha: "2026-10-02",
+    rango: "este_mes"
+  },
+  {
+    id_calificacion: 6,
+    codigo_ticket: "TKT-1002",
+    id_ticket: 1002,
+    tecnico: "Diana M.",
+    id_tecnico: 2,
+    puntuacion: 5,
+    comentario_resumen: "Impecable servicio...",
+    comentario_completo: "Impecable diagnóstico y recuperación de datos en tiempo récord.",
+    cliente: "Consultoría Contable",
+    contacto: "Esteban Rico",
+    fecha: "2026-09-28",
+    rango: "mes_anterior"
+  },
+  {
+    id_calificacion: 7,
+    codigo_ticket: "TKT-995",
+    id_ticket: 995,
+    tecnico: "Luis F.",
+    id_tecnico: 3,
+    puntuacion: 2,
+    comentario_resumen: "Faltó seguimiento...",
+    comentario_completo: "La falla se solucionó temporalmente pero volvió a presentarse a los dos días sin respuesta inmediata.",
+    cliente: "Comercializadora Andina",
+    contacto: "Rosa Caicedo",
+    fecha: "2026-09-20",
+    rango: "mes_anterior",
+    esAlerta: true
+  }
+];
+
 // ==============================================================================
 // 1. DASHBOARD DEL ADMINISTRADOR (VISTA 14)
 // ==============================================================================
@@ -171,12 +275,10 @@ let tecnicosCargaMemoria = [
 export async function obtenerMetricasDashboard() {
   return new Promise((resolve) => {
     setTimeout(() => {
-      // Datos correspondientes a los mockups de la Vista 14
       resolve({
         ticketsTotales: 120,
         ticketsAbiertos: 25,
         tecnicosActivos: 12,
-        // Datos para el gráfico comparativo
         graficoSemanal: [
           { etiqueta: "Sem 1", abiertos: 60, cerrados: 40, porcentaje: 85 },
           { etiqueta: "Sem 2", abiertos: 45, cerrados: 35, porcentaje: 58 },
@@ -189,7 +291,6 @@ export async function obtenerMetricasDashboard() {
           { etiqueta: "Julio", abiertos: 110, cerrados: 100, porcentaje: 95 },
           { etiqueta: "Agosto", abiertos: 120, cerrados: 95, porcentaje: 100 }
         ],
-        // Técnicos activos en este momento (según mockup)
         tecnicosMonitoreo: [
           { id: 1, nombre: "Carlos T.", estado: "Ocupado", ticketActual: "TKT-1029" },
           { id: 2, nombre: "Diana M.", estado: "Libre", ticketActual: "-" },
@@ -434,11 +535,76 @@ export async function asignarTecnicoATicket(idTicket, idTecnico) {
 }
 
 // ==============================================================================
-// 5. CALIFICACIONES RECIBIDAS (VISTA 20)
+// 5. CALIFICACIONES Y FEEDBACK (VISTA 20)
 // ==============================================================================
 
 /**
- * Obtiene las calificaciones con datos expandidos de cliente, técnico y ticket.
+ * Obtiene las métricas de satisfacción general para las tarjetas superiores de la Vista 20.
+ */
+export async function obtenerMetricasSatisfaccion() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        promedioGeneral: "4.5",
+        mejorValorado: {
+          nombre: "Diana M.",
+          promedio: "4.9"
+        },
+        alertasBajaCalif: 2
+      });
+    }, 80);
+  });
+}
+
+/**
+ * Obtiene la lista de calificaciones con filtros aplicados (Técnico, Rango de tiempo, Puntaje).
+ */
+export async function obtenerCalificacionesSupervision(filtros = {}) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      let resultado = [...calificacionesMemoria];
+
+      // Filtro por técnico
+      if (filtros.tecnico && filtros.tecnico !== "todos") {
+        resultado = resultado.filter((c) =>
+          c.tecnico.toLowerCase().includes(filtros.tecnico.toLowerCase())
+        );
+      }
+
+      // Filtro por rango
+      if (filtros.rango && filtros.rango !== "todos") {
+        if (filtros.rango === "este_mes") {
+          resultado = resultado.filter((c) => c.rango === "este_mes");
+        }
+      }
+
+      // Filtro por puntaje
+      if (filtros.puntaje && filtros.puntaje !== "todos") {
+        const numPuntaje = Number(filtros.puntaje);
+        resultado = resultado.filter((c) => c.puntuacion === numPuntaje);
+      }
+
+      resolve(resultado);
+    }, 100);
+  });
+}
+
+/**
+ * Simula el envío de un correo de seguimiento al cliente que emitió feedback.
+ */
+export async function enviarCorreoSeguimientoCliente(codigoTicket, _datosContacto) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        exito: true,
+        mensaje: `Correo de seguimiento enviado exitosamente al cliente del ticket #${codigoTicket}.`
+      });
+    }, 120);
+  });
+}
+
+/**
+ * Obtiene las calificaciones con datos expandidos de cliente, técnico y ticket (base).
  */
 export async function obtenerCalificacionesAdmin() {
   return calificacionesIniciales.map((c) => {

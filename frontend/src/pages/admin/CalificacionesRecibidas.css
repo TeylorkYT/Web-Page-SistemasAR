@@ -1,0 +1,539 @@
+/**
+ * ==============================================================================
+ * SISTEMASAR - ESTILOS DE CALIFICACIONES RECIBIDAS (CalificacionesRecibidas.css)
+ * ==============================================================================
+ * Basado estrictamente en los Mockups de la Vista 20.
+ * ==============================================================================
+ */
+
+.calificaciones-pagina {
+  padding: 8px 16px 40px 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Encabezado principal */
+.calificaciones-header-principal {
+  margin-bottom: 24px;
+}
+
+.calificaciones-titulo-principal {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+/* Alerta de notificación visual */
+.calificaciones-alerta {
+  padding: 12px 18px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.925rem;
+  font-weight: 600;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.calificaciones-alerta-exito {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.calificaciones-alerta-cerrar {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: inherit;
+  font-weight: bold;
+}
+
+/* ==========================================================================
+ * 1. SECCIÓN FILTROS DE BÚSQUEDA
+ * ========================================================================== */
+
+.seccion-filtros-calificaciones {
+  margin-bottom: 24px;
+}
+
+.filtros-titulo {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 10px;
+}
+
+.filtros-inputs-fila {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.filtro-caja-select {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 8px 14px;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #334155;
+  cursor: pointer;
+  flex: 1;
+  min-width: 220px;
+  transition: all 0.2s ease;
+}
+
+.filtro-caja-select:focus-within {
+  border-color: #1e3a8a;
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.12);
+}
+
+.filtro-icono {
+  font-size: 1rem;
+  color: #64748b;
+}
+
+.filtro-select-nativo {
+  border: none;
+  background: transparent;
+  width: 100%;
+  outline: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #0f172a;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+ * 2. SECCIÓN MÉTRICAS DE SATISFACCIÓN (3 TARJETAS)
+ * ========================================================================== */
+
+.seccion-metricas-satisfaccion {
+  margin-bottom: 32px;
+}
+
+.metricas-titulo {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 12px;
+}
+
+.metricas-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 800px) {
+  .metricas-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+.tarjeta-satisfaccion {
+  background-color: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 2px 5px rgba(15, 23, 42, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta-satisfaccion:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+}
+
+/* Iconos de las tarjetas de satisfacción */
+.icono-caja-satisfaccion {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.icono-caja-satisfaccion.estrella {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.icono-caja-satisfaccion.trofeo {
+  background-color: #fefce8;
+  color: #ca8a04;
+  border: 1px solid #fef08a;
+}
+
+.icono-caja-satisfaccion.alerta {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.satisfaccion-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.satisfaccion-label {
+  font-size: 0.825rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.satisfaccion-valor {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.satisfaccion-valor .valor-verde {
+  color: #16a34a;
+}
+
+.satisfaccion-valor .valor-morado {
+  color: #6366f1;
+}
+
+.satisfaccion-valor .valor-rojo {
+  color: #b91c1c;
+}
+
+/* ==========================================================================
+ * 3. SECCIÓN HISTORIAL DE CALIFICACIONES (TABLA)
+ * ========================================================================== */
+
+.seccion-historial-calificaciones {
+  margin-bottom: 24px;
+}
+
+.historial-titulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 14px;
+}
+
+.tabla-calificaciones-contenedor {
+  background-color: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.tabla-calificaciones {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.925rem;
+}
+
+.tabla-calificaciones th {
+  padding: 14px 18px;
+  font-weight: 600;
+  color: #334155;
+  background-color: #f8fafc;
+  border-bottom: 1.5px solid #e2e8f0;
+}
+
+.tabla-calificaciones td {
+  padding: 14px 18px;
+  color: #1e293b;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.tabla-calificaciones tr:last-child td {
+  border-bottom: none;
+}
+
+.tabla-calificaciones tr:hover td {
+  background-color: #fbfcfe;
+}
+
+.ticket-codigo-texto {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Estrellas doradas / olive según Mockup */
+.estrellas-contenedor {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 1.1rem;
+  color: #a1824a; /* Tono oliva/dorado según mockup */
+}
+
+.estrella-icono.alerta {
+  color: #dc2626;
+}
+
+.comentario-texto {
+  color: #475569;
+}
+
+.comentario-texto.alerta {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+/* Botón de acción (engranaje) */
+.boton-engranaje-accion {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  color: #64748b;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.boton-engranaje-accion:hover {
+  color: #0f172a;
+  background-color: #f1f5f9;
+  transform: rotate(30deg);
+}
+
+/* Paginador inferior según Mockup */
+.paginacion-contenedor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 18px;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.paginacion-boton {
+  background: transparent;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.paginacion-boton:hover:not(:disabled) {
+  text-decoration: underline;
+  background-color: #f1f5f9;
+}
+
+.paginacion-boton:disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+/* ==========================================================================
+ * 4. MODAL: DETALLE DEL TICKET (MOCKUP 2)
+ * ========================================================================== */
+
+.modal-superposicion {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-detalle-ticket-contenedor {
+  background-color: #ffffff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  animation: slideUp 0.25s ease-out;
+}
+
+.modal-header-detalle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 14px 24px;
+}
+
+.modal-titulo-detalle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.modal-boton-cerrar {
+  background: transparent;
+  border: none;
+  font-size: 1.3rem;
+  color: #64748b;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.modal-boton-cerrar:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.modal-cuerpo-detalle {
+  padding: 0 24px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Fila de metadatos */
+.modal-grid-datos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.modal-dato-fila {
+  display: flex;
+  align-items: baseline;
+}
+
+.modal-dato-clave {
+  width: 140px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.modal-dato-valor {
+  flex: 1;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.modal-calif-roja {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+/* Bloque del comentario íntegro */
+.modal-bloque-comentario {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-comentario-titulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.modal-comentario-caja {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 0.9rem;
+  color: #334155;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Botones inferiores del modal */
+.modal-footer-detalle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 14px 24px 22px 24px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.boton-modal-historial {
+  background-color: #e2e8f0;
+  color: #1e293b;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.boton-modal-historial:hover {
+  background-color: #cbd5e1;
+}
+
+.boton-modal-correo {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+  transition: all 0.2s ease;
+}
+
+.boton-modal-correo:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
