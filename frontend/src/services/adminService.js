@@ -5,8 +5,8 @@
  * Desarrollado por: Teylork (Líder)
  *
  * Capa de servicios con datos falsos para el módulo de administración:
+ * - Vista 14: Dashboard general del administrador (métricas, gráficos y técnicos)
  * - Vista 17: Gestión de categorías y servicios asociados
- * - Vista 14: Métricas del dashboard de administrador
  * - Vista 16: Asignación de técnico a tickets
  * - Vista 20: Calificaciones recibidas
  *
@@ -94,7 +94,49 @@ let serviciosMemoria = [
 let ticketsMemoria = [...ticketsIniciales];
 
 // ==============================================================================
-// 1. GESTIÓN DE CATEGORÍAS (VISTA 17)
+// 1. DASHBOARD DEL ADMINISTRADOR (VISTA 14)
+// ==============================================================================
+
+/**
+ * Obtiene las métricas generales del dashboard: totales, abiertos, técnicos activos,
+ * series para el gráfico comparativo y el listado de técnicos activos en tiempo real.
+ */
+export async function obtenerMetricasDashboard() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // Datos correspondientes a los mockups de la Vista 14
+      resolve({
+        ticketsTotales: 120,
+        ticketsAbiertos: 25,
+        tecnicosActivos: 12,
+        // Datos para el gráfico comparativo
+        graficoSemanal: [
+          { etiqueta: "Sem 1", abiertos: 60, cerrados: 40, porcentaje: 85 },
+          { etiqueta: "Sem 2", abiertos: 45, cerrados: 35, porcentaje: 58 },
+          { etiqueta: "Sem 3", abiertos: 25, cerrados: 20, porcentaje: 30 },
+          { etiqueta: "Sem 4", abiertos: 15, cerrados: 12, porcentaje: 20 }
+        ],
+        graficoMensual: [
+          { etiqueta: "Mayo", abiertos: 80, cerrados: 75, porcentaje: 70 },
+          { etiqueta: "Junio", abiertos: 95, cerrados: 88, porcentaje: 82 },
+          { etiqueta: "Julio", abiertos: 110, cerrados: 100, porcentaje: 95 },
+          { etiqueta: "Agosto", abiertos: 120, cerrados: 95, porcentaje: 100 }
+        ],
+        // Técnicos activos en este momento (según mockup)
+        tecnicosMonitoreo: [
+          { id: 1, nombre: "Carlos T.", estado: "Ocupado", ticketActual: "TKT-1029" },
+          { id: 2, nombre: "Diana M.", estado: "Libre", ticketActual: "-" },
+          { id: 3, nombre: "Luis F.", estado: "Ocupado", ticketActual: "TKT-1030" },
+          { id: 4, nombre: "Andrés R.", estado: "Ocupado", ticketActual: "TKT-1031" },
+          { id: 5, nombre: "Sofía C.", estado: "Libre", ticketActual: "-" }
+        ]
+      });
+    }, 100);
+  });
+}
+
+// ==============================================================================
+// 2. GESTIÓN DE CATEGORÍAS (VISTA 17)
 // ==============================================================================
 
 /**
@@ -163,7 +205,7 @@ export async function eliminarCategoria(idCategoria) {
 }
 
 // ==============================================================================
-// 2. GESTIÓN DE SERVICIOS ASOCIADOS (VISTA 17)
+// 3. GESTIÓN DE SERVICIOS ASOCIADOS (VISTA 17)
 // ==============================================================================
 
 /**
@@ -242,29 +284,6 @@ export async function eliminarServicio(idServicio) {
   const idNum = Number(idServicio);
   serviciosMemoria = serviciosMemoria.filter((s) => s.id_servicio !== idNum);
   return { exito: true, mensaje: "Servicio eliminado con éxito" };
-}
-
-// ==============================================================================
-// 3. DASHBOARD DEL ADMINISTRADOR (VISTA 14)
-// ==============================================================================
-
-/**
- * Obtiene las métricas clave para el panel del administrador.
- */
-export async function obtenerMetricasDashboard() {
-  const abiertos = ticketsMemoria.filter((t) => t.estado === "Abierto" || t.estado === "En_Proceso").length;
-  const cerrados = ticketsMemoria.filter((t) => t.estado === "Cerrado" || t.estado === "Resuelto").length;
-  const tecnicosActivos = usuariosIniciales.filter(
-    (u) => u.rol === "Tecnico" && u.estado === "Activo"
-  ).length;
-
-  return {
-    totalTickets: ticketsMemoria.length,
-    ticketsAbiertos: abiertos,
-    ticketsCerrados: cerrados,
-    tecnicosActivos,
-    ticketsRecientes: ticketsMemoria.slice(0, 5)
-  };
 }
 
 // ==============================================================================
