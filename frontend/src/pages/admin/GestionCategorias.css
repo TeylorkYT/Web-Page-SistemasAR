@@ -1,0 +1,492 @@
+/**
+ * ==============================================================================
+ * SISTEMASAR - ESTILOS DE GESTIÓN DE CATEGORÍAS Y SERVICIOS (GestionCategorias.css)
+ * ==============================================================================
+ * Basado estrictamente en los Mockups de la Vista 17.
+ * ==============================================================================
+ */
+
+.categorias-pagina {
+  padding: 8px 12px 32px 12px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Encabezado principal de la página */
+.categorias-header-principal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.categorias-titulo-principal {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+/* Alerta de notificación / retroalimentación */
+.categorias-alerta {
+  padding: 12px 16px;
+  border-radius: var(--radio-boton, 8px);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  font-weight: 500;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.categorias-alerta-exito {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.categorias-alerta-error {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.categorias-alerta-cerrar {
+  background: transparent;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  color: inherit;
+  font-size: 1.1rem;
+}
+
+/* Cuadrícula de 2 columnas según el Mockup */
+.categorias-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr;
+  gap: 28px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .categorias-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Columnas individuales */
+.categorias-columna {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Encabezado de cada columna */
+.columna-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  min-height: 44px;
+}
+
+.columna-titulo-grupo {
+  display: flex;
+  flex-direction: column;
+}
+
+.columna-titulo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.columna-subtitulo {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* Botones de acción superior (+ Nueva categoría / + Nuevo servicio) */
+.boton-accion-azul {
+  background-color: #1e3a8a;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 4px rgba(30, 58, 138, 0.2);
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
+}
+
+.boton-accion-azul:hover {
+  background-color: #172554;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(30, 58, 138, 0.25);
+}
+
+.boton-accion-azul:active {
+  transform: translateY(0);
+}
+
+/* Listas de tarjetas */
+.tarjetas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Tarjeta individual de Categoría */
+.tarjeta-categoria {
+  background-color: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.tarjeta-categoria:hover {
+  border-color: #cbd5e1;
+  background-color: #f8fafc;
+}
+
+/* Estado activo / seleccionado según Mockup (Borde azul resaltado) */
+.tarjeta-categoria.seleccionada {
+  border: 2px solid #1e3a8a;
+  background-color: #ffffff;
+  box-shadow: 0 3px 8px rgba(30, 58, 138, 0.12);
+}
+
+.tarjeta-categoria-nombre {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0f172a;
+  transition: color 0.2s;
+}
+
+.tarjeta-categoria.seleccionada .tarjeta-categoria-nombre {
+  color: #1e3a8a;
+  font-weight: 700;
+}
+
+/* Acciones en la tarjeta (Iconos de editar y borrar) */
+.tarjeta-acciones {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.boton-icono-accion {
+  background: transparent;
+  border: none;
+  color: #475569;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.boton-icono-accion:hover {
+  color: #0f172a;
+  background-color: #f1f5f9;
+}
+
+.boton-icono-accion.eliminar:hover {
+  color: #dc2626;
+  background-color: #fee2e2;
+}
+
+/* Tarjeta individual de Servicio */
+.tarjeta-servicio {
+  background-color: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.tarjeta-servicio:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.servicio-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.servicio-nombre {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.servicio-detalle {
+  font-size: 0.85rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.servicio-precio {
+  font-weight: 600;
+  color: #059669;
+}
+
+/* Estado vacío cuando no hay registros */
+.estado-vacio {
+  background-color: #ffffff;
+  border: 2px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 36px 20px;
+  text-align: center;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.estado-vacio-icono {
+  width: 48px;
+  height: 48px;
+  color: #94a3b8;
+}
+
+.estado-vacio-texto {
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ==========================================================================
+ * MODAL BASADO EN MOCKUP 2 (Nuevo / editar servicio)
+ * ========================================================================== */
+
+.modal-superposicion {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-contenedor-mockup {
+  background-color: #ffffff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  animation: slideUp 0.25s ease-out;
+}
+
+.modal-header-mockup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px 14px 24px;
+}
+
+.modal-titulo-mockup {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin: 0;
+}
+
+.modal-boton-cerrar {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.modal-boton-cerrar:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.modal-cuerpo-mockup {
+  padding: 0 24px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Grupo de campo estilo mockup */
+.campo-grupo-mockup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo-label-mockup {
+  font-size: 0.85rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.campo-input-mockup,
+.campo-select-mockup,
+.campo-textarea-mockup {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 0.925rem;
+  font-family: inherit;
+  color: #0f172a;
+  background-color: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.campo-select-mockup {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 36px;
+  font-weight: 600;
+  color: #1e3a8a;
+}
+
+.campo-input-mockup:focus,
+.campo-select-mockup:focus,
+.campo-textarea-mockup:focus {
+  border-color: #1e3a8a;
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+}
+
+.campo-textarea-mockup {
+  resize: vertical;
+  min-height: 64px;
+}
+
+.campo-fila-doble {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.campo-error-texto {
+  font-size: 0.8rem;
+  color: #dc2626;
+  margin-top: 2px;
+}
+
+/* Pie del modal */
+.modal-footer-mockup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px 20px 24px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.modal-boton-cancelar {
+  background: transparent;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.modal-boton-cancelar:hover {
+  background-color: #eff6ff;
+}
+
+.modal-boton-guardar {
+  background-color: #1e3a8a;
+  color: #ffffff;
+  border: none;
+  font-size: 0.925rem;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(30, 58, 138, 0.2);
+  transition: all 0.2s ease;
+}
+
+.modal-boton-guardar:hover {
+  background-color: #172554;
+  transform: translateY(-1px);
+}
+
+.modal-boton-eliminar-confirmar {
+  background-color: #dc2626;
+  color: #ffffff;
+  border: none;
+  font-size: 0.925rem;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-boton-eliminar-confirmar:hover {
+  background-color: #b91c1c;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
