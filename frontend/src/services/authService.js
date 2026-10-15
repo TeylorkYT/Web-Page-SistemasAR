@@ -1,37 +1,8 @@
-// Funciones con datos falsos de este módulo
-const usuariosPrueba = [
-  {
-    id_usuario: 1,
-    nombre: "Carlos",
-    apellido: "Ramírez",
-    correo_electronico: "cliente@prueba.com",
-    contrasena: "Prueba123*",
-    rol: "cliente",
-    estado: "Activo",
-  },
-  {
-    id_usuario: 2,
-    nombre: "Andrés",
-    apellido: "Gómez",
-    correo_electronico: "tecnico@prueba.com",
-    contrasena: "Prueba123*",
-    rol: "tecnico",
-    estado: "Activo",
-  },
-  {
-    id_usuario: 3,
-    nombre: "Laura",
-    apellido: "Martinez",
-    correo_electronico: "admin@prueba.com",
-    contrasena: "Prueba123*",
-    rol: "administrador",
-    estado: "Activo",
-  },
-];
+import { usuarios } from "../data/datosFalsos";
 
 export async function iniciarSesion(correo, contrasena) {
   const correoLimpio = (correo || "").trim().toLowerCase();
-  const usuario = usuariosPrueba.find(
+  const usuario = usuarios.find(
     (u) =>
       u.correo_electronico.toLowerCase() === correoLimpio &&
       u.contrasena === contrasena
@@ -58,7 +29,7 @@ export async function solicitarRecuperacion(correo) {
 }
 
 export async function registrarCliente(datos) {
-  const existe = usuariosPrueba.some(
+  const existe = usuarios.some(
     (u) =>
       u.correo_electronico.toLowerCase() ===
       (datos.correo_electronico || "").trim().toLowerCase()
@@ -69,7 +40,7 @@ export async function registrarCliente(datos) {
   }
 
   const nuevoUsuario = {
-    id_usuario: usuariosPrueba.length + 1,
+    id_usuario: usuarios.length + 1,
     nombre: datos.nombre,
     apellido: datos.apellido,
     correo_electronico: datos.correo_electronico,
