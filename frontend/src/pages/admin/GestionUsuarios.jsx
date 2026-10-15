@@ -1,3 +1,9 @@
+import Layout from "../../components/Layout";
+
 export default function GestionUsuarios() {
-  return <h1>Gestión de Usuarios</h1>;
+  return (
+    <Layout>
+      <h1>Gestion Usuarios</h1>
+    </Layout>
+  );
 }

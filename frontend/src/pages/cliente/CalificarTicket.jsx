@@ -1,3 +1,9 @@
+import Layout from "../../components/Layout";
+
 export default function CalificarTicket() {
-  return <h1>Calificar ticket</h1>;
+  return (
+    <Layout>
+      <h1>Calificar Ticket</h1>
+    </Layout>
+  );
 }

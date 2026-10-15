@@ -1,3 +1,9 @@
+import Layout from "../../components/Layout";
+
 export default function DetalleTicketCliente() {
-  return <h1>Detalle del ticket (Cliente)</h1>;
+  return (
+    <Layout>
+      <h1>Detalle Ticket Cliente</h1>
+    </Layout>
+  );
 }

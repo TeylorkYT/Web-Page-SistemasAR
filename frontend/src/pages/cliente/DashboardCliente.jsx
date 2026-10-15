@@ -1,8 +1,9 @@
-export default function ClienteDashboard() {
+import Layout from "../../components/Layout";
+
+export default function DashboardCliente() {
   return (
-    <div>
-      <h1>Panel de Cliente</h1>
-      <p>Bienvenido al sistema de soporte.</p>
-    </div>
+    <Layout>
+      <h1>Dashboard Cliente</h1>
+    </Layout>
   );
 }

@@ -1,7 +1,9 @@
+import Layout from "../../components/Layout";
+
 export default function CrearTicket() {
   return (
-    <div>
-      <h1>Crear Ticket de Soporte</h1>
-    </div>
+    <Layout>
+      <h1>Crear Ticket</h1>
+    </Layout>
   );
 }

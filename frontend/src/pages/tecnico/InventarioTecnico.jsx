@@ -1,3 +1,9 @@
+import Layout from "../../components/Layout";
+
 export default function InventarioTecnico() {
-  return <h1>Consulta de inventario (Técnico)</h1>;
+  return (
+    <Layout>
+      <h1>Inventario Técnico</h1>
+    </Layout>
+  );
 }

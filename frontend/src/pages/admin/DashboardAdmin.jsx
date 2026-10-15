@@ -1,3 +1,9 @@
+import Layout from "../../components/Layout";
+
 export default function DashboardAdmin() {
-  return <h1>Dashboard del Administrador</h1>;
+  return (
+    <Layout>
+      <h1>Dashboard Admin</h1>
+    </Layout>
+  );
 }

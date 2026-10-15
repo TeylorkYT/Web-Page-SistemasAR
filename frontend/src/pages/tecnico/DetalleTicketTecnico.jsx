@@ -1,7 +1,9 @@
-export default function DetalleTicket() {
+import Layout from "../../components/Layout";
+
+export default function DetalleTicketTecnico() {
   return (
-    <div>
-      <h1>Detalle del Ticket</h1>
-    </div>
+    <Layout>
+      <h1>Detalle Ticket Técnico</h1>
+    </Layout>
   );
 }

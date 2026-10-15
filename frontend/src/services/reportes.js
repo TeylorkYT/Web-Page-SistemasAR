@@ -1,1 +1,0 @@
-// Funciones con datos falsos de este módulo

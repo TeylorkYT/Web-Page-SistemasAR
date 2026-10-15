@@ -1,3 +1,9 @@
+import Layout from "../../components/Layout";
+
 export default function MisTickets() {
-  return <h1>Mis tickets</h1>;
+  return (
+    <Layout>
+      <h1>Mis Tickets</h1>
+    </Layout>
+  );
 }

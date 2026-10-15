@@ -1,3 +1,9 @@
+import Layout from "../../components/Layout";
+
 export default function GestionInventario() {
-  return <h1>Gestión de Inventario</h1>;
+  return (
+    <Layout>
+      <h1>Gestion Inventario</h1>
+    </Layout>
+  );
 }

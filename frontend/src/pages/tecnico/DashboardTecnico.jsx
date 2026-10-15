@@ -1,8 +1,9 @@
-export default function TecnicoDashboard() {
+import Layout from "../../components/Layout";
+
+export default function DashboardTecnico() {
   return (
-    <div>
-      <h1>Panel de Técnico</h1>
-      <p>Gestión de tickets asignados.</p>
-    </div>
+    <Layout>
+      <h1>Dashboard Técnico</h1>
+    </Layout>
   );
 }

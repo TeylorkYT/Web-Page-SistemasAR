@@ -1,3 +1,9 @@
+import Layout from "../../components/Layout";
+
 export default function GestionCategorias() {
-  return <h1>Gestión de Categorías</h1>;
+  return (
+    <Layout>
+      <h1>Gestion Categorias</h1>
+    </Layout>
+  );
 }

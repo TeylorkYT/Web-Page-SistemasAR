@@ -1,3 +1,9 @@
+import Layout from "../../components/Layout";
+
 export default function ActualizarAvance() {
-  return <h1>Actualizar avance</h1>;
+  return (
+    <Layout>
+      <h1>Actualizar Avance</h1>
+    </Layout>
+  );
 }

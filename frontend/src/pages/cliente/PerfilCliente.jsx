@@ -1,3 +1,9 @@
+import Layout from "../../components/Layout";
+
 export default function PerfilCliente() {
-  return <h1>Perfil del cliente</h1>;
+  return (
+    <Layout>
+      <h1>Perfil Cliente</h1>
+    </Layout>
+  );
 }
