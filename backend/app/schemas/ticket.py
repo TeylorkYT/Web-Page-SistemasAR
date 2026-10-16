@@ -105,3 +105,16 @@ class ComentarioOut(BaseModel):
     rol: str
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class AdjuntoOut(BaseModel):
+    id_adjunto: int
+    id_ticket: int
+    id_usuario: int
+    nombre_archivo: str
+    ruta_url: str
+    tipo_mime: str
+    tamano_bytes: int
+    fecha_subida: datetime
+
+    model_config = ConfigDict(from_attributes=True)
