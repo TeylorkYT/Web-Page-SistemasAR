@@ -1,0 +1,218 @@
+diff --git a/backend/app/routers/reportes.py b/backend/app/routers/reportes.py
+index 33b248c..fe2de51 100644
+--- a/backend/app/routers/reportes.py
++++ b/backend/app/routers/reportes.py
+@@ -1,3 +1,4 @@
++from datetime import datetime
+ from typing import Any
+ from fastapi import APIRouter, Depends, HTTPException, Query
+ from sqlalchemy.orm import Session
+@@ -18,6 +19,16 @@ def obtener_reporte(
+     db: Session = Depends(get_db),
+     admin: Usuario = Depends(requiere_roles("Administrador", "administrador")),
+ ):
++    for nombre, valor in (("desde", desde), ("hasta", hasta)):
++        if valor:
++            try:
++                datetime.fromisoformat(valor)
++            except ValueError:
++                raise HTTPException(
++                    status_code=400,
++                    detail=f"Parámetro '{nombre}' inválido. Use formato ISO (AAAA-MM-DD)",
++                )
++
+     if tipo_informe == "por_agente":
+         return reporte_service.reporte_por_agente(db, desde, hasta)
+     elif tipo_informe == "por_prioridad":
+diff --git a/backend/app/schemas/auth.py b/backend/app/schemas/auth.py
+index 290553e..087cca3 100644
+--- a/backend/app/schemas/auth.py
++++ b/backend/app/schemas/auth.py
+@@ -1,10 +1,15 @@
+-from pydantic import BaseModel
++from pydantic import BaseModel, field_validator
+ 
+ 
+ class LoginIn(BaseModel):
+     correo_electronico: str
+     contrasena: str
+ 
++    @field_validator("correo_electronico")
++    @classmethod
++    def _normalizar_correo(cls, v: str) -> str:
++        return v.strip().lower()
++
+ 
+ class RefreshIn(BaseModel):
+     refresh_token: str
+diff --git a/backend/app/schemas/usuario.py b/backend/app/schemas/usuario.py
+index 1be03ad..aded73d 100644
+--- a/backend/app/schemas/usuario.py
++++ b/backend/app/schemas/usuario.py
+@@ -1,7 +1,29 @@
+ from datetime import date
+-from typing import Literal
++import re
++from typing import Annotated, Literal
+ 
+-from pydantic import BaseModel, ConfigDict, Field
++from pydantic import AfterValidator, BaseModel, ConfigDict, Field, StringConstraints
++
++_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
++
++
++def _validar_correo(valor: str) -> str:
++    valor = valor.strip().lower()
++    if not _EMAIL_RE.match(valor):
++        raise ValueError("Correo electrónico inválido")
++    return valor
++
++
++def _validar_clave_bcrypt(valor: str) -> str:
++    # bcrypt limita a 72 BYTES (no caracteres): evita ValueError -> HTTP 500
++    if len(valor.encode("utf-8")) > 72:
++        raise ValueError("La contraseña no puede superar 72 bytes")
++    return valor
++
++
++Correo = Annotated[str, StringConstraints(max_length=100), AfterValidator(_validar_correo)]
++Clave = Annotated[str, Field(min_length=8, max_length=72), AfterValidator(_validar_clave_bcrypt)]
++TextoLimpio50 = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
+ 
+ RolUsuario = Literal["cliente", "tecnico", "administrador"]
+ RolInput = Literal["Cliente", "Tecnico", "Administrador", "cliente", "tecnico", "administrador"]
+@@ -28,24 +50,24 @@ class UsuarioOut(BaseModel):
+ 
+ 
+ class RegistroClienteIn(BaseModel):
+-    nombre: str = Field(..., min_length=1, max_length=50)
+-    apellido: str = Field(..., min_length=1, max_length=50)
+-    correo_electronico: str = Field(..., min_length=3, max_length=100)
+-    contrasena: str = Field(..., min_length=8, max_length=72)
++    nombre: TextoLimpio50
++    apellido: TextoLimpio50
++    correo_electronico: Correo
++    contrasena: Clave
+     telefono: str = Field(..., min_length=1, max_length=20)
+     direccion: str = Field(..., min_length=1, max_length=150)
+     area_departamento: str = Field(default="General", max_length=80)
+ 
+ 
+ class RecuperarIn(BaseModel):
+-    correo_electronico: str = Field(..., min_length=3, max_length=100)
++    correo_electronico: Correo
+ 
+ 
+ class UsuarioCrearIn(BaseModel):
+-    nombre: str = Field(..., min_length=1, max_length=50)
+-    apellido: str = Field(..., min_length=1, max_length=50)
+-    correo_electronico: str = Field(..., min_length=3, max_length=100)
+-    contrasena: str = Field(..., min_length=8, max_length=72)
++    nombre: TextoLimpio50
++    apellido: TextoLimpio50
++    correo_electronico: Correo
++    contrasena: Clave
+     rol: RolInput
+     estado: EstadoUsuario = "Activo"
+     telefono: str | None = Field(default=None, max_length=20)
+@@ -59,8 +81,8 @@ class UsuarioCrearIn(BaseModel):
+ class UsuarioUpdateIn(BaseModel):
+     nombre: str | None = Field(default=None, max_length=50)
+     apellido: str | None = Field(default=None, max_length=50)
+-    correo_electronico: str | None = Field(default=None, min_length=3, max_length=100)
+-    contrasena: str | None = Field(default=None, min_length=8, max_length=72)
++    correo_electronico: Correo | None = None
++    contrasena: Clave | None = None
+     estado: EstadoUsuario | None = None
+     telefono: str | None = Field(default=None, max_length=20)
+     direccion: str | None = Field(default=None, max_length=150)
+diff --git a/backend/pytest.ini b/backend/pytest.ini
+new file mode 100644
+index 0000000..505a8a0
+--- /dev/null
++++ b/backend/pytest.ini
+@@ -0,0 +1,4 @@
++[pytest]
++testpaths = tests
++filterwarnings =
++    ignore::DeprecationWarning
+diff --git a/backend/requirements.txt b/backend/requirements.txt
+index ec3635a..9675f5e 100644
+Binary files a/backend/requirements.txt and b/backend/requirements.txt differ
+diff --git a/backend/tests/test_validaciones_regresion.py b/backend/tests/test_validaciones_regresion.py
+new file mode 100644
+index 0000000..8e52fee
+--- /dev/null
++++ b/backend/tests/test_validaciones_regresion.py
+@@ -0,0 +1,38 @@
++"""Regresiones de validación de entrada (auditoría QA)."""
++import pytest
++
++REG = dict(
++    nombre="Ana", apellido="Pérez", correo_electronico="ana@ejemplo.com",
++    contrasena="Prueba123*", telefono="3001112233", direccion="Calle 1",
++)
++
++
++@pytest.mark.parametrize("correo", ["abc", "a@b", "a b@c.com", "@x.com", ""])
++def test_registro_rechaza_correo_invalido(client, correo):
++    r = client.post("/api/v1/auth/register", json={**REG, "correo_electronico": correo})
++    assert r.status_code == 422
++
++
++def test_registro_rechaza_nombre_solo_espacios(client):
++    r = client.post("/api/v1/auth/register", json={**REG, "nombre": "   ", "correo_electronico": "n1@ejemplo.com"})
++    assert r.status_code == 422
++
++
++def test_registro_rechaza_clave_multibyte_mayor_72_bytes(client):
++    r = client.post("/api/v1/auth/register", json={**REG, "correo_electronico": "n2@ejemplo.com", "contrasena": "ñ" * 40})
++    assert r.status_code == 422
++
++
++def test_correo_se_normaliza_a_minusculas(client):
++    r = client.post("/api/v1/auth/register", json={**REG, "correo_electronico": "  MAYUS@Ejemplo.COM "})
++    assert r.status_code == 201
++    assert r.json()["correo_electronico"] == "mayus@ejemplo.com"
++    login = client.post("/api/v1/auth/login", json={"correo_electronico": "MAYUS@EJEMPLO.COM", "contrasena": "Prueba123*"})
++    assert login.status_code == 200
++
++
++@pytest.mark.parametrize("param", ["desde", "hasta"])
++def test_reportes_rechaza_fecha_invalida(client, param):
++    t = client.post("/api/v1/auth/login", json={"correo_electronico": "admin@prueba.com", "contrasena": "Prueba123*"}).json()["access_token"]
++    r = client.get(f"/api/v1/reportes/por_agente?{param}=basura", headers={"Authorization": f"Bearer {t}"})
++    assert r.status_code == 400
+diff --git a/frontend/src/pages/cliente/PerfilCliente.jsx b/frontend/src/pages/cliente/PerfilCliente.jsx
+index 7e0945f..3b8bf3b 100644
+--- a/frontend/src/pages/cliente/PerfilCliente.jsx
++++ b/frontend/src/pages/cliente/PerfilCliente.jsx
+@@ -76,7 +76,7 @@ export default function PerfilCliente() {
+             </div>
+ 
+             <div style={{ marginTop: "24px", paddingTop: "20px", borderTop: "1px solid #e2e8f0", textAlign: "right" }}>
+-              <Boton variante="secundario">Editar Perfil</Boton>
++              <Boton variante="secundario" deshabilitado>Editar Perfil</Boton>
+             </div>
+           </div>
+ 
+@@ -88,7 +88,7 @@ export default function PerfilCliente() {
+           }}>
+             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+               <h2 style={{ margin: 0, fontSize: "18px", color: "#0f172a" }}>Mis Equipos Registrados</h2>
+-              <Boton variante="primario" estilo={{ padding: "6px 12px", fontSize: "12px" }}>+ Añadir Equipo</Boton>
++              <Boton variante="primario" deshabilitado estilo={{ padding: "6px 12px", fontSize: "12px" }}>+ Añadir Equipo</Boton>
+             </div>
+ 
+             {equipos.length > 0 ? (
+diff --git a/frontend/src/services/api.js b/frontend/src/services/api.js
+index 55144cb..baf05b6 100644
+--- a/frontend/src/services/api.js
++++ b/frontend/src/services/api.js
+@@ -7,4 +7,5 @@
+  */
+ 
+ // URL principal del servidor backend (FastAPI en local)
+-export const API_URL = "http://127.0.0.1:8000";
++// En producción define VITE_API_URL (ej. https://sistemasar.net). Vacío = mismo origen vía Nginx.
++export const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8000";

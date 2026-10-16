@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
@@ -18,6 +19,16 @@ def obtener_reporte(
     db: Session = Depends(get_db),
     admin: Usuario = Depends(requiere_roles("Administrador", "administrador")),
 ):
+    for nombre, valor in (("desde", desde), ("hasta", hasta)):
+        if valor:
+            try:
+                datetime.fromisoformat(valor)
+            except ValueError:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Parámetro '{nombre}' inválido. Use formato ISO (AAAA-MM-DD)",
+                )
+
     if tipo_informe == "por_agente":
         return reporte_service.reporte_por_agente(db, desde, hasta)
     elif tipo_informe == "por_prioridad":

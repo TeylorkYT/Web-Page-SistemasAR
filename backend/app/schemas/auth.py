@@ -1,9 +1,14 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class LoginIn(BaseModel):
     correo_electronico: str
     contrasena: str
+
+    @field_validator("correo_electronico")
+    @classmethod
+    def _normalizar_correo(cls, v: str) -> str:
+        return v.strip().lower()
 
 
 class RefreshIn(BaseModel):
