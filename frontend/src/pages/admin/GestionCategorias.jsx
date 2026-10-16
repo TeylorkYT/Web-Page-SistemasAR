@@ -1,16 +1,18 @@
 /**
  * ==============================================================================
- * SISTEMASAR - VISTA 17: GESTIÓN DE CATEGORÍAS Y SERVICIOS (GestionCategorias.jsx)
+ * SISTEMASAR - VISTA 17: GESTIÓN DE CATEGORÍAS (GestionCategorias.jsx)
  * ==============================================================================
  * Desarrollado por: Teylork (Líder)
  *
- * Implementa la Vista 17 según los mockups:
- * - Columna Izquierda: Listado de categorías con botón "+ Nueva categoría".
- *   Permite seleccionar una categoría activa (resaltada en azul), editarla o eliminarla.
- * - Columna Derecha: Listado de servicios asociados a la categoría seleccionada
- *   con botón "+ Nuevo servicio", tiempo estimado SLA, edición y eliminación.
- * - Modales interactivos para crear y editar categoría y servicio.
- * - Consumo exclusivo mediante la capa de servicios (adminService.js).
+ * Adaptado al Documento Definitivo v2.0:
+ * - Columna Izquierda: Listado de categorías con botón "+ Nueva categoría" y editar.
+ * - Columna Derecha: Detalle de la categoría seleccionada (nombre y descripción).
+ * - Modal de crear / editar: Únicamente 2 campos:
+ *   1. nombre_categoria (obligatorio y único)
+ *   2. descripcion
+ * - Se quitan el botón "+ Nuevo servicio", tiempo estimado (SLA) y costo.
+ * - Borrar/inactivar queda suspendido según Decisión 4 (solo crear y editar).
+ * - Consumo exclusivo a través de adminService.js (sin fetch ni import directo de datosFalsos).
  * ==============================================================================
  */
 
@@ -20,16 +22,10 @@ import Layout from "../../components/Layout";
 import {
   obtenerCategorias,
   crearCategoria,
-  actualizarCategoria,
-  eliminarCategoria,
-  obtenerServicios,
-  crearServicio,
-  actualizarServicio,
-  eliminarServicio
+  actualizarCategoria
 } from "../../services/adminService";
 import "./GestionCategorias.css";
 
-// Icono SVG de Lápiz (Editar)
 function IconoLapiz() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -38,14 +34,10 @@ function IconoLapiz() {
   );
 }
 
-// Icono SVG de Papelera (Eliminar)
-function IconoPapelera() {
+function IconoCarpeta() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="3 6 5 6 21 6"></polyline>
-      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-      <line x1="10" y1="11" x2="10" y2="17"></line>
-      <line x1="14" y1="11" x2="14" y2="17"></line>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
     </svg>
   );
 }
@@ -53,36 +45,18 @@ function IconoPapelera() {
 export default function GestionCategorias() {
   const navigate = useNavigate();
 
-  // Estados principales de datos
+  // Estados de datos
   const [categorias, setCategorias] = useState([]);
-  const [servicios, setServicios] = useState([]);
   const [categoriaSeleccionadaId, setCategoriaSeleccionadaId] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [alerta, setAlerta] = useState(null);
 
-  // Estados de modales
-  const [modalCategoriaAbierto, setModalCategoriaAbierto] = useState(false);
+  // Estados de modal para crear / editar categoría
+  const [modalAbierto, setModalAbierto] = useState(false);
   const [categoriaEnEdicion, setCategoriaEnEdicion] = useState(null);
   const [formCategoria, setFormCategoria] = useState({ nombre_categoria: "", descripcion: "" });
-
-  const [modalServicioAbierto, setModalServicioAbierto] = useState(false);
-  const [servicioEnEdicion, setServicioEnEdicion] = useState(null);
-  const [formServicio, setFormServicio] = useState({
-    id_categoria: "",
-    nombre_servicio: "",
-    descripcion: "",
-    tiempo_estimado: "",
-    costo: ""
-  });
-
-  const [modalEliminar, setModalEliminar] = useState({
-    abierto: false,
-    tipo: "", // 'categoria' | 'servicio'
-    id: null,
-    nombre: ""
-  });
-
   const [errorFormulario, setErrorFormulario] = useState("");
+  const [guardando, setGuardando] = useState(false);
 
   const mostrarAlerta = (tipo, mensaje) => {
     setAlerta({ tipo, mensaje });
@@ -91,27 +65,22 @@ export default function GestionCategorias() {
     }, 4000);
   };
 
-  // Carga inicial de datos mediante el servicio
+  // Carga inicial mediante el servicio
   useEffect(() => {
     let cancelado = false;
     obtenerCategorias()
-      .then((listaCategorias) => {
+      .then((lista) => {
         if (cancelado) return;
-        setCategorias(listaCategorias);
-        if (listaCategorias.length > 0) {
-          const primeraCatId = listaCategorias[0].id_categoria;
-          setCategoriaSeleccionadaId(primeraCatId);
-          obtenerServicios(primeraCatId).then((listaServicios) => {
-            if (!cancelado) setServicios(listaServicios);
-          });
+        setCategorias(lista);
+        if (lista.length > 0) {
+          setCategoriaSeleccionadaId(lista[0].id_categoria);
         }
         setCargando(false);
       })
       .catch((err) => {
-        if (!cancelado) {
-          mostrarAlerta("error", "Error al cargar las categorías: " + err.message);
-          setCargando(false);
-        }
+        if (cancelado) return;
+        mostrarAlerta("error", "Error al cargar categorías: " + err.message);
+        setCargando(false);
       });
 
     return () => {
@@ -119,59 +88,37 @@ export default function GestionCategorias() {
     };
   }, []);
 
-  // Cambiar categoría seleccionada
-  const manejarSeleccionarCategoria = async (idCat) => {
-    setCategoriaSeleccionadaId(idCat);
-    try {
-      const lista = await obtenerServicios(idCat);
-      setServicios(lista);
-    } catch (err) {
-      mostrarAlerta("error", "Error al cargar los servicios asociados: " + err.message);
-    }
-  };
+  const categoriaActiva = categorias.find((c) => c.id_categoria === categoriaSeleccionadaId) || null;
 
-  // Navegación del menú lateral
-  const manejarCambioItemMenu = (id) => {
-    const rutas = {
-      dashboard: "/admin",
-      usuarios: "/admin/usuarios",
-      asignacion: "/admin/tickets/1/asignar",
-      categorias: "/admin/categorias",
-      inventario: "/admin/inventario",
-      reportes: "/admin/reportes",
-      calificaciones: "/admin/calificaciones"
-    };
-    if (rutas[id]) navigate(rutas[id]);
-  };
-
-  // --------------------------------------------------------------------------
-  // LÓGICA DE CATEGORÍAS
-  // --------------------------------------------------------------------------
   const abrirModalNuevaCategoria = () => {
     setCategoriaEnEdicion(null);
     setFormCategoria({ nombre_categoria: "", descripcion: "" });
     setErrorFormulario("");
-    setModalCategoriaAbierto(true);
+    setModalAbierto(true);
   };
 
   const abrirModalEditarCategoria = (e, cat) => {
-    e.stopPropagation();
+    if (e) e.stopPropagation();
     setCategoriaEnEdicion(cat);
     setFormCategoria({
       nombre_categoria: cat.nombre_categoria,
       descripcion: cat.descripcion || ""
     });
     setErrorFormulario("");
-    setModalCategoriaAbierto(true);
+    setModalAbierto(true);
   };
 
   const guardarCategoria = async (e) => {
     e.preventDefault();
-    if (!formCategoria.nombre_categoria.trim()) {
+    setErrorFormulario("");
+
+    const nombre = formCategoria.nombre_categoria.trim();
+    if (!nombre) {
       setErrorFormulario("El nombre de la categoría es obligatorio");
       return;
     }
 
+    setGuardando(true);
     try {
       if (categoriaEnEdicion) {
         const catActualizada = await actualizarCategoria(categoriaEnEdicion.id_categoria, formCategoria);
@@ -183,454 +130,198 @@ export default function GestionCategorias() {
         const nuevaCat = await crearCategoria(formCategoria);
         setCategorias((prev) => [...prev, nuevaCat]);
         setCategoriaSeleccionadaId(nuevaCat.id_categoria);
-        setServicios([]);
         mostrarAlerta("exito", `Categoría "${nuevaCat.nombre_categoria}" creada exitosamente.`);
       }
-      setModalCategoriaAbierto(false);
+      setModalAbierto(false);
     } catch (err) {
       setErrorFormulario(err.message || "Error al guardar la categoría");
-    }
-  };
-
-  const solicitarEliminarCategoria = (e, cat) => {
-    e.stopPropagation();
-    setModalEliminar({
-      abierto: true,
-      tipo: "categoria",
-      id: cat.id_categoria,
-      nombre: cat.nombre_categoria
-    });
-  };
-
-  // --------------------------------------------------------------------------
-  // LÓGICA DE SERVICIOS
-  // --------------------------------------------------------------------------
-  const abrirModalNuevoServicio = () => {
-    setServicioEnEdicion(null);
-    setFormServicio({
-      id_categoria: categoriaSeleccionadaId || (categorias[0]?.id_categoria ?? ""),
-      nombre_servicio: "",
-      descripcion: "",
-      tiempo_estimado: "",
-      costo: ""
-    });
-    setErrorFormulario("");
-    setModalServicioAbierto(true);
-  };
-
-  const abrirModalEditarServicio = (serv) => {
-    setServicioEnEdicion(serv);
-    setFormServicio({
-      id_categoria: serv.id_categoria,
-      nombre_servicio: serv.nombre_servicio,
-      descripcion: serv.descripcion || "",
-      tiempo_estimado: serv.tiempo_estimado || "",
-      costo: serv.costo || ""
-    });
-    setErrorFormulario("");
-    setModalServicioAbierto(true);
-  };
-
-  const guardarServicio = async (e) => {
-    e.preventDefault();
-    if (!formServicio.nombre_servicio.trim()) {
-      setErrorFormulario("El nombre del servicio es obligatorio");
-      return;
-    }
-
-    try {
-      if (servicioEnEdicion) {
-        const servActualizado = await actualizarServicio(servicioEnEdicion.id_servicio, formServicio);
-        setServicios((prev) =>
-          prev.map((s) => (s.id_servicio === servActualizado.id_servicio ? servActualizado : s))
-        );
-        mostrarAlerta("exito", `Servicio "${servActualizado.nombre_servicio}" actualizado correctamente.`);
-      } else {
-        const nuevoServ = await crearServicio(formServicio);
-        if (Number(nuevoServ.id_categoria) === Number(categoriaSeleccionadaId)) {
-          setServicios((prev) => [...prev, nuevoServ]);
-        }
-        mostrarAlerta("exito", `Servicio "${nuevoServ.nombre_servicio}" guardado exitosamente.`);
-      }
-      setModalServicioAbierto(false);
-    } catch (err) {
-      setErrorFormulario(err.message || "Error al guardar el servicio");
-    }
-  };
-
-  const solicitarEliminarServicio = (serv) => {
-    setModalEliminar({
-      abierto: true,
-      tipo: "servicio",
-      id: serv.id_servicio,
-      nombre: serv.nombre_servicio
-    });
-  };
-
-  // --------------------------------------------------------------------------
-  // CONFIRMACIÓN DE ELIMINACIÓN
-  // --------------------------------------------------------------------------
-  const confirmarEliminar = async () => {
-    try {
-      if (modalEliminar.tipo === "categoria") {
-        await eliminarCategoria(modalEliminar.id);
-        const nuevasCategorias = categorias.filter((c) => c.id_categoria !== modalEliminar.id);
-        setCategorias(nuevasCategorias);
-        if (categoriaSeleccionadaId === modalEliminar.id) {
-          if (nuevasCategorias.length > 0) {
-            manejarSeleccionarCategoria(nuevasCategorias[0].id_categoria);
-          } else {
-            setCategoriaSeleccionadaId(null);
-            setServicios([]);
-          }
-        }
-        mostrarAlerta("exito", `Categoría "${modalEliminar.nombre}" eliminada correctamente.`);
-      } else if (modalEliminar.tipo === "servicio") {
-        await eliminarServicio(modalEliminar.id);
-        setServicios((prev) => prev.filter((s) => s.id_servicio !== modalEliminar.id));
-        mostrarAlerta("exito", `Servicio "${modalEliminar.nombre}" eliminado correctamente.`);
-      }
-    } catch (err) {
-      mostrarAlerta("error", "Error al eliminar: " + err.message);
     } finally {
-      setModalEliminar({ abierto: false, tipo: "", id: null, nombre: "" });
+      setGuardando(false);
     }
   };
-
-  const categoriaActual = categorias.find((c) => c.id_categoria === categoriaSeleccionadaId);
 
   return (
     <Layout
       rol="administrador"
       itemActivo="categorias"
-      nombreUsuario="Marlon Monsalve"
-      onCambiarItem={manejarCambioItemMenu}
+      nombreUsuario="Carlos Administrador"
     >
       <div className="categorias-pagina">
-        {/* Encabezado Principal */}
+        {/* Encabezado principal */}
         <header className="categorias-header-principal">
-          <h1 className="categorias-titulo-principal">Gestión de categorías y servicios</h1>
+          <div>
+            <h1 className="categorias-titulo-principal">Gestión de Categorías</h1>
+            <p style={{ color: "#64748b", margin: "4px 0 0 0", fontSize: "0.95rem" }}>
+              Catálogo oficial de soporte técnico según Documento Definitivo v2.0
+            </p>
+          </div>
+          <button
+            type="button"
+            className="boton-nuevo"
+            onClick={abrirModalNuevaCategoria}
+            aria-label="Crear nueva categoría"
+          >
+            + Nueva categoría
+          </button>
         </header>
 
-        {/* Alerta de notificación visual */}
+        {/* Notificaciones / Alertas */}
         {alerta && (
-          <div className={`categorias-alerta categorias-alerta-${alerta.tipo}`}>
+          <div
+            className={`categorias-alerta ${
+              alerta.tipo === "exito" ? "categorias-alerta-exito" : "categorias-alerta-error"
+            }`}
+            role="status"
+          >
             <span>{alerta.mensaje}</span>
             <button
               type="button"
               className="categorias-alerta-cerrar"
               onClick={() => setAlerta(null)}
-              aria-label="Cerrar notificación"
+              aria-label="Cerrar alerta"
             >
               ×
             </button>
           </div>
         )}
 
-        {/* Estado de carga */}
         {cargando ? (
-          <div className="estado-vacio">
-            <p className="estado-vacio-texto">Cargando categorías y servicios...</p>
+          <div style={{ textAlign: "center", padding: "48px", color: "#64748b" }}>
+            Cargando categorías...
           </div>
         ) : (
           <div className="categorias-grid">
-            {/* --------------------------------------------------------------
-             * COLUMNA 1: CATEGORÍAS
-             * -------------------------------------------------------------- */}
-            <section className="categorias-columna" aria-labelledby="titulo-categorias">
+            {/* ------------------------------------------------------------------
+             * COLUMNA IZQUIERDA: Listado de categorías con botón editar
+             * ------------------------------------------------------------------ */}
+            <section className="categorias-columna" aria-label="Listado de categorías">
               <div className="columna-header">
-                <h2 id="titulo-categorias" className="columna-titulo">Categorías</h2>
-                <button
-                  type="button"
-                  className="boton-accion-azul"
-                  onClick={abrirModalNuevaCategoria}
-                  id="btn-nueva-categoria"
-                >
-                  <span>+</span>
-                  <span>Nueva categoría</span>
-                </button>
+                <h2 className="columna-titulo">Categorías ({categorias.length})</h2>
               </div>
 
-              {categorias.length === 0 ? (
-                <div className="estado-vacio">
-                  <p className="estado-vacio-texto">No hay categorías registradas.</p>
-                </div>
-              ) : (
-                <div className="tarjetas-lista">
-                  {categorias.map((cat) => {
-                    const estaSeleccionada = cat.id_categoria === categoriaSeleccionadaId;
-                    return (
-                      <div
-                        key={cat.id_categoria}
-                        className={`tarjeta-categoria ${estaSeleccionada ? "seleccionada" : ""}`}
-                        onClick={() => manejarSeleccionarCategoria(cat.id_categoria)}
-                        title={cat.descripcion || cat.nombre_categoria}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            manejarSeleccionarCategoria(cat.id_categoria);
-                          }
-                        }}
-                      >
-                        <span className="tarjeta-categoria-nombre">
-                          {cat.nombre_categoria}
-                        </span>
-
-                        <div className="tarjeta-acciones">
-                          <button
-                            type="button"
-                            className="boton-icono-accion"
-                            title="Editar categoría"
-                            aria-label={`Editar ${cat.nombre_categoria}`}
-                            onClick={(e) => abrirModalEditarCategoria(e, cat)}
-                          >
-                            <IconoLapiz />
-                          </button>
-                          <button
-                            type="button"
-                            className="boton-icono-accion eliminar"
-                            title="Eliminar categoría"
-                            aria-label={`Eliminar ${cat.nombre_categoria}`}
-                            onClick={(e) => solicitarEliminarCategoria(e, cat)}
-                          >
-                            <IconoPapelera />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </section>
-
-            {/* --------------------------------------------------------------
-             * COLUMNA 2: SERVICIOS ASOCIADOS
-             * -------------------------------------------------------------- */}
-            <section className="categorias-columna" aria-labelledby="titulo-servicios">
-              <div className="columna-header">
-                <div className="columna-titulo-grupo">
-                  <h2 id="titulo-servicios" className="columna-titulo">Servicios asociados</h2>
-                  <span className="columna-subtitulo">
-                    Categoría: {categoriaActual ? categoriaActual.nombre_categoria : "Ninguna seleccionada"}
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  className="boton-accion-azul"
-                  onClick={abrirModalNuevoServicio}
-                  disabled={!categoriaSeleccionadaId}
-                  id="btn-nuevo-servicio"
-                >
-                  <span>+</span>
-                  <span>Nuevo servicio</span>
-                </button>
-              </div>
-
-              {servicios.length === 0 ? (
-                <div className="estado-vacio">
-                  <p className="estado-vacio-texto">
-                    No hay servicios registrados para esta categoría.
-                  </p>
-                  <button
-                    type="button"
-                    className="boton-accion-azul"
-                    onClick={abrirModalNuevoServicio}
-                  >
-                    + Agregar primer servicio
-                  </button>
-                </div>
-              ) : (
-                <div className="tarjetas-lista">
-                  {servicios.map((serv) => (
-                    <div key={serv.id_servicio} className="tarjeta-servicio">
-                      <div className="servicio-info">
-                        <span className="servicio-nombre">{serv.nombre_servicio}</span>
-                        <div className="servicio-detalle">
-                          <span>Tiempo est: {serv.tiempo_estimado || "N/A"}</span>
-                          {serv.costo && serv.costo !== "0" && (
-                            <span className="servicio-precio">• ${serv.costo}</span>
-                          )}
-                        </div>
+              <div className="categorias-lista">
+                {categorias.map((cat) => {
+                  const esActiva = cat.id_categoria === categoriaSeleccionadaId;
+                  return (
+                    <div
+                      key={cat.id_categoria}
+                      className={`tarjeta-categoria ${esActiva ? "seleccionada" : ""}`}
+                      onClick={() => setCategoriaSeleccionadaId(cat.id_categoria)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          setCategoriaSeleccionadaId(cat.id_categoria);
+                        }
+                      }}
+                    >
+                      <div className="tarjeta-categoria-info">
+                        <span className="tarjeta-categoria-nombre">{cat.nombre_categoria}</span>
+                        {cat.descripcion && (
+                          <span className="tarjeta-categoria-subtexto" style={{ display: "block", color: "#64748b", fontSize: "0.85rem", marginTop: "2px" }}>
+                            {cat.descripcion.length > 55 ? cat.descripcion.substring(0, 52) + "..." : cat.descripcion}
+                          </span>
+                        )}
                       </div>
 
-                      <div className="tarjeta-acciones">
+                      <div className="tarjeta-acciones-categoria" onClick={(e) => e.stopPropagation()}>
                         <button
                           type="button"
-                          className="boton-icono-accion"
-                          title="Editar servicio"
-                          aria-label={`Editar ${serv.nombre_servicio}`}
-                          onClick={() => abrirModalEditarServicio(serv)}
+                          className="boton-accion-icono boton-editar"
+                          onClick={(e) => abrirModalEditarCategoria(e, cat)}
+                          title="Editar categoría"
+                          aria-label={`Editar categoría ${cat.nombre_categoria}`}
                         >
                           <IconoLapiz />
                         </button>
-                        <button
-                          type="button"
-                          className="boton-icono-accion eliminar"
-                          title="Eliminar servicio"
-                          aria-label={`Eliminar ${serv.nombre_servicio}`}
-                          onClick={() => solicitarEliminarServicio(serv)}
-                        >
-                          <IconoPapelera />
-                        </button>
                       </div>
                     </div>
-                  ))}
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* ------------------------------------------------------------------
+             * COLUMNA DERECHA: Detalle de la categoría seleccionada
+             * Reemplaza el panel derecho anterior por nombre y descripción según v2.0
+             * ------------------------------------------------------------------ */}
+            <section className="categorias-columna" aria-label="Detalle de categoría">
+              <div className="columna-header">
+                <h2 className="columna-titulo">Detalle de la categoría</h2>
+                {categoriaActiva && (
+                  <button
+                    type="button"
+                    className="boton-accion-icono boton-editar"
+                    onClick={(e) => abrirModalEditarCategoria(e, categoriaActiva)}
+                    title="Editar esta categoría"
+                    style={{ border: "1px solid #cbd5e1", padding: "6px 12px", borderRadius: "6px", display: "flex", gap: "6px", alignItems: "center", fontSize: "0.85rem", background: "#fff", cursor: "pointer" }}
+                  >
+                    <IconoLapiz /> Editar
+                  </button>
+                )}
+              </div>
+
+              {categoriaActiva ? (
+                <div
+                  className="categoria-detalle-panel"
+                  style={{
+                    backgroundColor: "#ffffff",
+                    borderRadius: "10px",
+                    border: "1px solid #e2e8f0",
+                    padding: "24px",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+                    <div style={{ color: "var(--color-primario, #39A900)", background: "#f0fdf4", padding: "10px", borderRadius: "8px" }}>
+                      <IconoCarpeta />
+                    </div>
+                    <div>
+                      <span style={{ fontSize: "0.8rem", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>
+                        Categoría #{categoriaActiva.id_categoria}
+                      </span>
+                      <h3 style={{ margin: "2px 0 0 0", fontSize: "1.3rem", color: "#0f172a", fontWeight: 700 }}>
+                        {categoriaActiva.nombre_categoria}
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "16px" }}>
+                    <h4 style={{ margin: "0 0 8px 0", fontSize: "0.95rem", color: "#334155", fontWeight: 600 }}>
+                      Descripción del servicio
+                    </h4>
+                    <p style={{ margin: 0, color: "#475569", lineHeight: 1.6, fontSize: "0.95rem" }}>
+                      {categoriaActiva.descripcion || "Sin descripción registrada."}
+                    </p>
+                  </div>
+
+                  <div style={{ marginTop: "24px", padding: "12px 16px", backgroundColor: "#f8fafc", borderRadius: "6px", borderLeft: "3px solid var(--color-primario, #39A900)", fontSize: "0.85rem", color: "#475569" }}>
+                    <strong>Alcance del modelo v2.0:</strong> La categoría clasifica los tickets técnicos. El catálogo oficial no incluye liquidación de repuestos ni costos referenciales.
+                  </div>
+                </div>
+              ) : (
+                <div style={{ textAlign: "center", padding: "32px", color: "#94a3b8", background: "#fff", borderRadius: "8px", border: "1px dashed #cbd5e1" }}>
+                  Seleccione una categoría para consultar su detalle.
                 </div>
               )}
             </section>
           </div>
         )}
 
-        {/* ====================================================================
-         * MODAL: NUEVO / EDITAR SERVICIO (Fiel al Mockup 2)
-         * ==================================================================== */}
-        {modalServicioAbierto && (
-          <div className="modal-superposicion" onClick={() => setModalServicioAbierto(false)}>
-            <div className="modal-contenedor-mockup" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header-mockup">
-                <h3 className="modal-titulo-mockup">Nuevo / editar servicio</h3>
-                <button
-                  type="button"
-                  className="modal-boton-cerrar"
-                  onClick={() => setModalServicioAbierto(false)}
-                  aria-label="Cerrar modal"
-                >
-                  ×
-                </button>
-              </div>
-
-              <form onSubmit={guardarServicio}>
-                <div className="modal-cuerpo-mockup">
-                  {errorFormulario && <p className="campo-error-texto">{errorFormulario}</p>}
-
-                  {/* Campo: Categoría padre */}
-                  <div className="campo-grupo-mockup">
-                    <label className="campo-label-mockup" htmlFor="input-categoria-padre">
-                      Categoría padre
-                    </label>
-                    <select
-                      id="input-categoria-padre"
-                      className="campo-select-mockup"
-                      value={formServicio.id_categoria}
-                      onChange={(e) =>
-                        setFormServicio({ ...formServicio, id_categoria: e.target.value })
-                      }
-                      required
-                    >
-                      {categorias.map((cat) => (
-                        <option key={cat.id_categoria} value={cat.id_categoria}>
-                          {cat.nombre_categoria}{" "}
-                          {cat.id_categoria === categoriaSeleccionadaId ? "(preseleccionada)" : ""}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Campo: Nombre del servicio */}
-                  <div className="campo-grupo-mockup">
-                    <label className="campo-label-mockup" htmlFor="input-nombre-servicio">
-                      Nombre del servicio
-                    </label>
-                    <input
-                      id="input-nombre-servicio"
-                      type="text"
-                      className="campo-input-mockup"
-                      placeholder="Ej. Cambio de pasta térmica"
-                      value={formServicio.nombre_servicio}
-                      onChange={(e) =>
-                        setFormServicio({ ...formServicio, nombre_servicio: e.target.value })
-                      }
-                      required
-                      autoFocus
-                    />
-                  </div>
-
-                  {/* Campo: Descripción breve */}
-                  <div className="campo-grupo-mockup">
-                    <label className="campo-label-mockup" htmlFor="input-desc-servicio">
-                      Descripción breve
-                    </label>
-                    <textarea
-                      id="input-desc-servicio"
-                      className="campo-textarea-mockup"
-                      rows="2"
-                      placeholder="Breve detalle técnico del servicio..."
-                      value={formServicio.descripcion}
-                      onChange={(e) =>
-                        setFormServicio({ ...formServicio, descripcion: e.target.value })
-                      }
-                    />
-                  </div>
-
-                  {/* Fila doble: Tiempo estimado (SLA) y Costo referencial */}
-                  <div className="campo-fila-doble">
-                    <div className="campo-grupo-mockup">
-                      <label className="campo-label-mockup" htmlFor="input-tiempo-sla">
-                        Tiempo estimado (SLA)
-                      </label>
-                      <input
-                        id="input-tiempo-sla"
-                        type="text"
-                        className="campo-input-mockup"
-                        placeholder="ej: 2 horas"
-                        value={formServicio.tiempo_estimado}
-                        onChange={(e) =>
-                          setFormServicio({ ...formServicio, tiempo_estimado: e.target.value })
-                        }
-                      />
-                    </div>
-
-                    <div className="campo-grupo-mockup">
-                      <label className="campo-label-mockup" htmlFor="input-costo-ref">
-                        Costo referencial (opc.)
-                      </label>
-                      <input
-                        id="input-costo-ref"
-                        type="text"
-                        className="campo-input-mockup"
-                        placeholder="$"
-                        value={formServicio.costo}
-                        onChange={(e) =>
-                          setFormServicio({ ...formServicio, costo: e.target.value })
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="modal-footer-mockup">
-                  <button
-                    type="button"
-                    className="modal-boton-cancelar"
-                    onClick={() => setModalServicioAbierto(false)}
-                  >
-                    Cancelar
-                  </button>
-                  <button type="submit" className="modal-boton-guardar">
-                    Guardar servicio
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* ====================================================================
-         * MODAL: NUEVA / EDITAR CATEGORÍA
-         * ==================================================================== */}
-        {modalCategoriaAbierto && (
-          <div className="modal-superposicion" onClick={() => setModalCategoriaAbierto(false)}>
-            <div className="modal-contenedor-mockup" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header-mockup">
-                <h3 className="modal-titulo-mockup">
+        {/* ----------------------------------------------------------------------
+         * MODAL ÚNICO: Crear o Editar Categoría (solo nombre_categoria y descripcion)
+         * ---------------------------------------------------------------------- */}
+        {modalAbierto && (
+          <div className="modal-overlay" role="dialog" aria-modal="true">
+            <div className="modal-contenido" style={{ maxWidth: "480px" }}>
+              <div className="modal-header">
+                <h3 className="modal-titulo">
                   {categoriaEnEdicion ? "Editar categoría" : "Nueva categoría"}
                 </h3>
                 <button
                   type="button"
                   className="modal-boton-cerrar"
-                  onClick={() => setModalCategoriaAbierto(false)}
+                  onClick={() => setModalAbierto(false)}
                   aria-label="Cerrar modal"
                 >
                   ×
@@ -638,117 +329,58 @@ export default function GestionCategorias() {
               </div>
 
               <form onSubmit={guardarCategoria}>
-                <div className="modal-cuerpo-mockup">
-                  {errorFormulario && <p className="campo-error-texto">{errorFormulario}</p>}
+                <div className="modal-body">
+                  {errorFormulario && (
+                    <div style={{ padding: "8px 12px", background: "#fef2f2", color: "#991b1b", borderRadius: "6px", marginBottom: "14px", fontSize: "0.85rem" }}>
+                      {errorFormulario}
+                    </div>
+                  )}
 
-                  <div className="campo-grupo-mockup">
-                    <label className="campo-label-mockup" htmlFor="input-nombre-categoria">
-                      Nombre de la categoría
+                  <div className="formulario-campo">
+                    <label htmlFor="nombre_categoria">
+                      Nombre de la categoría <span style={{ color: "#ef4444" }}>*</span>
                     </label>
                     <input
-                      id="input-nombre-categoria"
+                      id="nombre_categoria"
                       type="text"
-                      className="campo-input-mockup"
-                      placeholder="Ej. Redes y conectividad"
                       value={formCategoria.nombre_categoria}
-                      onChange={(e) =>
-                        setFormCategoria({ ...formCategoria, nombre_categoria: e.target.value })
-                      }
+                      onChange={(e) => setFormCategoria({ ...formCategoria, nombre_categoria: e.target.value })}
+                      placeholder="Ej. Redes y Conectividad"
                       required
                       autoFocus
                     />
                   </div>
 
-                  <div className="campo-grupo-mockup">
-                    <label className="campo-label-mockup" htmlFor="input-desc-categoria">
-                      Descripción breve
-                    </label>
+                  <div className="formulario-campo">
+                    <label htmlFor="descripcion_categoria">Descripción</label>
                     <textarea
-                      id="input-desc-categoria"
-                      className="campo-textarea-mockup"
-                      rows="3"
-                      placeholder="Descripción de los servicios que cubre esta categoría..."
+                      id="descripcion_categoria"
+                      rows={3}
                       value={formCategoria.descripcion}
-                      onChange={(e) =>
-                        setFormCategoria({ ...formCategoria, descripcion: e.target.value })
-                      }
+                      onChange={(e) => setFormCategoria({ ...formCategoria, descripcion: e.target.value })}
+                      placeholder="Describa el alcance de la categoría técnica..."
                     />
                   </div>
                 </div>
 
-                <div className="modal-footer-mockup">
+                <div className="modal-footer">
                   <button
                     type="button"
-                    className="modal-boton-cancelar"
-                    onClick={() => setModalCategoriaAbierto(false)}
+                    className="boton-secundario"
+                    onClick={() => setModalAbierto(false)}
+                    disabled={guardando}
                   >
                     Cancelar
                   </button>
-                  <button type="submit" className="modal-boton-guardar">
-                    Guardar categoría
+                  <button
+                    type="submit"
+                    className="boton-primario"
+                    disabled={guardando}
+                  >
+                    {guardando ? "Guardando..." : categoriaEnEdicion ? "Guardar cambios" : "Crear categoría"}
                   </button>
                 </div>
               </form>
-            </div>
-          </div>
-        )}
-
-        {/* ====================================================================
-         * MODAL: CONFIRMACIÓN DE ELIMINACIÓN
-         * ==================================================================== */}
-        {modalEliminar.abierto && (
-          <div
-            className="modal-superposicion"
-            onClick={() => setModalEliminar({ abierto: false, tipo: "", id: null, nombre: "" })}
-          >
-            <div className="modal-contenedor-mockup" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header-mockup">
-                <h3 className="modal-titulo-mockup" style={{ color: "#dc2626" }}>
-                  Confirmar eliminación
-                </h3>
-                <button
-                  type="button"
-                  className="modal-boton-cerrar"
-                  onClick={() =>
-                    setModalEliminar({ abierto: false, tipo: "", id: null, nombre: "" })
-                  }
-                  aria-label="Cerrar modal"
-                >
-                  ×
-                </button>
-              </div>
-
-              <div className="modal-cuerpo-mockup">
-                <p style={{ margin: 0, color: "#475569", lineHeight: 1.5 }}>
-                  ¿Estás seguro de que deseas eliminar{" "}
-                  <strong>{modalEliminar.tipo === "categoria" ? "la categoría" : "el servicio"}</strong>{" "}
-                  «<strong>{modalEliminar.nombre}</strong>»?
-                  {modalEliminar.tipo === "categoria" && (
-                    <span style={{ display: "block", marginTop: "8px", fontSize: "0.85rem", color: "#dc2626" }}>
-                      Nota: También se desvincularán los servicios asociados.
-                    </span>
-                  )}
-                </p>
-              </div>
-
-              <div className="modal-footer-mockup">
-                <button
-                  type="button"
-                  className="modal-boton-cancelar"
-                  onClick={() =>
-                    setModalEliminar({ abierto: false, tipo: "", id: null, nombre: "" })
-                  }
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  className="modal-boton-eliminar-confirmar"
-                  onClick={confirmarEliminar}
-                >
-                  Eliminar definitivamente
-                </button>
-              </div>
             </div>
           </div>
         )}
