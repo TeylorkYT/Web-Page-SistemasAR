@@ -14,6 +14,7 @@
 
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './Layout.css';
 
 /**
@@ -268,15 +269,31 @@ export default function Layout({
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Rol detectado por la URL; si se pasa prop explícita se respeta (compatibilidad)
-  const rol = rolProp || detectarRol(location.pathname);
+  // Integración AuthContext (Daily 3)
+  const auth = useAuth();
+  const sesion = auth?.sesion;
+  const cerrarSesion = auth?.cerrarSesion;
+
+  // Rol detectado por la URL o sesión; si se pasa prop explícita se respeta
+  const rol = rolProp || sesion?.rol || detectarRol(location.pathname);
   const itemActivo = itemActivoProp || detectarItemActivo(location.pathname, rol);
+  const nombreActivo = sesion?.nombre || nombreUsuario;
 
   // Estado local para abrir o cerrar el menú lateral en dispositivos móviles
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
 
   // Obtener la configuración visual del rol actual (fallback a administrador)
   const configActual = CONFIG_POR_ROL[rol] || CONFIG_POR_ROL.administrador;
+
+  // Cerrar sesión
+  const handleCerrarSesion = () => {
+    if (cerrarSesion) {
+      cerrarSesion();
+    } else {
+      localStorage.removeItem('sesion');
+    }
+    navigate('/login');
+  };
 
   // KIT-2: Manejar el clic en una opción del menú lateral: navega a la ruta correspondiente
   const seleccionarOpcion = (id) => {
@@ -291,7 +308,7 @@ export default function Layout({
   };
 
   // Extraer inicial del usuario para el avatar
-  const inicialUsuario = nombreUsuario ? nombreUsuario.charAt(0).toUpperCase() : 'U';
+  const inicialUsuario = nombreActivo ? nombreActivo.charAt(0).toUpperCase() : 'U';
 
   return (
     <div className="layout-contenedor">
@@ -423,15 +440,30 @@ export default function Layout({
             </button>
 
             {/* Avatar del usuario con inicial y rol */}
-            <div className="header-avatar-perfil" title={`Sesión: ${nombreUsuario} (${rol})`}>
+            <div className="header-avatar-perfil" title={`Sesión: ${nombreActivo} (${rol})`}>
               <div className="header-avatar-circulo">
                 {inicialUsuario}
               </div>
               <div className="header-usuario-info">
-                <span className="header-usuario-nombre">{nombreUsuario}</span>
+                <span className="header-usuario-nombre">{nombreActivo}</span>
                 <span className="header-usuario-rol">{rol}</span>
               </div>
             </div>
+
+            {/* Botón cerrar sesión */}
+            <button
+              type="button"
+              className="header-boton-cerrar-sesion"
+              onClick={handleCerrarSesion}
+              title="Cerrar sesión"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Salir</span>
+            </button>
           </div>
         </header>
 

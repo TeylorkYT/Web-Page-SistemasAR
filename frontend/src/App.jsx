@@ -1,4 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import RutaProtegida from "./routes/RutaProtegida";
+
 import Indice from "./pages/Indice";
 import Estado from "./pages/Estado";
 
@@ -32,43 +35,49 @@ import CalificacionesRecibidas from "./pages/admin/CalificacionesRecibidas";
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Índice y Estado */}
-        <Route path="/" element={<Indice />} />
-        <Route path="/estado" element={<Estado />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Rutas públicas */}
+          <Route path="/" element={<Indice />} />
+          <Route path="/estado" element={<Estado />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/recuperar" element={<RecuperarContrasena />} />
+          <Route path="/registro" element={<Registro />} />
 
-        {/* Auth */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/recuperar" element={<RecuperarContrasena />} />
-        <Route path="/registro" element={<Registro />} />
+          {/* Rutas protegidas: Cliente */}
+          <Route element={<RutaProtegida rol="cliente" />}>
+            <Route path="/cliente" element={<DashboardCliente />} />
+            <Route path="/cliente/tickets/nuevo" element={<CrearTicket />} />
+            <Route path="/cliente/tickets" element={<MisTickets />} />
+            <Route path="/cliente/tickets/:id" element={<DetalleTicketCliente />} />
+            <Route path="/cliente/tickets/:id/calificar" element={<CalificarTicket />} />
+            <Route path="/cliente/perfil" element={<PerfilCliente />} />
+          </Route>
 
-        {/* Cliente */}
-        <Route path="/cliente" element={<DashboardCliente />} />
-        <Route path="/cliente/tickets/nuevo" element={<CrearTicket />} />
-        <Route path="/cliente/tickets" element={<MisTickets />} />
-        <Route path="/cliente/tickets/:id" element={<DetalleTicketCliente />} />
-        <Route path="/cliente/tickets/:id/calificar" element={<CalificarTicket />} />
-        <Route path="/cliente/perfil" element={<PerfilCliente />} />
+          {/* Rutas protegidas: Técnico */}
+          <Route element={<RutaProtegida rol="tecnico" />}>
+            <Route path="/tecnico" element={<DashboardTecnico />} />
+            <Route path="/tecnico/tickets/:id" element={<DetalleTicketTecnico />} />
+            <Route path="/tecnico/tickets/:id/avance" element={<ActualizarAvance />} />
+            <Route path="/tecnico/inventario" element={<InventarioTecnico />} />
+          </Route>
 
-        {/* Técnico */}
-        <Route path="/tecnico" element={<DashboardTecnico />} />
-        <Route path="/tecnico/tickets/:id" element={<DetalleTicketTecnico />} />
-        <Route path="/tecnico/tickets/:id/avance" element={<ActualizarAvance />} />
-        <Route path="/tecnico/inventario" element={<InventarioTecnico />} />
+          {/* Rutas protegidas: Administrador */}
+          <Route element={<RutaProtegida rol="administrador" />}>
+            <Route path="/admin" element={<DashboardAdmin />} />
+            <Route path="/admin/usuarios" element={<GestionUsuarios />} />
+            <Route path="/admin/tickets/:id/asignar" element={<AsignarTecnico />} />
+            <Route path="/admin/categorias" element={<GestionCategorias />} />
+            <Route path="/admin/inventario" element={<GestionInventario />} />
+            <Route path="/admin/reportes" element={<Reportes />} />
+            <Route path="/admin/calificaciones" element={<CalificacionesRecibidas />} />
+          </Route>
 
-        {/* Admin */}
-        <Route path="/admin" element={<DashboardAdmin />} />
-        <Route path="/admin/usuarios" element={<GestionUsuarios />} />
-        <Route path="/admin/tickets/:id/asignar" element={<AsignarTecnico />} />
-        <Route path="/admin/categorias" element={<GestionCategorias />} />
-        <Route path="/admin/inventario" element={<GestionInventario />} />
-        <Route path="/admin/reportes" element={<Reportes />} />
-        <Route path="/admin/calificaciones" element={<CalificacionesRecibidas />} />
-
-        {/* Redirección por defecto */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Redirección por defecto */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }

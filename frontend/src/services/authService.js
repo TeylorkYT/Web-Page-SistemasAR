@@ -1,21 +1,21 @@
+import { cliente } from "../api/client";
 import { usuarios } from "../data/datosFalsos";
 
-export async function iniciarSesion(correo, contrasena) {
-  const correoLimpio = (correo || "").trim().toLowerCase();
-  const usuario = usuarios.find(
-    (u) =>
-      u.correo_electronico.toLowerCase() === correoLimpio &&
-      u.contrasena === contrasena
-  );
-
-  if (!usuario) {
-    throw new Error("Correo o contraseña incorrectos");
+export async function iniciarSesion(correo_electronico, contrasena) {
+  try {
+    const { data } = await cliente.post("/auth/login", { correo_electronico, contrasena });
+    return data;
+  } catch (error) {
+    const estado = error.response?.status;
+    if (estado === 401) throw new Error("Correo o contraseña incorrectos");
+    if (estado === 403) throw new Error("Tu cuenta está inactiva. Habla con el administrador");
+    throw new Error("No se pudo conectar con el servidor");
   }
+}
 
-  return {
-    rol: usuario.rol.toLowerCase(),
-    nombre: `${usuario.nombre} ${usuario.apellido}`,
-  };
+export async function obtenerPerfil() {
+  const { data } = await cliente.get("/auth/me");
+  return data;
 }
 
 export async function solicitarRecuperacion(correo) {
