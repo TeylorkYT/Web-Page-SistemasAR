@@ -7,10 +7,14 @@ from sqlalchemy.engine import URL
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
+import app.models as _models  # noqa: F401 - Asegura registro de todas las tablas en Base.metadata
 from app.core.security import hashear_contrasena
 from app.db.database import Base, get_db
 from app.main import app
-from app.models.usuario import Usuario  # Asegura registro de tabla en Base.metadata
+from app.models.administrador import Administrador
+from app.models.cliente import Cliente
+from app.models.tecnico import Tecnico
+from app.models.usuario import Usuario
 
 
 def _obtener_engine_pruebas():
@@ -90,6 +94,14 @@ def _poblar_usuarios_prueba(session):
         existente = session.get(Usuario, u.id_usuario)
         if not existente:
             session.add(u)
+    session.commit()
+
+    if not session.get(Administrador, 1):
+        session.add(Administrador(id_usuario=1, cargo="Coordinador de Soporte TI"))
+    if not session.get(Tecnico, 2):
+        session.add(Tecnico(id_usuario=2, especialidad="Soporte General TI", disponibilidad="Disponible"))
+    if not session.get(Cliente, 3):
+        session.add(Cliente(id_usuario=3, telefono="3001234567", direccion="Calle 1 # 2-3", area_departamento="Ventas"))
     session.commit()
 
 
