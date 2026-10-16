@@ -18,7 +18,11 @@ import {
   categorias as categoriasIniciales,
   tickets as ticketsIniciales,
   usuarios as usuariosIniciales,
-  calificaciones as calificacionesIniciales
+  calificaciones as calificacionesIniciales,
+  tecnicos,
+  clientes,
+  ticketCategorias,
+  historial
 } from "../data/datosFalsos";
 
 // ------------------------------------------------------------------------------
@@ -275,29 +279,48 @@ let calificacionesMemoria = [
 export async function obtenerMetricasDashboard() {
   return new Promise((resolve) => {
     setTimeout(() => {
+      const ticketsTotales = ticketsMemoria.length;
+      const ticketsAbiertos = ticketsMemoria.filter((t) => t.estado !== "Cerrado").length;
+      const ticketsCerrados = ticketsMemoria.filter((t) => t.estado === "Cerrado").length;
+
+      // Técnicos activos: disponibilidad distinta de 'Fuera_de_Servicio'
+      const tecnicosActivosLista = tecnicos.filter(
+        (tec) => tec.disponibilidad !== "Fuera_de_Servicio"
+      );
+      const tecnicosActivos = tecnicosActivosLista.length;
+
+      // Tabla de monitoreo en tiempo real con datos de v2.0
+      const tecnicosMonitoreo = tecnicosActivosLista.map((tec) => {
+        const usuario = usuariosIniciales.find((u) => u.id_usuario === tec.id_usuario);
+        const ticketEnProceso = ticketsMemoria.find(
+          (t) => t.id_tecnico === tec.id_usuario && t.estado === "En_Proceso"
+        );
+        return {
+          id: tec.id_usuario,
+          nombre: usuario ? `${usuario.nombre} ${usuario.apellido}` : `Técnico #${tec.id_usuario}`,
+          estado: tec.disponibilidad, // 'Disponible', 'Ocupado', 'En_Almuerzo'
+          ticketActual: ticketEnProceso ? `TKT-${ticketEnProceso.id_ticket}` : "-"
+        };
+      });
+
       resolve({
-        ticketsTotales: 120,
-        ticketsAbiertos: 25,
-        tecnicosActivos: 12,
+        ticketsTotales,
+        ticketsAbiertos,
+        ticketsCerrados,
+        tecnicosActivos,
         graficoSemanal: [
-          { etiqueta: "Sem 1", abiertos: 60, cerrados: 40, porcentaje: 85 },
-          { etiqueta: "Sem 2", abiertos: 45, cerrados: 35, porcentaje: 58 },
-          { etiqueta: "Sem 3", abiertos: 25, cerrados: 20, porcentaje: 30 },
-          { etiqueta: "Sem 4", abiertos: 15, cerrados: 12, porcentaje: 20 }
+          { etiqueta: "Sem 1", abiertos: 4, cerrados: 2, porcentaje: 60 },
+          { etiqueta: "Sem 2", abiertos: 6, cerrados: 3, porcentaje: 75 },
+          { etiqueta: "Sem 3", abiertos: 5, cerrados: 3, porcentaje: 65 },
+          { etiqueta: "Sem 4", abiertos: ticketsAbiertos, cerrados: ticketsCerrados, porcentaje: Math.round(((ticketsCerrados || 1) / (ticketsTotales || 1)) * 100) }
         ],
         graficoMensual: [
-          { etiqueta: "Mayo", abiertos: 80, cerrados: 75, porcentaje: 70 },
-          { etiqueta: "Junio", abiertos: 95, cerrados: 88, porcentaje: 82 },
-          { etiqueta: "Julio", abiertos: 110, cerrados: 100, porcentaje: 95 },
-          { etiqueta: "Agosto", abiertos: 120, cerrados: 95, porcentaje: 100 }
+          { etiqueta: "Mayo", abiertos: 12, cerrados: 10, porcentaje: 70 },
+          { etiqueta: "Junio", abiertos: 15, cerrados: 12, porcentaje: 80 },
+          { etiqueta: "Julio", abiertos: 18, cerrados: 16, porcentaje: 88 },
+          { etiqueta: "Agosto", abiertos: ticketsAbiertos, cerrados: ticketsCerrados, porcentaje: 95 }
         ],
-        tecnicosMonitoreo: [
-          { id: 1, nombre: "Carlos T.", estado: "Ocupado", ticketActual: "TKT-1029" },
-          { id: 2, nombre: "Diana M.", estado: "Libre", ticketActual: "-" },
-          { id: 3, nombre: "Luis F.", estado: "Ocupado", ticketActual: "TKT-1030" },
-          { id: 4, nombre: "Andrés R.", estado: "Ocupado", ticketActual: "TKT-1031" },
-          { id: 5, nombre: "Sofía C.", estado: "Libre", ticketActual: "-" }
-        ]
+        tecnicosMonitoreo
       });
     }, 100);
   });
