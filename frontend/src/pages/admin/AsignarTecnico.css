@@ -171,8 +171,13 @@
   color: #ffffff;
 }
 
-.badge-prioridad.alta,
 .badge-prioridad.critica {
+  background-color: #881337; /* Vino tinto / carmesí profundo para nivel Crítica */
+  border: 1px solid #fda4af;
+  box-shadow: 0 0 6px rgba(225, 29, 72, 0.35);
+}
+
+.badge-prioridad.alta {
   background-color: #b91c1c; /* Rojo oscuro según mockup */
 }
 
@@ -181,7 +186,7 @@
 }
 
 .badge-prioridad.baja {
-  background-color: #437a34; /* Verde oliva según mockup */
+  background-color: #047857; /* Verde según estándar */
 }
 
 /* Cuerpo de la tarjeta */

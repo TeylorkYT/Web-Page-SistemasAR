@@ -99,70 +99,37 @@ let serviciosMemoria = [
 
 let ticketsMemoria = [...ticketsIniciales];
 
-// Tickets pendientes de asignación fieles al Mockup 16 y conectados con DDL
-let ticketsPendientesMemoria = [
-  {
-    id_ticket: 1035,
-    codigo: "TKT-1035",
-    titulo: "Sin red local",
-    cliente: "Empresa S.A.",
-    falla: "Sin red local",
-    categoria: "Redes",
-    fecha_creacion_texto: "Hace 2 horas",
-    prioridad: "ALTA",
-    descripcion: "El router de la oficina principal no da señal, luz roja parpadeando constantemente. Toda la planta de ventas se encuentra incomunicada.",
-    estado: "Abierto",
-    id_tecnico: null
-  },
-  {
-    id_ticket: 1036,
-    codigo: "TKT-1036",
-    titulo: "PC no enciende",
-    cliente: "Juan Pérez",
-    falla: "PC no enciende",
-    categoria: "Hardware",
-    fecha_creacion_texto: "Hace 4 horas",
-    prioridad: "MEDIA",
-    descripcion: "El equipo de escritorio no responde al presionar el botón de encendido. No enciende ningún LED ni ventilador tras corte de energía.",
-    estado: "Abierto",
-    id_tecnico: null
-  },
-  {
-    id_ticket: 1037,
-    codigo: "TKT-1037",
-    titulo: "Act. de software",
-    cliente: "Ana Gómez",
-    falla: "Act. de software",
-    categoria: "Software",
-    fecha_creacion_texto: "Hace 1 día",
-    prioridad: "BAJA",
-    descripcion: "Se requiere actualización a Windows 11 e instalación de paquetería ofimática corporativa y certificado digital.",
-    estado: "Abierto",
-    id_tecnico: null
-  },
-  {
-    id_ticket: 1038,
-    codigo: "TKT-1038",
-    titulo: "Falla de impresión en red",
-    cliente: "Carlos Ordóñez",
-    falla: "Impresora bloqueada",
-    categoria: "Periféricos",
-    fecha_creacion_texto: "Hace 3 horas",
-    prioridad: "MEDIA",
-    descripcion: "La impresora térmica de facturación se queda en cola de impresión y marca error de comunicación intermitente.",
-    estado: "Abierto",
-    id_tecnico: null
-  }
-];
+// Función para construir objeto de ticket pendiente con datos relacionales v2.0
+export function construirTicketPendiente(t) {
+  const clienteUser = usuariosIniciales.find((u) => u.id_usuario === t.id_cliente);
+  const catsRel = ticketCategorias.filter((tc) => tc.id_ticket === t.id_ticket);
+  const nombresCats = catsRel.map((tc) => {
+    const cat = categoriasMemoria.find((c) => c.id_categoria === tc.id_categoria);
+    return cat ? cat.nombre_categoria : `Cat #${tc.id_categoria}`;
+  });
 
-// Técnicos disponibles con carga de trabajo para asignación (Mockup 16)
-let tecnicosCargaMemoria = [
-  { id_tecnico: 2, nombre: "Diana M.", estado: "Libre", cargaTickets: 0, especialidad: "Redes y Servidores" },
-  { id_tecnico: 1, nombre: "Carlos T.", estado: "1 Tkt", cargaTickets: 1, especialidad: "Hardware y Ensamblaje" },
-  { id_tecnico: 3, nombre: "Luis F.", estado: "2 Tkts", cargaTickets: 2, especialidad: "Soporte General" },
-  { id_tecnico: 5, nombre: "Andrés R.", estado: "1 Tkt", cargaTickets: 1, especialidad: "Software y Sistemas" },
-  { id_tecnico: 6, nombre: "Sofía C.", estado: "Libre", cargaTickets: 0, especialidad: "Seguridad y Redes" }
-];
+  return {
+    id_ticket: t.id_ticket,
+    codigo: `TKT-${t.id_ticket}`,
+    titulo: t.titulo,
+    cliente: clienteUser ? `${clienteUser.nombre} ${clienteUser.apellido}` : `Cliente #${t.id_cliente}`,
+    falla: t.titulo,
+    descripcion: t.descripcion,
+    prioridad: t.prioridad, // 'Baja', 'Media', 'Alta', 'Critica'
+    modalidad: t.modalidad,
+    fecha_creacion: t.fecha_creacion,
+    fecha_creacion_texto: t.fecha_creacion,
+    categorias: nombresCats.length > 0 ? nombresCats : ["General"],
+    categoria: nombresCats.join(", ") || "General",
+    estado: t.estado,
+    id_tecnico: t.id_tecnico
+  };
+}
+
+// Tickets pendientes de asignación fieles al esquema v2.0 (estado Abierto sin técnico)
+let ticketsPendientesMemoria = ticketsMemoria
+  .filter((t) => t.estado === "Abierto" && !t.id_tecnico)
+  .map(construirTicketPendiente);
 
 // Calificaciones fieles al Mockup 20 y al modelo de datos
 let calificacionesMemoria = [
@@ -514,44 +481,74 @@ export async function obtenerDetalleTicketAsignar(idTicket) {
 }
 
 /**
- * Obtiene el listado de técnicos disponibles con su estado y carga actual.
+ * Obtiene el listado de técnicos con su disponibilidad y cantidad de tickets en En_Proceso (v2.0).
+ * Los técnicos en Fuera_de_Servicio aparecen marcados como deshabilitados.
+ * Si un técnico tiene 5 o más tickets en En_Proceso, se marca con alerta de sobrecarga.
  */
 export async function obtenerTecnicosParaAsignar() {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve([...tecnicosCargaMemoria]);
+      const lista = tecnicos.map((tec) => {
+        const usuario = usuariosIniciales.find((u) => u.id_usuario === tec.id_usuario);
+        const ticketsEnProceso = ticketsMemoria.filter(
+          (t) => t.id_tecnico === tec.id_usuario && t.estado === "En_Proceso"
+        ).length;
+
+        return {
+          id_tecnico: tec.id_usuario,
+          nombre: usuario ? `${usuario.nombre} ${usuario.apellido}` : `Técnico #${tec.id_usuario}`,
+          especialidad: tec.especialidad,
+          disponibilidad: tec.disponibilidad, // 'Disponible', 'Ocupado', 'En_Almuerzo', 'Fuera_de_Servicio'
+          ticketsEnProceso,
+          alertaCarga: ticketsEnProceso >= 5,
+          deshabilitado: tec.disponibilidad === "Fuera_de_Servicio",
+          estado: tec.disponibilidad.replace(/_/g, " ")
+        };
+      });
+      resolve(lista);
     }, 80);
   });
 }
 
 /**
- * Asigna un técnico responsable a un ticket pendiente.
+ * Asigna un técnico responsable a un ticket pendiente (v2.0).
+ * Guarda id_tecnico, id_asignado_por, la prioridad elegida y pasa a 'En_Proceso'.
  */
-export async function asignarTecnicoATicket(idTicket, idTecnico) {
+export async function asignarTecnicoATicket(idTicket, idTecnico, prioridadAjustada = null) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const idNum = Number(idTicket);
-      const ticket = ticketsPendientesMemoria.find((t) => t.id_ticket === idNum);
+      const ticket = ticketsMemoria.find((t) => t.id_ticket === idNum);
       if (!ticket) {
-        return reject(new Error("Ticket no encontrado en la lista de pendientes"));
+        return reject(new Error("Ticket no encontrado en la lista"));
       }
 
-      const tecnico = tecnicosCargaMemoria.find((tec) => tec.id_tecnico === Number(idTecnico));
-      if (!tecnico) {
+      const tec = tecnicos.find((tc) => tc.id_usuario === Number(idTecnico));
+      if (!tec) {
         return reject(new Error("Debe seleccionar un técnico válido"));
       }
+      if (tec.disponibilidad === "Fuera_de_Servicio") {
+        return reject(new Error("No se puede asignar un ticket a un técnico fuera de servicio"));
+      }
 
-      // Actualizar carga del técnico
-      tecnico.cargaTickets += 1;
-      tecnico.estado = `${tecnico.cargaTickets} Tkt${tecnico.cargaTickets > 1 ? "s" : ""}`;
+      const usuarioTec = usuariosIniciales.find((u) => u.id_usuario === tec.id_usuario);
+      const nombreTecnico = usuarioTec ? `${usuarioTec.nombre} ${usuarioTec.apellido}` : `Técnico #${tec.id_usuario}`;
 
-      // Remover o marcar como asignado
+      // Actualizar el ticket en memoria
+      ticket.id_tecnico = tec.id_usuario;
+      ticket.id_asignado_por = 1; // Administrador Carlos
+      if (prioridadAjustada) {
+        ticket.prioridad = prioridadAjustada;
+      }
+      ticket.estado = "En_Proceso";
+
+      // Remover de tickets pendientes
       ticketsPendientesMemoria = ticketsPendientesMemoria.filter((t) => t.id_ticket !== idNum);
 
       resolve({
         exito: true,
-        mensaje: `Ticket ${ticket.codigo} asignado exitosamente a ${tecnico.nombre}.`,
-        ticketActualizado: { ...ticket, estado: "En_Proceso", id_tecnico: tecnico.id_tecnico }
+        mensaje: `Ticket TKT-${ticket.id_ticket} asignado exitosamente a ${nombreTecnico} con prioridad ${ticket.prioridad}.`,
+        ticketActualizado: { ...ticket }
       });
     }, 120);
   });
