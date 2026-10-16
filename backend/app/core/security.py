@@ -18,6 +18,13 @@ def verificar_contrasena(contrasena: str, hash_guardado: str) -> bool:
         return False
 
 
+def _obtener_secreto() -> str:
+    if config.ENV == "production":
+        config.validar_configuracion_produccion()
+        return config.JWT_SECRET  # type: ignore[return-value]
+    return config.JWT_SECRET or "clave-secreta-jwt-sistemas-ar-desarrollo-local"
+
+
 def _crear_token(id_usuario: int, rol: str, tipo: str, vigencia: timedelta) -> str:
     ahora = datetime.now(timezone.utc)
     datos = {
@@ -27,7 +34,7 @@ def _crear_token(id_usuario: int, rol: str, tipo: str, vigencia: timedelta) -> s
         "iat": ahora,
         "exp": ahora + vigencia,
     }
-    secret = config.JWT_SECRET or "clave-secreta-jwt-sistemas-ar-desarrollo-local"
+    secret = _obtener_secreto()
     return jwt.encode(datos, secret, algorithm=config.JWT_ALGORITHM)
 
 
@@ -40,8 +47,9 @@ def crear_refresh_token(id_usuario: int, rol: str) -> str:
 
 
 def decodificar_token(token: str, tipo: str) -> dict:
-    secret = config.JWT_SECRET or "clave-secreta-jwt-sistemas-ar-desarrollo-local"
+    secret = _obtener_secreto()
     datos = jwt.decode(token, secret, algorithms=[config.JWT_ALGORITHM])
     if datos.get("tipo") != tipo:
         raise jwt.InvalidTokenError("Tipo de token incorrecto")
     return datos
+
