@@ -18,7 +18,11 @@ import {
   categorias as categoriasIniciales,
   tickets as ticketsIniciales,
   usuarios as usuariosIniciales,
-  calificaciones as calificacionesIniciales
+  calificaciones as calificacionesIniciales,
+  tecnicos,
+  clientes,
+  ticketCategorias,
+  historial
 } from "../data/datosFalsos";
 
 // ------------------------------------------------------------------------------
@@ -95,174 +99,68 @@ let serviciosMemoria = [
 
 let ticketsMemoria = [...ticketsIniciales];
 
-// Tickets pendientes de asignación fieles al Mockup 16 y conectados con DDL
-let ticketsPendientesMemoria = [
-  {
-    id_ticket: 1035,
-    codigo: "TKT-1035",
-    titulo: "Sin red local",
-    cliente: "Empresa S.A.",
-    falla: "Sin red local",
-    categoria: "Redes",
-    fecha_creacion_texto: "Hace 2 horas",
-    prioridad: "ALTA",
-    descripcion: "El router de la oficina principal no da señal, luz roja parpadeando constantemente. Toda la planta de ventas se encuentra incomunicada.",
-    estado: "Abierto",
-    id_tecnico: null
-  },
-  {
-    id_ticket: 1036,
-    codigo: "TKT-1036",
-    titulo: "PC no enciende",
-    cliente: "Juan Pérez",
-    falla: "PC no enciende",
-    categoria: "Hardware",
-    fecha_creacion_texto: "Hace 4 horas",
-    prioridad: "MEDIA",
-    descripcion: "El equipo de escritorio no responde al presionar el botón de encendido. No enciende ningún LED ni ventilador tras corte de energía.",
-    estado: "Abierto",
-    id_tecnico: null
-  },
-  {
-    id_ticket: 1037,
-    codigo: "TKT-1037",
-    titulo: "Act. de software",
-    cliente: "Ana Gómez",
-    falla: "Act. de software",
-    categoria: "Software",
-    fecha_creacion_texto: "Hace 1 día",
-    prioridad: "BAJA",
-    descripcion: "Se requiere actualización a Windows 11 e instalación de paquetería ofimática corporativa y certificado digital.",
-    estado: "Abierto",
-    id_tecnico: null
-  },
-  {
-    id_ticket: 1038,
-    codigo: "TKT-1038",
-    titulo: "Falla de impresión en red",
-    cliente: "Carlos Ordóñez",
-    falla: "Impresora bloqueada",
-    categoria: "Periféricos",
-    fecha_creacion_texto: "Hace 3 horas",
-    prioridad: "MEDIA",
-    descripcion: "La impresora térmica de facturación se queda en cola de impresión y marca error de comunicación intermitente.",
-    estado: "Abierto",
-    id_tecnico: null
-  }
-];
+// Función para construir objeto de ticket pendiente con datos relacionales v2.0
+export function construirTicketPendiente(t) {
+  const clienteUser = usuariosIniciales.find((u) => u.id_usuario === t.id_cliente);
+  const catsRel = ticketCategorias.filter((tc) => tc.id_ticket === t.id_ticket);
+  const nombresCats = catsRel.map((tc) => {
+    const cat = categoriasMemoria.find((c) => c.id_categoria === tc.id_categoria);
+    return cat ? cat.nombre_categoria : `Cat #${tc.id_categoria}`;
+  });
 
-// Técnicos disponibles con carga de trabajo para asignación (Mockup 16)
-let tecnicosCargaMemoria = [
-  { id_tecnico: 2, nombre: "Diana M.", estado: "Libre", cargaTickets: 0, especialidad: "Redes y Servidores" },
-  { id_tecnico: 1, nombre: "Carlos T.", estado: "1 Tkt", cargaTickets: 1, especialidad: "Hardware y Ensamblaje" },
-  { id_tecnico: 3, nombre: "Luis F.", estado: "2 Tkts", cargaTickets: 2, especialidad: "Soporte General" },
-  { id_tecnico: 5, nombre: "Andrés R.", estado: "1 Tkt", cargaTickets: 1, especialidad: "Software y Sistemas" },
-  { id_tecnico: 6, nombre: "Sofía C.", estado: "Libre", cargaTickets: 0, especialidad: "Seguridad y Redes" }
-];
+  return {
+    id_ticket: t.id_ticket,
+    codigo: `TKT-${t.id_ticket}`,
+    titulo: t.titulo,
+    cliente: clienteUser ? `${clienteUser.nombre} ${clienteUser.apellido}` : `Cliente #${t.id_cliente}`,
+    falla: t.titulo,
+    descripcion: t.descripcion,
+    prioridad: t.prioridad, // 'Baja', 'Media', 'Alta', 'Critica'
+    modalidad: t.modalidad,
+    fecha_creacion: t.fecha_creacion,
+    fecha_creacion_texto: t.fecha_creacion,
+    categorias: nombresCats.length > 0 ? nombresCats : ["General"],
+    categoria: nombresCats.join(", ") || "General",
+    estado: t.estado,
+    id_tecnico: t.id_tecnico
+  };
+}
 
-// Calificaciones fieles al Mockup 20 y al modelo de datos
-let calificacionesMemoria = [
-  {
-    id_calificacion: 1,
-    codigo_ticket: "TKT-1024",
-    id_ticket: 1024,
-    tecnico: "Diana M.",
-    id_tecnico: 2,
-    puntuacion: 5,
-    comentario_resumen: "Excelente soporte, muy...",
-    comentario_completo: "Excelente soporte, muy rápida la solución y el equipo quedó funcionando al 100%. Totalmente recomendada.",
-    cliente: "Tecnología Global",
-    contacto: "Carlos Gómez",
-    fecha: "2026-10-14",
-    rango: "este_mes"
-  },
-  {
-    id_calificacion: 2,
-    codigo_ticket: "TKT-1021",
-    id_ticket: 1021,
-    tecnico: "Carlos T.",
-    id_tecnico: 1,
-    puntuacion: 4,
-    comentario_resumen: "Resolvió el problema...",
-    comentario_completo: "Resolvió el problema del servidor a tiempo, aunque tardó un poco en responder las dudas iniciales.",
-    cliente: "Distribuidora del Norte",
-    contacto: "Jorge Martínez",
-    fecha: "2026-10-12",
-    rango: "este_mes"
-  },
-  {
-    id_calificacion: 3,
-    codigo_ticket: "TKT-1015",
-    id_ticket: 1015,
-    tecnico: "Diana M.",
-    id_tecnico: 2,
-    puntuacion: 5,
-    comentario_resumen: "Muy amable y...",
-    comentario_completo: "Muy amable y capacitó al personal sobre el uso correcto y mantenimiento de la red.",
-    cliente: "Colegio San José",
-    contacto: "Patricia Vélez",
-    fecha: "2026-10-08",
-    rango: "este_mes"
-  },
-  {
-    id_calificacion: 4,
-    codigo_ticket: "TKT-1010",
-    id_ticket: 1010,
-    tecnico: "Carlos T.",
-    id_tecnico: 1,
-    puntuacion: 1,
-    comentario_resumen: "No resolvió el...",
-    comentario_completo: "El técnico llegó 2 horas tarde, no trajo la herramienta adecuada y el router sigue presentando cortes de red.",
-    cliente: "Empresa S.A.",
-    contacto: "Ana Gómez",
-    fecha: "2026-10-05",
+// Tickets pendientes de asignación fieles al esquema v2.0 (estado Abierto sin técnico)
+let ticketsPendientesMemoria = ticketsMemoria
+  .filter((t) => t.estado === "Abierto" && !t.id_tecnico)
+  .map(construirTicketPendiente);
+
+// Función para enriquecer objeto de calificación con datos relacionales v2.0
+export function enriquecerCalificacion(c) {
+  const ticket = ticketsMemoria.find((t) => t.id_ticket === c.id_ticket);
+  const tecnico = usuariosIniciales.find((u) => u.id_usuario === c.id_tecnico);
+  const cliente = usuariosIniciales.find((u) => u.id_usuario === c.id_cliente);
+  const clienteSub = clientes.find((cl) => cl.id_usuario === c.id_cliente);
+
+  return {
+    id_calificacion: c.id_calificacion,
+    id_ticket: c.id_ticket,
+    codigo_ticket: `TKT-${c.id_ticket}`,
+    id_tecnico: c.id_tecnico,
+    tecnico: tecnico ? `${tecnico.nombre} ${tecnico.apellido}` : `Técnico #${c.id_tecnico}`,
+    id_cliente: c.id_cliente,
+    cliente: cliente ? `${cliente.nombre} ${cliente.apellido}` : `Cliente #${c.id_cliente}`,
+    contacto: clienteSub ? clienteSub.telefono : (cliente ? cliente.correo_electronico : ""),
+    correo_cliente: cliente ? cliente.correo_electronico : "",
+    puntuacion: c.puntuacion,
+    comentario: c.comentario,
+    comentario_resumen: c.comentario && c.comentario.length > 28 ? c.comentario.substring(0, 25) + "..." : c.comentario,
+    comentario_completo: c.comentario,
+    fecha_calificacion: c.fecha_calificacion,
+    fecha: c.fecha_calificacion ? c.fecha_calificacion.substring(0, 10) : "",
     rango: "este_mes",
-    esAlerta: true
-  },
-  {
-    id_calificacion: 5,
-    codigo_ticket: "TKT-1008",
-    id_ticket: 1008,
-    tecnico: "Andrés R.",
-    id_tecnico: 5,
-    puntuacion: 4,
-    comentario_resumen: "Buena atención general...",
-    comentario_completo: "Buena atención y disposición, aunque faltó un informe más detallado por escrito.",
-    cliente: "Logística Express",
-    contacto: "Laura Restrepo",
-    fecha: "2026-10-02",
-    rango: "este_mes"
-  },
-  {
-    id_calificacion: 6,
-    codigo_ticket: "TKT-1002",
-    id_ticket: 1002,
-    tecnico: "Diana M.",
-    id_tecnico: 2,
-    puntuacion: 5,
-    comentario_resumen: "Impecable servicio...",
-    comentario_completo: "Impecable diagnóstico y recuperación de datos en tiempo récord.",
-    cliente: "Consultoría Contable",
-    contacto: "Esteban Rico",
-    fecha: "2026-09-28",
-    rango: "mes_anterior"
-  },
-  {
-    id_calificacion: 7,
-    codigo_ticket: "TKT-995",
-    id_ticket: 995,
-    tecnico: "Luis F.",
-    id_tecnico: 3,
-    puntuacion: 2,
-    comentario_resumen: "Faltó seguimiento...",
-    comentario_completo: "La falla se solucionó temporalmente pero volvió a presentarse a los dos días sin respuesta inmediata.",
-    cliente: "Comercializadora Andina",
-    contacto: "Rosa Caicedo",
-    fecha: "2026-09-20",
-    rango: "mes_anterior",
-    esAlerta: true
-  }
-];
+    esAlerta: c.puntuacion <= 2,
+    titulo_ticket: ticket ? ticket.titulo : `Ticket #${c.id_ticket}`
+  };
+}
+
+let calificacionesMemoria = calificacionesIniciales.map(enriquecerCalificacion);
 
 // ==============================================================================
 // 1. DASHBOARD DEL ADMINISTRADOR (VISTA 14)
@@ -275,29 +173,48 @@ let calificacionesMemoria = [
 export async function obtenerMetricasDashboard() {
   return new Promise((resolve) => {
     setTimeout(() => {
+      const ticketsTotales = ticketsMemoria.length;
+      const ticketsAbiertos = ticketsMemoria.filter((t) => t.estado !== "Cerrado").length;
+      const ticketsCerrados = ticketsMemoria.filter((t) => t.estado === "Cerrado").length;
+
+      // Técnicos activos: disponibilidad distinta de 'Fuera_de_Servicio'
+      const tecnicosActivosLista = tecnicos.filter(
+        (tec) => tec.disponibilidad !== "Fuera_de_Servicio"
+      );
+      const tecnicosActivos = tecnicosActivosLista.length;
+
+      // Tabla de monitoreo en tiempo real con datos de v2.0
+      const tecnicosMonitoreo = tecnicosActivosLista.map((tec) => {
+        const usuario = usuariosIniciales.find((u) => u.id_usuario === tec.id_usuario);
+        const ticketEnProceso = ticketsMemoria.find(
+          (t) => t.id_tecnico === tec.id_usuario && t.estado === "En_Proceso"
+        );
+        return {
+          id: tec.id_usuario,
+          nombre: usuario ? `${usuario.nombre} ${usuario.apellido}` : `Técnico #${tec.id_usuario}`,
+          estado: tec.disponibilidad, // 'Disponible', 'Ocupado', 'En_Almuerzo'
+          ticketActual: ticketEnProceso ? `TKT-${ticketEnProceso.id_ticket}` : "-"
+        };
+      });
+
       resolve({
-        ticketsTotales: 120,
-        ticketsAbiertos: 25,
-        tecnicosActivos: 12,
+        ticketsTotales,
+        ticketsAbiertos,
+        ticketsCerrados,
+        tecnicosActivos,
         graficoSemanal: [
-          { etiqueta: "Sem 1", abiertos: 60, cerrados: 40, porcentaje: 85 },
-          { etiqueta: "Sem 2", abiertos: 45, cerrados: 35, porcentaje: 58 },
-          { etiqueta: "Sem 3", abiertos: 25, cerrados: 20, porcentaje: 30 },
-          { etiqueta: "Sem 4", abiertos: 15, cerrados: 12, porcentaje: 20 }
+          { etiqueta: "Sem 1", abiertos: 4, cerrados: 2, porcentaje: 60 },
+          { etiqueta: "Sem 2", abiertos: 6, cerrados: 3, porcentaje: 75 },
+          { etiqueta: "Sem 3", abiertos: 5, cerrados: 3, porcentaje: 65 },
+          { etiqueta: "Sem 4", abiertos: ticketsAbiertos, cerrados: ticketsCerrados, porcentaje: Math.round(((ticketsCerrados || 1) / (ticketsTotales || 1)) * 100) }
         ],
         graficoMensual: [
-          { etiqueta: "Mayo", abiertos: 80, cerrados: 75, porcentaje: 70 },
-          { etiqueta: "Junio", abiertos: 95, cerrados: 88, porcentaje: 82 },
-          { etiqueta: "Julio", abiertos: 110, cerrados: 100, porcentaje: 95 },
-          { etiqueta: "Agosto", abiertos: 120, cerrados: 95, porcentaje: 100 }
+          { etiqueta: "Mayo", abiertos: 12, cerrados: 10, porcentaje: 70 },
+          { etiqueta: "Junio", abiertos: 15, cerrados: 12, porcentaje: 80 },
+          { etiqueta: "Julio", abiertos: 18, cerrados: 16, porcentaje: 88 },
+          { etiqueta: "Agosto", abiertos: ticketsAbiertos, cerrados: ticketsCerrados, porcentaje: 95 }
         ],
-        tecnicosMonitoreo: [
-          { id: 1, nombre: "Carlos T.", estado: "Ocupado", ticketActual: "TKT-1029" },
-          { id: 2, nombre: "Diana M.", estado: "Libre", ticketActual: "-" },
-          { id: 3, nombre: "Luis F.", estado: "Ocupado", ticketActual: "TKT-1030" },
-          { id: 4, nombre: "Andrés R.", estado: "Ocupado", ticketActual: "TKT-1031" },
-          { id: 5, nombre: "Sofía C.", estado: "Libre", ticketActual: "-" }
-        ]
+        tecnicosMonitoreo
       });
     }, 100);
   });
@@ -491,44 +408,74 @@ export async function obtenerDetalleTicketAsignar(idTicket) {
 }
 
 /**
- * Obtiene el listado de técnicos disponibles con su estado y carga actual.
+ * Obtiene el listado de técnicos con su disponibilidad y cantidad de tickets en En_Proceso (v2.0).
+ * Los técnicos en Fuera_de_Servicio aparecen marcados como deshabilitados.
+ * Si un técnico tiene 5 o más tickets en En_Proceso, se marca con alerta de sobrecarga.
  */
 export async function obtenerTecnicosParaAsignar() {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve([...tecnicosCargaMemoria]);
+      const lista = tecnicos.map((tec) => {
+        const usuario = usuariosIniciales.find((u) => u.id_usuario === tec.id_usuario);
+        const ticketsEnProceso = ticketsMemoria.filter(
+          (t) => t.id_tecnico === tec.id_usuario && t.estado === "En_Proceso"
+        ).length;
+
+        return {
+          id_tecnico: tec.id_usuario,
+          nombre: usuario ? `${usuario.nombre} ${usuario.apellido}` : `Técnico #${tec.id_usuario}`,
+          especialidad: tec.especialidad,
+          disponibilidad: tec.disponibilidad, // 'Disponible', 'Ocupado', 'En_Almuerzo', 'Fuera_de_Servicio'
+          ticketsEnProceso,
+          alertaCarga: ticketsEnProceso >= 5,
+          deshabilitado: tec.disponibilidad === "Fuera_de_Servicio",
+          estado: tec.disponibilidad.replace(/_/g, " ")
+        };
+      });
+      resolve(lista);
     }, 80);
   });
 }
 
 /**
- * Asigna un técnico responsable a un ticket pendiente.
+ * Asigna un técnico responsable a un ticket pendiente (v2.0).
+ * Guarda id_tecnico, id_asignado_por, la prioridad elegida y pasa a 'En_Proceso'.
  */
-export async function asignarTecnicoATicket(idTicket, idTecnico) {
+export async function asignarTecnicoATicket(idTicket, idTecnico, prioridadAjustada = null) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const idNum = Number(idTicket);
-      const ticket = ticketsPendientesMemoria.find((t) => t.id_ticket === idNum);
+      const ticket = ticketsMemoria.find((t) => t.id_ticket === idNum);
       if (!ticket) {
-        return reject(new Error("Ticket no encontrado en la lista de pendientes"));
+        return reject(new Error("Ticket no encontrado en la lista"));
       }
 
-      const tecnico = tecnicosCargaMemoria.find((tec) => tec.id_tecnico === Number(idTecnico));
-      if (!tecnico) {
+      const tec = tecnicos.find((tc) => tc.id_usuario === Number(idTecnico));
+      if (!tec) {
         return reject(new Error("Debe seleccionar un técnico válido"));
       }
+      if (tec.disponibilidad === "Fuera_de_Servicio") {
+        return reject(new Error("No se puede asignar un ticket a un técnico fuera de servicio"));
+      }
 
-      // Actualizar carga del técnico
-      tecnico.cargaTickets += 1;
-      tecnico.estado = `${tecnico.cargaTickets} Tkt${tecnico.cargaTickets > 1 ? "s" : ""}`;
+      const usuarioTec = usuariosIniciales.find((u) => u.id_usuario === tec.id_usuario);
+      const nombreTecnico = usuarioTec ? `${usuarioTec.nombre} ${usuarioTec.apellido}` : `Técnico #${tec.id_usuario}`;
 
-      // Remover o marcar como asignado
+      // Actualizar el ticket en memoria
+      ticket.id_tecnico = tec.id_usuario;
+      ticket.id_asignado_por = 1; // Administrador Carlos
+      if (prioridadAjustada) {
+        ticket.prioridad = prioridadAjustada;
+      }
+      ticket.estado = "En_Proceso";
+
+      // Remover de tickets pendientes
       ticketsPendientesMemoria = ticketsPendientesMemoria.filter((t) => t.id_ticket !== idNum);
 
       resolve({
         exito: true,
-        mensaje: `Ticket ${ticket.codigo} asignado exitosamente a ${tecnico.nombre}.`,
-        ticketActualizado: { ...ticket, estado: "En_Proceso", id_tecnico: tecnico.id_tecnico }
+        mensaje: `Ticket TKT-${ticket.id_ticket} asignado exitosamente a ${nombreTecnico} con prioridad ${ticket.prioridad}.`,
+        ticketActualizado: { ...ticket }
       });
     }, 120);
   });
@@ -541,23 +488,56 @@ export async function asignarTecnicoATicket(idTicket, idTecnico) {
 /**
  * Obtiene las métricas de satisfacción general para las tarjetas superiores de la Vista 20.
  */
+/**
+ * Obtiene las métricas de satisfacción general para las tarjetas superiores de la Vista 20 (v2.0).
+ */
 export async function obtenerMetricasSatisfaccion() {
   return new Promise((resolve) => {
     setTimeout(() => {
+      if (calificacionesMemoria.length === 0) {
+        return resolve({
+          promedioGeneral: "0.0",
+          mejorValorado: { nombre: "Sin registros", promedio: "0.0" },
+          alertasBajaCalif: 0
+        });
+      }
+
+      const totalPuntos = calificacionesMemoria.reduce((acc, c) => acc + c.puntuacion, 0);
+      const promedioGeneral = (totalPuntos / calificacionesMemoria.length).toFixed(1);
+
+      // Calcular técnico mejor valorado
+      const promediosPorTecnico = {};
+      calificacionesMemoria.forEach((c) => {
+        if (!promediosPorTecnico[c.id_tecnico]) {
+          promediosPorTecnico[c.id_tecnico] = { nombre: c.tecnico, suma: 0, count: 0 };
+        }
+        promediosPorTecnico[c.id_tecnico].suma += c.puntuacion;
+        promediosPorTecnico[c.id_tecnico].count += 1;
+      });
+
+      let mejor = { nombre: "Diana Paz", promedio: "5.0" };
+      let maxProm = -1;
+      Object.values(promediosPorTecnico).forEach((t) => {
+        const prom = t.suma / t.count;
+        if (prom > maxProm) {
+          maxProm = prom;
+          mejor = { nombre: t.nombre, promedio: prom.toFixed(1) };
+        }
+      });
+
+      const alertasBajaCalif = calificacionesMemoria.filter((c) => c.puntuacion <= 2).length;
+
       resolve({
-        promedioGeneral: "4.5",
-        mejorValorado: {
-          nombre: "Diana M.",
-          promedio: "4.9"
-        },
-        alertasBajaCalif: 2
+        promedioGeneral,
+        mejorValorado: mejor,
+        alertasBajaCalif
       });
     }, 80);
   });
 }
 
 /**
- * Obtiene la lista de calificaciones con filtros aplicados (Técnico, Rango de tiempo, Puntaje).
+ * Obtiene la lista de calificaciones con filtros aplicados (Técnico, Rango de fechas sobre fecha_calificacion, Puntaje 1-5).
  */
 export async function obtenerCalificacionesSupervision(filtros = {}) {
   return new Promise((resolve) => {
@@ -567,18 +547,25 @@ export async function obtenerCalificacionesSupervision(filtros = {}) {
       // Filtro por técnico
       if (filtros.tecnico && filtros.tecnico !== "todos") {
         resultado = resultado.filter((c) =>
-          c.tecnico.toLowerCase().includes(filtros.tecnico.toLowerCase())
+          c.tecnico.toLowerCase().includes(filtros.tecnico.toLowerCase()) ||
+          String(c.id_tecnico) === String(filtros.tecnico)
         );
       }
 
-      // Filtro por rango
-      if (filtros.rango && filtros.rango !== "todos") {
+      // Filtro por rango de fechas (sobre fecha_calificacion)
+      if (filtros.fechaInicio) {
+        resultado = resultado.filter((c) => c.fecha_calificacion >= filtros.fechaInicio);
+      }
+      if (filtros.fechaFin) {
+        resultado = resultado.filter((c) => c.fecha_calificacion <= filtros.fechaFin + " 23:59:59");
+      }
+      if (filtros.rango && filtros.rango !== "todos" && !filtros.fechaInicio && !filtros.fechaFin) {
         if (filtros.rango === "este_mes") {
-          resultado = resultado.filter((c) => c.rango === "este_mes");
+          resultado = resultado.filter((c) => (c.fecha_calificacion || "").startsWith("2026-08"));
         }
       }
 
-      // Filtro por puntaje
+      // Filtro por puntaje (1 a 5)
       if (filtros.puntaje && filtros.puntaje !== "todos") {
         const numPuntaje = Number(filtros.puntaje);
         resultado = resultado.filter((c) => c.puntuacion === numPuntaje);
@@ -586,6 +573,19 @@ export async function obtenerCalificacionesSupervision(filtros = {}) {
 
       resolve(resultado);
     }, 100);
+  });
+}
+
+/**
+ * Obtiene las filas de Historial_Ticket correspondientes al ticket de una calificación (Requisito D4).
+ */
+export async function obtenerHistorialTicketCalificacion(idTicket) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const idNum = Number(idTicket);
+      const rows = historial.filter((h) => h.id_ticket === idNum);
+      resolve(rows);
+    }, 80);
   });
 }
 
@@ -607,16 +607,5 @@ export async function enviarCorreoSeguimientoCliente(codigoTicket, _datosContact
  * Obtiene las calificaciones con datos expandidos de cliente, técnico y ticket (base).
  */
 export async function obtenerCalificacionesAdmin() {
-  return calificacionesIniciales.map((c) => {
-    const ticket = ticketsIniciales.find((t) => t.id_ticket === c.id_ticket);
-    const tecnico = usuariosIniciales.find((u) => u.id_usuario === c.id_tecnico);
-    const cliente = usuariosIniciales.find((u) => u.id_usuario === c.id_cliente);
-
-    return {
-      ...c,
-      titulo_ticket: ticket ? ticket.titulo : `Ticket #${c.id_ticket}`,
-      nombre_tecnico: tecnico ? `${tecnico.nombre} ${tecnico.apellido}` : "Técnico",
-      nombre_cliente: cliente ? `${cliente.nombre} ${cliente.apellido}` : "Cliente"
-    };
-  });
+  return calificacionesMemoria;
 }

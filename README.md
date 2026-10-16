@@ -30,7 +30,7 @@ sistemasar/
 │       ├── pages/
 │       └── services/
 ├── database/         # Scripts SQL
-│   ├── ddl.sql           # Estructura de la base de datos
+│   ├── mibasededatos.sql # Estructura de la base de datos (v2.0)
 │   └── datos_prueba.sql  # Datos de prueba
 ├── docs/             # Documentación del proyecto
 │   └── dailies/          # Actas y seguimiento de dailies

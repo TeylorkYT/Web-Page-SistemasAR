@@ -109,6 +109,13 @@ export default function DashboardAdmin() {
           </div>
 
           <div className="tarjeta-metrica">
+            <span className="metrica-etiqueta">Tickets cerrados</span>
+            <span className="metrica-valor" style={{ color: "#059669" }}>
+              {cargando ? "..." : metricas.ticketsCerrados ?? 0}
+            </span>
+          </div>
+
+          <div className="tarjeta-metrica">
             <span className="metrica-etiqueta">Técnicos activos</span>
             <span className="metrica-valor">
               {cargando ? "..." : metricas.tecnicosActivos}
@@ -125,7 +132,7 @@ export default function DashboardAdmin() {
           </h2>
 
           <div className="grafico-card-contenedor">
-            {/* Visualización de Barras según Mockup */}
+            {/* Visualización de Barras simples según v2.0 */}
             <div className="grafico-barras-area" role="img" aria-label="Gráfico de barras de tickets">
               {datosGrafico.map((barra, indice) => {
                 const estaActiva = columnaActiva === indice;
@@ -151,7 +158,7 @@ export default function DashboardAdmin() {
               })}
             </div>
 
-            {/* Checkbox inferior: gráfico comparativo semanal */}
+            {/* Control comparativo semanal */}
             <div className="grafico-control-inferior">
               <label className="grafico-checkbox-label">
                 <input
@@ -186,25 +193,28 @@ export default function DashboardAdmin() {
               <tbody>
                 {metricas.tecnicosMonitoreo && metricas.tecnicosMonitoreo.length > 0 ? (
                   metricas.tecnicosMonitoreo.map((tec) => {
-                    const esOcupado = tec.estado === "Ocupado";
+                    const estadoNorm = (tec.estado || "").toLowerCase();
+                    const claseBadge =
+                      estadoNorm === "ocupado"
+                        ? "ocupado"
+                        : estadoNorm === "en_almuerzo"
+                        ? "en-almuerzo"
+                        : "libre";
+                    const idTicketLimpio = tec.ticketActual ? tec.ticketActual.replace(/^TKT-/i, "") : "1";
                     return (
                       <tr key={tec.id}>
                         <td>
                           <strong>{tec.nombre}</strong>
                         </td>
                         <td>
-                          <span
-                            className={`estado-tecnico-badge ${
-                              esOcupado ? "ocupado" : "libre"
-                            }`}
-                          >
-                            ● {tec.estado}
+                          <span className={`estado-tecnico-badge ${claseBadge}`}>
+                            ● {tec.estado.replace(/_/g, " ")}
                           </span>
                         </td>
                         <td>
                           {tec.ticketActual && tec.ticketActual !== "-" ? (
                             <Link
-                              to="/admin/tickets/1/asignar"
+                              to={`/admin/tickets/${idTicketLimpio}/asignar`}
                               className="ticket-enlace"
                               title="Ver detalle de asignación"
                             >
