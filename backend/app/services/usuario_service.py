@@ -2,6 +2,7 @@ from datetime import date
 
 from fastapi import HTTPException
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.security import hashear_contrasena
@@ -89,7 +90,11 @@ def registrar_cliente(db: Session, datos: RegistroClienteIn) -> UsuarioOut:
         area_departamento=datos.area_departamento or "General",
     )
     db.add(cliente)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="El correo ya está registrado")
     db.refresh(usuario)
 
     return armar_usuario_out(db, usuario)
@@ -148,7 +153,11 @@ def crear_usuario_admin(db: Session, datos: UsuarioCrearIn) -> UsuarioOut:
         )
 
     db.add(subtipo)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="El correo ya está registrado")
     db.refresh(usuario)
 
     return armar_usuario_out(db, usuario)
@@ -206,7 +215,11 @@ def actualizar_usuario_admin(
             if datos.cargo is not None:
                 admin.cargo = datos.cargo
 
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="El correo ya está registrado")
     db.refresh(usuario)
 
     return armar_usuario_out(db, usuario)

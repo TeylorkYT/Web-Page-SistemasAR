@@ -40,11 +40,17 @@ def recuperar(_datos: RecuperarIn):
 @router.post("/login", response_model=TokenOut)
 def login(datos: LoginIn, db: Session = Depends(get_db)):
     usuario = usuario_service.obtener_por_correo(db, datos.correo_electronico)
-    if usuario is None or not verificar_contrasena(datos.contrasena, usuario.contrasena):
-        raise HTTPException(status_code=401, detail="Correo o contraseña incorrectos")
-    if usuario.estado != "Activo":
-        raise HTTPException(status_code=403, detail="Cuenta inactiva")
+    if (
+        usuario is None
+        or not verificar_contrasena(datos.contrasena, usuario.contrasena)
+        or usuario.estado != "Activo"
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Correo o contraseña incorrectos",
+        )
     return _tokens(usuario)
+
 
 
 @router.post("/refresh", response_model=TokenOut)

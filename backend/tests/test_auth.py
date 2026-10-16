@@ -42,8 +42,9 @@ def test_login_usuario_inactivo(client):
         "/api/v1/auth/login",
         json={"correo_electronico": "inactivo@prueba.com", "contrasena": "Prueba123*"},
     )
-    assert respuesta.status_code == 403
-    assert respuesta.json() == {"detail": "Cuenta inactiva"}
+    assert respuesta.status_code == 401
+    assert respuesta.json() == {"detail": "Correo o contraseña incorrectos"}
+
 
 
 def test_me_sin_token_responde_401(client):

@@ -161,3 +161,48 @@ def test_cierre_ticket_sin_calificar(client):
     assert resp_cierre.status_code == 200
     assert resp_cierre.json()["estado"] == "Cerrado"
     assert resp_cierre.json()["fecha_cierre"] is not None
+
+
+def test_doble_calificacion_concurrente_responde_409(client):
+    """T-C15 (P-05): Simular colisión concurrente (IntegrityError en commit) -> debe responder 409 y no 500."""
+    from unittest.mock import patch
+    from sqlalchemy.exc import IntegrityError
+
+    admin_headers = _auth_headers(client, "admin@prueba.com")
+    cliente_headers = _auth_headers(client, "cliente@prueba.com")
+    tecnico_headers = _auth_headers(client, "tecnico@prueba.com")
+
+    cat = client.post(
+        "/api/v1/categorias",
+        headers=admin_headers,
+        json={"nombre_categoria": "Cat Concurrencia"},
+    ).json()
+    tkt = client.post(
+        "/api/v1/tickets",
+        headers=cliente_headers,
+        json={"titulo": "Ticket Carrera", "descripcion": "Desc", "categorias": [cat["id_categoria"]]},
+    ).json()
+    id_ticket = tkt["id_ticket"]
+
+    client.patch(
+        f"/api/v1/tickets/{id_ticket}/asignar",
+        headers=admin_headers,
+        json={"id_tecnico": 2},
+    )
+    client.post(
+        f"/api/v1/tickets/{id_ticket}/reporte",
+        headers=tecnico_headers,
+        json={"solucion_aplicada": "Solucionado"},
+    )
+
+    with patch("sqlalchemy.orm.Session.commit") as mock_commit:
+        mock_commit.side_effect = IntegrityError("Duplicate entry for key Calificacion.id_ticket", None, None)
+        resp = client.post(
+            f"/api/v1/tickets/{id_ticket}/calificacion",
+            headers=cliente_headers,
+            json={"puntuacion": 5, "comentario": "Doble clic simultáneo"},
+        )
+        assert resp.status_code == 409
+        assert "calificación registrada" in resp.json()["detail"].lower()
+
+
