@@ -21,6 +21,12 @@ CORS_ORIGINS = [orig.strip() for orig in os.getenv("CORS_ORIGINS", "http://local
 if ENV == "production":
     CORS_ORIGINS = [orig for orig in CORS_ORIGINS if orig != "*"]
 
+UPLOAD_DIR = os.getenv(
+    "UPLOAD_DIR",
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "uploads")),
+)
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 
 def validar_configuracion_produccion() -> None:
     if ENV == "production":

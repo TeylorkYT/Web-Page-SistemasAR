@@ -6,6 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.core import config
 from app.db.database import engine
 from app.routers import (
+    adjuntos,
     auth,
     calificaciones,
     categorias,
@@ -33,6 +34,7 @@ app.include_router(categorias.router)
 app.include_router(equipos.router)
 app.include_router(tecnicos.router)
 app.include_router(tickets.router)
+app.include_router(adjuntos.router)
 app.include_router(tickets_flujo.router)
 app.include_router(calificaciones.router)
 app.include_router(notificaciones.router)
