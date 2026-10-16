@@ -30,7 +30,6 @@ export default function ActualizarAvance() {
   // Estados
   const [tecnico, setTecnico] = useState(null);
   const [ticket, setTicket] = useState(null);
-  const [cargandoTicket, setCargandoTicket] = useState(true);
 
   // Campos de formulario
   const [tipoAccion, setTipoAccion] = useState("Reparacion");

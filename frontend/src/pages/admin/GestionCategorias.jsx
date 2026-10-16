@@ -17,7 +17,6 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import Layout from "../../components/Layout";
 import {
   obtenerCategorias,
@@ -43,8 +42,6 @@ function IconoCarpeta() {
 }
 
 export default function GestionCategorias() {
-  const navigate = useNavigate();
-
   // Estados de datos
   const [categorias, setCategorias] = useState([]);
   const [categoriaSeleccionadaId, setCategoriaSeleccionadaId] = useState(null);

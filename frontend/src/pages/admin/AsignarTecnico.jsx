@@ -19,7 +19,7 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Layout from "../../components/Layout";
 import {
   obtenerTicketsPendientes,
@@ -30,7 +30,6 @@ import "./AsignarTecnico.css";
 
 export default function AsignarTecnico() {
   const { id: paramId } = useParams();
-  const navigate = useNavigate();
 
   // Estados de datos
   const [tickets, setTickets] = useState([]);
