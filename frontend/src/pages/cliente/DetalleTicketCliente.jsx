@@ -1,9 +1,141 @@
-import Layout from "../../components/Layout";
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import Layout from '../../components/Layout';
+import { obtenerTicket } from '../../services/ticketsService';
+import './DetalleTicketCliente.css';
+
+const COLOR_ESTADO = {
+  Abierto:    { bg: '#dbeafe', color: '#1e40af' },
+  En_Proceso: { bg: '#fef3c7', color: '#92400e' },
+  Resuelto:   { bg: '#d1fae5', color: '#065f46' },
+  Cerrado:    { bg: '#f1f5f9', color: '#475569' }
+};
+
+const COLOR_PRIORIDAD = {
+  Critica: '#ef4444',
+  Alta:    '#f59e0b',
+  Media:   '#0284c7',
+  Baja:    '#64748b'
+};
 
 export default function DetalleTicketCliente() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [ticket, setTicket] = useState(null);
+  const [cargando, setCargando] = useState(true);
+
+  useEffect(() => {
+    obtenerTicket(id)
+      .then(setTicket)
+      .finally(() => setCargando(false));
+  }, [id]);
+
+  if (cargando) {
+    return <Layout><p className="detalle-ticket-mensaje">Cargando ticket…</p></Layout>;
+  }
+
+  if (!ticket) {
+    return <Layout><p className="detalle-ticket-mensaje">Ticket no encontrado.</p></Layout>;
+  }
+
+  const colorEstado = COLOR_ESTADO[ticket.estado] || {};
+  const colorPrioridad = COLOR_PRIORIDAD[ticket.prioridad] || '#64748b';
+  const puedeCalificar = ticket.estado === 'Resuelto' || ticket.estado === 'Cerrado';
+
   return (
     <Layout>
-      <h1>Detalle Ticket Cliente</h1>
+      {/* Cabecera */}
+      <div className="detalle-ticket-cabecera">
+        <button
+          id="btn-volver-tickets"
+          className="detalle-ticket-btn-volver"
+          onClick={() => navigate('/cliente/tickets')}
+        >
+          ← Mis tickets
+        </button>
+        <div className="detalle-ticket-cabecera-derecha">
+          <span
+            className="detalle-ticket-badge"
+            style={{ background: colorEstado.bg, color: colorEstado.color }}
+          >
+            {ticket.estado === 'En_Proceso' ? 'En proceso' : ticket.estado}
+          </span>
+          {puedeCalificar && (
+            <button
+              id="btn-calificar"
+              className="detalle-ticket-btn-calificar"
+              onClick={() => navigate(`/cliente/tickets/${ticket.id_ticket}/calificar`)}
+            >
+              ★ Calificar atención
+            </button>
+          )}
+        </div>
+      </div>
+
+      <h1 className="detalle-ticket-titulo">{ticket.titulo}</h1>
+
+      {/* Información principal */}
+      <div className="detalle-ticket-grid">
+        <div className="detalle-ticket-tarjeta detalle-ticket-info">
+          <h2 className="detalle-ticket-seccion">Detalles del ticket</h2>
+          <dl className="detalle-ticket-dl">
+            <dt>ID</dt>
+            <dd>#{ticket.id_ticket}</dd>
+            <dt>Fecha de creación</dt>
+            <dd>{ticket.fecha_creacion}</dd>
+            {ticket.fecha_resolucion && (
+              <>
+                <dt>Fecha de resolución</dt>
+                <dd>{ticket.fecha_resolucion}</dd>
+              </>
+            )}
+            <dt>Prioridad</dt>
+            <dd>
+              <span
+                className="detalle-ticket-prioridad"
+                style={{ color: colorPrioridad }}
+              >
+                ● {ticket.prioridad}
+              </span>
+            </dd>
+            <dt>Categorías</dt>
+            <dd>{(ticket.categorias || []).join(', ') || '—'}</dd>
+          </dl>
+
+          <h2 className="detalle-ticket-seccion" style={{ marginTop: 20 }}>Descripción</h2>
+          <p className="detalle-ticket-descripcion">{ticket.descripcion}</p>
+        </div>
+
+        {/* Historial */}
+        <div className="detalle-ticket-tarjeta detalle-ticket-historial">
+          <h2 className="detalle-ticket-seccion">Historial de cambios</h2>
+          {(!ticket.historial || ticket.historial.length === 0) ? (
+            <p className="detalle-ticket-vacio">Sin historial registrado.</p>
+          ) : (
+            <ol className="detalle-ticket-timeline">
+              {ticket.historial.map((h) => (
+                <li key={h.id_historial} className="detalle-ticket-timeline-item">
+                  <div className="detalle-ticket-timeline-punto" />
+                  <div className="detalle-ticket-timeline-contenido">
+                    <p className="detalle-ticket-timeline-accion">
+                      <strong>{h.tipo_accion}</strong>
+                      {h.estado_nuevo && (
+                        <span className="detalle-ticket-timeline-estado">
+                          → {h.estado_nuevo === 'En_Proceso' ? 'En proceso' : h.estado_nuevo}
+                        </span>
+                      )}
+                    </p>
+                    <p className="detalle-ticket-timeline-detalle">{h.detalles}</p>
+                    <p className="detalle-ticket-timeline-meta">
+                      {h.nombre_usuario} · {h.fecha_accion}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+      </div>
     </Layout>
   );
 }
