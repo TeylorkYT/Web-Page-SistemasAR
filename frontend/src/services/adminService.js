@@ -131,109 +131,36 @@ let ticketsPendientesMemoria = ticketsMemoria
   .filter((t) => t.estado === "Abierto" && !t.id_tecnico)
   .map(construirTicketPendiente);
 
-// Calificaciones fieles al Mockup 20 y al modelo de datos
-let calificacionesMemoria = [
-  {
-    id_calificacion: 1,
-    codigo_ticket: "TKT-1024",
-    id_ticket: 1024,
-    tecnico: "Diana M.",
-    id_tecnico: 2,
-    puntuacion: 5,
-    comentario_resumen: "Excelente soporte, muy...",
-    comentario_completo: "Excelente soporte, muy rápida la solución y el equipo quedó funcionando al 100%. Totalmente recomendada.",
-    cliente: "Tecnología Global",
-    contacto: "Carlos Gómez",
-    fecha: "2026-10-14",
-    rango: "este_mes"
-  },
-  {
-    id_calificacion: 2,
-    codigo_ticket: "TKT-1021",
-    id_ticket: 1021,
-    tecnico: "Carlos T.",
-    id_tecnico: 1,
-    puntuacion: 4,
-    comentario_resumen: "Resolvió el problema...",
-    comentario_completo: "Resolvió el problema del servidor a tiempo, aunque tardó un poco en responder las dudas iniciales.",
-    cliente: "Distribuidora del Norte",
-    contacto: "Jorge Martínez",
-    fecha: "2026-10-12",
-    rango: "este_mes"
-  },
-  {
-    id_calificacion: 3,
-    codigo_ticket: "TKT-1015",
-    id_ticket: 1015,
-    tecnico: "Diana M.",
-    id_tecnico: 2,
-    puntuacion: 5,
-    comentario_resumen: "Muy amable y...",
-    comentario_completo: "Muy amable y capacitó al personal sobre el uso correcto y mantenimiento de la red.",
-    cliente: "Colegio San José",
-    contacto: "Patricia Vélez",
-    fecha: "2026-10-08",
-    rango: "este_mes"
-  },
-  {
-    id_calificacion: 4,
-    codigo_ticket: "TKT-1010",
-    id_ticket: 1010,
-    tecnico: "Carlos T.",
-    id_tecnico: 1,
-    puntuacion: 1,
-    comentario_resumen: "No resolvió el...",
-    comentario_completo: "El técnico llegó 2 horas tarde, no trajo la herramienta adecuada y el router sigue presentando cortes de red.",
-    cliente: "Empresa S.A.",
-    contacto: "Ana Gómez",
-    fecha: "2026-10-05",
+// Función para enriquecer objeto de calificación con datos relacionales v2.0
+export function enriquecerCalificacion(c) {
+  const ticket = ticketsMemoria.find((t) => t.id_ticket === c.id_ticket);
+  const tecnico = usuariosIniciales.find((u) => u.id_usuario === c.id_tecnico);
+  const cliente = usuariosIniciales.find((u) => u.id_usuario === c.id_cliente);
+  const clienteSub = clientes.find((cl) => cl.id_usuario === c.id_cliente);
+
+  return {
+    id_calificacion: c.id_calificacion,
+    id_ticket: c.id_ticket,
+    codigo_ticket: `TKT-${c.id_ticket}`,
+    id_tecnico: c.id_tecnico,
+    tecnico: tecnico ? `${tecnico.nombre} ${tecnico.apellido}` : `Técnico #${c.id_tecnico}`,
+    id_cliente: c.id_cliente,
+    cliente: cliente ? `${cliente.nombre} ${cliente.apellido}` : `Cliente #${c.id_cliente}`,
+    contacto: clienteSub ? clienteSub.telefono : (cliente ? cliente.correo_electronico : ""),
+    correo_cliente: cliente ? cliente.correo_electronico : "",
+    puntuacion: c.puntuacion,
+    comentario: c.comentario,
+    comentario_resumen: c.comentario && c.comentario.length > 28 ? c.comentario.substring(0, 25) + "..." : c.comentario,
+    comentario_completo: c.comentario,
+    fecha_calificacion: c.fecha_calificacion,
+    fecha: c.fecha_calificacion ? c.fecha_calificacion.substring(0, 10) : "",
     rango: "este_mes",
-    esAlerta: true
-  },
-  {
-    id_calificacion: 5,
-    codigo_ticket: "TKT-1008",
-    id_ticket: 1008,
-    tecnico: "Andrés R.",
-    id_tecnico: 5,
-    puntuacion: 4,
-    comentario_resumen: "Buena atención general...",
-    comentario_completo: "Buena atención y disposición, aunque faltó un informe más detallado por escrito.",
-    cliente: "Logística Express",
-    contacto: "Laura Restrepo",
-    fecha: "2026-10-02",
-    rango: "este_mes"
-  },
-  {
-    id_calificacion: 6,
-    codigo_ticket: "TKT-1002",
-    id_ticket: 1002,
-    tecnico: "Diana M.",
-    id_tecnico: 2,
-    puntuacion: 5,
-    comentario_resumen: "Impecable servicio...",
-    comentario_completo: "Impecable diagnóstico y recuperación de datos en tiempo récord.",
-    cliente: "Consultoría Contable",
-    contacto: "Esteban Rico",
-    fecha: "2026-09-28",
-    rango: "mes_anterior"
-  },
-  {
-    id_calificacion: 7,
-    codigo_ticket: "TKT-995",
-    id_ticket: 995,
-    tecnico: "Luis F.",
-    id_tecnico: 3,
-    puntuacion: 2,
-    comentario_resumen: "Faltó seguimiento...",
-    comentario_completo: "La falla se solucionó temporalmente pero volvió a presentarse a los dos días sin respuesta inmediata.",
-    cliente: "Comercializadora Andina",
-    contacto: "Rosa Caicedo",
-    fecha: "2026-09-20",
-    rango: "mes_anterior",
-    esAlerta: true
-  }
-];
+    esAlerta: c.puntuacion <= 2,
+    titulo_ticket: ticket ? ticket.titulo : `Ticket #${c.id_ticket}`
+  };
+}
+
+let calificacionesMemoria = calificacionesIniciales.map(enriquecerCalificacion);
 
 // ==============================================================================
 // 1. DASHBOARD DEL ADMINISTRADOR (VISTA 14)
@@ -561,23 +488,56 @@ export async function asignarTecnicoATicket(idTicket, idTecnico, prioridadAjusta
 /**
  * Obtiene las métricas de satisfacción general para las tarjetas superiores de la Vista 20.
  */
+/**
+ * Obtiene las métricas de satisfacción general para las tarjetas superiores de la Vista 20 (v2.0).
+ */
 export async function obtenerMetricasSatisfaccion() {
   return new Promise((resolve) => {
     setTimeout(() => {
+      if (calificacionesMemoria.length === 0) {
+        return resolve({
+          promedioGeneral: "0.0",
+          mejorValorado: { nombre: "Sin registros", promedio: "0.0" },
+          alertasBajaCalif: 0
+        });
+      }
+
+      const totalPuntos = calificacionesMemoria.reduce((acc, c) => acc + c.puntuacion, 0);
+      const promedioGeneral = (totalPuntos / calificacionesMemoria.length).toFixed(1);
+
+      // Calcular técnico mejor valorado
+      const promediosPorTecnico = {};
+      calificacionesMemoria.forEach((c) => {
+        if (!promediosPorTecnico[c.id_tecnico]) {
+          promediosPorTecnico[c.id_tecnico] = { nombre: c.tecnico, suma: 0, count: 0 };
+        }
+        promediosPorTecnico[c.id_tecnico].suma += c.puntuacion;
+        promediosPorTecnico[c.id_tecnico].count += 1;
+      });
+
+      let mejor = { nombre: "Diana Paz", promedio: "5.0" };
+      let maxProm = -1;
+      Object.values(promediosPorTecnico).forEach((t) => {
+        const prom = t.suma / t.count;
+        if (prom > maxProm) {
+          maxProm = prom;
+          mejor = { nombre: t.nombre, promedio: prom.toFixed(1) };
+        }
+      });
+
+      const alertasBajaCalif = calificacionesMemoria.filter((c) => c.puntuacion <= 2).length;
+
       resolve({
-        promedioGeneral: "4.5",
-        mejorValorado: {
-          nombre: "Diana M.",
-          promedio: "4.9"
-        },
-        alertasBajaCalif: 2
+        promedioGeneral,
+        mejorValorado: mejor,
+        alertasBajaCalif
       });
     }, 80);
   });
 }
 
 /**
- * Obtiene la lista de calificaciones con filtros aplicados (Técnico, Rango de tiempo, Puntaje).
+ * Obtiene la lista de calificaciones con filtros aplicados (Técnico, Rango de fechas sobre fecha_calificacion, Puntaje 1-5).
  */
 export async function obtenerCalificacionesSupervision(filtros = {}) {
   return new Promise((resolve) => {
@@ -587,18 +547,25 @@ export async function obtenerCalificacionesSupervision(filtros = {}) {
       // Filtro por técnico
       if (filtros.tecnico && filtros.tecnico !== "todos") {
         resultado = resultado.filter((c) =>
-          c.tecnico.toLowerCase().includes(filtros.tecnico.toLowerCase())
+          c.tecnico.toLowerCase().includes(filtros.tecnico.toLowerCase()) ||
+          String(c.id_tecnico) === String(filtros.tecnico)
         );
       }
 
-      // Filtro por rango
-      if (filtros.rango && filtros.rango !== "todos") {
+      // Filtro por rango de fechas (sobre fecha_calificacion)
+      if (filtros.fechaInicio) {
+        resultado = resultado.filter((c) => c.fecha_calificacion >= filtros.fechaInicio);
+      }
+      if (filtros.fechaFin) {
+        resultado = resultado.filter((c) => c.fecha_calificacion <= filtros.fechaFin + " 23:59:59");
+      }
+      if (filtros.rango && filtros.rango !== "todos" && !filtros.fechaInicio && !filtros.fechaFin) {
         if (filtros.rango === "este_mes") {
-          resultado = resultado.filter((c) => c.rango === "este_mes");
+          resultado = resultado.filter((c) => (c.fecha_calificacion || "").startsWith("2026-08"));
         }
       }
 
-      // Filtro por puntaje
+      // Filtro por puntaje (1 a 5)
       if (filtros.puntaje && filtros.puntaje !== "todos") {
         const numPuntaje = Number(filtros.puntaje);
         resultado = resultado.filter((c) => c.puntuacion === numPuntaje);
@@ -606,6 +573,19 @@ export async function obtenerCalificacionesSupervision(filtros = {}) {
 
       resolve(resultado);
     }, 100);
+  });
+}
+
+/**
+ * Obtiene las filas de Historial_Ticket correspondientes al ticket de una calificación (Requisito D4).
+ */
+export async function obtenerHistorialTicketCalificacion(idTicket) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const idNum = Number(idTicket);
+      const rows = historial.filter((h) => h.id_ticket === idNum);
+      resolve(rows);
+    }, 80);
   });
 }
 
@@ -627,16 +607,5 @@ export async function enviarCorreoSeguimientoCliente(codigoTicket, _datosContact
  * Obtiene las calificaciones con datos expandidos de cliente, técnico y ticket (base).
  */
 export async function obtenerCalificacionesAdmin() {
-  return calificacionesIniciales.map((c) => {
-    const ticket = ticketsIniciales.find((t) => t.id_ticket === c.id_ticket);
-    const tecnico = usuariosIniciales.find((u) => u.id_usuario === c.id_tecnico);
-    const cliente = usuariosIniciales.find((u) => u.id_usuario === c.id_cliente);
-
-    return {
-      ...c,
-      titulo_ticket: ticket ? ticket.titulo : `Ticket #${c.id_ticket}`,
-      nombre_tecnico: tecnico ? `${tecnico.nombre} ${tecnico.apellido}` : "Técnico",
-      nombre_cliente: cliente ? `${cliente.nombre} ${cliente.apellido}` : "Cliente"
-    };
-  });
+  return calificacionesMemoria;
 }
