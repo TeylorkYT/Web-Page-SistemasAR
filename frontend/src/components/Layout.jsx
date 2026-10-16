@@ -13,6 +13,7 @@
  */
 
 import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './Layout.css';
 
 /**
@@ -21,6 +22,49 @@ import './Layout.css';
  * ==============================================================================
  * Define los títulos de panel, iconos y opciones del menú lateral para cada perfil.
  */
+// ----------------------------------------------------------------------------
+// KIT-2: Rutas de navegación por rol y por ítem del menú
+// ----------------------------------------------------------------------------
+const RUTAS_POR_ROL = {
+  administrador: {
+    dashboard:     '/admin',
+    usuarios:      '/admin/usuarios',
+    categorias:    '/admin/categorias',
+    inventario:    '/admin/inventario',
+    reportes:      '/admin/reportes',
+    calificaciones:'/admin/calificaciones'
+  },
+  tecnico: {
+    dashboard:             '/tecnico',
+    'tickets-asignados':   '/tecnico/tickets/1',
+    'inventario-repuestos':'/tecnico/inventario'
+  },
+  cliente: {
+    dashboard:     '/cliente',
+    'crear-ticket':'/cliente/tickets/nuevo',
+    'mis-tickets': '/cliente/tickets',
+    'perfil-equipos':'/cliente/perfil'
+  }
+};
+
+// Detecta el rol a partir de la primera parte de la ruta actual
+function detectarRol(pathname) {
+  if (pathname.startsWith('/admin'))   return 'administrador';
+  if (pathname.startsWith('/tecnico')) return 'tecnico';
+  if (pathname.startsWith('/cliente')) return 'cliente';
+  return 'administrador'; // fallback
+}
+
+// Detecta qué ítem del menú está activo según la ruta actual
+function detectarItemActivo(pathname, rol) {
+  const rutas = RUTAS_POR_ROL[rol] || {};
+  // Ordenar por longitud descendente para que rutas más específicas ganen
+  const entrada = Object.entries(rutas)
+    .sort(([, a], [, b]) => b.length - a.length)
+    .find(([, ruta]) => pathname === ruta || pathname.startsWith(ruta + '/'));
+  return entrada ? entrada[0] : 'dashboard';
+}
+
 const CONFIG_POR_ROL = {
   // ----------------------------------------------------------------------------
   // 1. ROL ADMINISTRADOR (Mockups 14 - 20)
@@ -50,16 +94,6 @@ const CONFIG_POR_ROL = {
             <circle cx="9" cy="7" r="4"></circle>
             <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
             <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
-        )
-      },
-      {
-        id: 'asignacion',
-        etiqueta: 'Asignación',
-        icono: (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
           </svg>
         )
       },
@@ -224,20 +258,32 @@ const CONFIG_POR_ROL = {
  */
 export default function Layout({
   children,
-  rol = 'administrador',
+  rol: rolProp,
   onCambiarRol,
-  itemActivo = 'dashboard',
+  itemActivo: itemActivoProp,
   onCambiarItem,
   nombreUsuario = 'Jaider Joan Getial'
 }) {
+  // KIT-2: leer rol e ítem activo desde la URL con useLocation
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Rol detectado por la URL; si se pasa prop explícita se respeta (compatibilidad)
+  const rol = rolProp || detectarRol(location.pathname);
+  const itemActivo = itemActivoProp || detectarItemActivo(location.pathname, rol);
+
   // Estado local para abrir o cerrar el menú lateral en dispositivos móviles
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
 
   // Obtener la configuración visual del rol actual (fallback a administrador)
   const configActual = CONFIG_POR_ROL[rol] || CONFIG_POR_ROL.administrador;
 
-  // Manejar el clic en una opción del menú lateral
+  // KIT-2: Manejar el clic en una opción del menú lateral: navega a la ruta correspondiente
   const seleccionarOpcion = (id) => {
+    const rutas = RUTAS_POR_ROL[rol] || {};
+    if (rutas[id]) {
+      navigate(rutas[id]);
+    }
     if (onCambiarItem) {
       onCambiarItem(id);
     }

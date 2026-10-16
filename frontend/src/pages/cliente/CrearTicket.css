@@ -1,0 +1,158 @@
+.crear-ticket-titulo {
+  font-size: var(--tamano-texto-2xl);
+  font-weight: 700;
+  color: var(--color-texto-principal);
+  margin: 0 0 24px;
+}
+
+.crear-ticket-tarjeta {
+  background: var(--color-superficie);
+  border-radius: var(--radio-tarjeta);
+  box-shadow: var(--sombra-tarjeta);
+  padding: 32px;
+  max-width: 720px;
+}
+
+/* Campo */
+.crear-ticket-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.crear-ticket-label {
+  font-size: var(--tamano-texto-sm);
+  font-weight: 600;
+  color: var(--color-texto-principal);
+}
+
+.crear-ticket-requerido {
+  color: var(--color-peligro);
+  margin-left: 2px;
+}
+
+.crear-ticket-ayuda {
+  font-weight: 400;
+  color: var(--color-texto-secundario);
+  font-size: 0.8rem;
+}
+
+.crear-ticket-input,
+.crear-ticket-textarea {
+  padding: 10px 14px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-boton);
+  font-size: var(--tamano-texto-sm);
+  color: var(--color-texto-principal);
+  background: var(--color-superficie);
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: var(--fuente-principal);
+}
+.crear-ticket-input:focus,
+.crear-ticket-textarea:focus {
+  border-color: var(--color-borde-focus);
+  box-shadow: 0 0 0 3px rgba(10, 54, 157, 0.12);
+}
+
+/* Categorías: chips */
+.crear-ticket-categorias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.crear-ticket-cat-chip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border: 1.5px solid var(--color-borde);
+  border-radius: var(--radio-completo);
+  font-size: var(--tamano-texto-sm);
+  font-weight: 500;
+  color: var(--color-texto-secundario);
+  background: var(--color-superficie);
+  cursor: pointer;
+  transition: all 0.18s;
+  user-select: none;
+}
+.crear-ticket-cat-chip:hover {
+  border-color: var(--color-primario);
+  color: var(--color-primario);
+}
+.crear-ticket-cat-chip.seleccionada {
+  background-color: var(--color-primario);
+  border-color: var(--color-primario);
+  color: #fff;
+}
+
+.crear-ticket-cat-checkbox {
+  display: none;
+}
+
+/* Mensajes */
+.crear-ticket-error {
+  color: var(--color-peligro);
+  font-size: var(--tamano-texto-sm);
+  margin: 4px 0 12px;
+  padding: 10px 14px;
+  background: #fef2f2;
+  border-radius: var(--radio-boton);
+  border-left: 3px solid var(--color-peligro);
+}
+
+.crear-ticket-exito {
+  color: var(--color-exito);
+  font-size: var(--tamano-texto-sm);
+  margin: 4px 0 12px;
+  padding: 10px 14px;
+  background: #f0fdf4;
+  border-radius: var(--radio-boton);
+  border-left: 3px solid var(--color-exito);
+}
+
+/* Acciones */
+.crear-ticket-acciones {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.crear-ticket-btn-primario {
+  background-color: var(--color-primario);
+  color: #fff;
+  border: none;
+  border-radius: var(--radio-boton);
+  padding: 11px 28px;
+  font-size: var(--tamano-texto-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.crear-ticket-btn-primario:hover:not(:disabled) {
+  background-color: var(--color-primario-hover);
+}
+.crear-ticket-btn-primario:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.crear-ticket-btn-secundario {
+  background: transparent;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-boton);
+  padding: 11px 22px;
+  font-size: var(--tamano-texto-sm);
+  font-weight: 500;
+  color: var(--color-texto-secundario);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.crear-ticket-btn-secundario:hover {
+  border-color: var(--color-texto-secundario);
+  color: var(--color-texto-principal);
+}

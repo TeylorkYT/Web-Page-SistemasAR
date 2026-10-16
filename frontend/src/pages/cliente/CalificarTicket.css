@@ -1,0 +1,183 @@
+.calificar-cabecera {
+  margin-bottom: 16px;
+}
+
+.calificar-btn-volver {
+  background: transparent;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-boton);
+  padding: 8px 16px;
+  font-size: var(--tamano-texto-sm);
+  color: var(--color-texto-secundario);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.calificar-btn-volver:hover {
+  border-color: var(--color-primario);
+  color: var(--color-primario);
+}
+
+/* Tarjeta centrada */
+.calificar-tarjeta {
+  background: var(--color-superficie);
+  border-radius: var(--radio-tarjeta);
+  box-shadow: var(--sombra-tarjeta);
+  padding: 40px 36px;
+  max-width: 560px;
+}
+
+.calificar-titulo {
+  font-size: var(--tamano-texto-xl);
+  font-weight: 700;
+  color: var(--color-texto-principal);
+  margin: 0 0 8px;
+}
+
+.calificar-subtitulo {
+  font-size: var(--tamano-texto-sm);
+  color: var(--color-texto-secundario);
+  margin: 0 0 16px;
+}
+
+.calificar-aviso {
+  font-size: var(--tamano-texto-sm);
+  color: var(--color-texto-secundario);
+  background: var(--color-primario-suave);
+  border-radius: var(--radio-boton);
+  padding: 10px 14px;
+  margin: 0 0 28px;
+  border-left: 3px solid var(--color-primario);
+}
+
+/* Campo */
+.calificar-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.calificar-label {
+  font-size: var(--tamano-texto-sm);
+  font-weight: 600;
+  color: var(--color-texto-principal);
+}
+
+.calificar-opcional {
+  font-weight: 400;
+  color: var(--color-texto-secundario);
+  font-size: 0.8rem;
+}
+
+/* Estrellas */
+.calificar-estrellas {
+  display: flex;
+  gap: 6px;
+}
+
+.calificar-estrella {
+  font-size: 2.6rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #d1d5db;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.15s, transform 0.1s;
+}
+.calificar-estrella:hover,
+.calificar-estrella.activa {
+  color: #f59e0b;
+}
+.calificar-estrella:hover {
+  transform: scale(1.15);
+}
+
+.calificar-puntuacion-texto {
+  font-size: var(--tamano-texto-sm);
+  font-weight: 600;
+  color: #f59e0b;
+  margin: 0;
+}
+
+/* Textarea */
+.calificar-textarea {
+  padding: 10px 14px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-boton);
+  font-size: var(--tamano-texto-sm);
+  color: var(--color-texto-principal);
+  background: var(--color-superficie);
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: var(--fuente-principal);
+}
+.calificar-textarea:focus {
+  border-color: var(--color-borde-focus);
+  box-shadow: 0 0 0 3px rgba(10, 54, 157, 0.12);
+}
+
+/* Mensajes */
+.calificar-error {
+  color: var(--color-peligro);
+  font-size: var(--tamano-texto-sm);
+  padding: 10px 14px;
+  background: #fef2f2;
+  border-radius: var(--radio-boton);
+  border-left: 3px solid var(--color-peligro);
+  margin: 0 0 16px;
+}
+
+.calificar-exito {
+  color: var(--color-exito);
+  font-size: var(--tamano-texto-sm);
+  padding: 10px 14px;
+  background: #f0fdf4;
+  border-radius: var(--radio-boton);
+  border-left: 3px solid var(--color-exito);
+  margin: 0 0 16px;
+}
+
+/* Acciones */
+.calificar-acciones {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.calificar-btn-omitir {
+  background: transparent;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-boton);
+  padding: 11px 20px;
+  font-size: var(--tamano-texto-sm);
+  font-weight: 500;
+  color: var(--color-texto-secundario);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.calificar-btn-omitir:hover {
+  border-color: var(--color-texto-secundario);
+  color: var(--color-texto-principal);
+}
+
+.calificar-btn-enviar {
+  background-color: var(--color-primario);
+  color: #fff;
+  border: none;
+  border-radius: var(--radio-boton);
+  padding: 11px 28px;
+  font-size: var(--tamano-texto-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.calificar-btn-enviar:hover:not(:disabled) {
+  background-color: var(--color-primario-hover);
+}
+.calificar-btn-enviar:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

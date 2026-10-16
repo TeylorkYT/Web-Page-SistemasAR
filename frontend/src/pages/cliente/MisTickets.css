@@ -1,0 +1,145 @@
+.mis-tickets-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.mis-tickets-titulo {
+  font-size: var(--tamano-texto-2xl);
+  font-weight: 700;
+  color: var(--color-texto-principal);
+  margin: 0;
+}
+
+.mis-tickets-btn-nuevo {
+  background-color: var(--color-primario);
+  color: #fff;
+  border: none;
+  border-radius: var(--radio-boton);
+  padding: 10px 20px;
+  font-size: var(--tamano-texto-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.mis-tickets-btn-nuevo:hover {
+  background-color: var(--color-primario-hover);
+}
+
+/* Filtros */
+.mis-tickets-filtros {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.mis-tickets-filtro-btn {
+  padding: 7px 16px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-boton);
+  background: var(--color-superficie);
+  color: var(--color-texto-secundario);
+  font-size: var(--tamano-texto-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mis-tickets-filtro-btn:hover {
+  border-color: var(--color-primario);
+  color: var(--color-primario);
+}
+.mis-tickets-filtro-btn.activo {
+  background-color: var(--color-primario);
+  border-color: var(--color-primario);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Tabla */
+.mis-tickets-tabla-contenedor {
+  background: var(--color-superficie);
+  border-radius: var(--radio-tarjeta);
+  box-shadow: var(--sombra-tarjeta);
+  overflow-x: auto;
+}
+
+.mis-tickets-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--tamano-texto-sm);
+}
+
+.mis-tickets-tabla thead tr {
+  background-color: var(--color-fondo-app);
+}
+
+.mis-tickets-tabla th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--color-texto-secundario);
+  border-bottom: 1px solid var(--color-borde);
+  white-space: nowrap;
+}
+
+.mis-tickets-tabla td {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--color-borde);
+  color: var(--color-texto-principal);
+  vertical-align: middle;
+}
+
+.mis-tickets-tabla tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.mis-tickets-tabla tbody tr:hover {
+  background-color: var(--color-primario-suave);
+}
+
+.mis-tickets-id {
+  font-weight: 600;
+  color: var(--color-primario);
+  white-space: nowrap;
+}
+
+.mis-tickets-titulo-celda {
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mis-tickets-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: var(--radio-completo);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mis-tickets-btn-ver {
+  padding: 5px 14px;
+  border: 1px solid var(--color-primario);
+  border-radius: var(--radio-boton);
+  background: transparent;
+  color: var(--color-primario);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mis-tickets-btn-ver:hover {
+  background-color: var(--color-primario);
+  color: #fff;
+}
+
+.mis-tickets-vacio {
+  color: var(--color-texto-secundario);
+  padding: 32px 0;
+  text-align: center;
+  font-size: var(--tamano-texto-base);
+}
