@@ -1,2 +1,5 @@
-// Funciones con datos falsos de este módulo
-export const datosSimulados = [];
+import { inventario } from "../data/datosFalsos";
+
+export async function listarInventario() {
+    return [...inventario];
+}
