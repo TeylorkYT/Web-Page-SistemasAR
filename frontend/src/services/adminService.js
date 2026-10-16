@@ -14,6 +14,7 @@
  * ==============================================================================
  */
 
+import { cliente } from "../api/client";
 import {
   categorias as categoriasIniciales,
   tickets as ticketsIniciales,
@@ -171,53 +172,52 @@ let calificacionesMemoria = calificacionesIniciales.map(enriquecerCalificacion);
  * series para el gráfico comparativo y el listado de técnicos activos en tiempo real.
  */
 export async function obtenerMetricasDashboard() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const ticketsTotales = ticketsMemoria.length;
-      const ticketsAbiertos = ticketsMemoria.filter((t) => t.estado !== "Cerrado").length;
-      const ticketsCerrados = ticketsMemoria.filter((t) => t.estado === "Cerrado").length;
+  try {
+    const [{ data: general }, { data: tecnicosList }, { data: ticketsList }] = await Promise.all([
+      cliente.get("/reportes/estado_general"),
+      cliente.get("/tecnicos"),
+      cliente.get("/tickets")
+    ]);
 
-      // Técnicos activos: disponibilidad distinta de 'Fuera_de_Servicio'
-      const tecnicosActivosLista = tecnicos.filter(
-        (tec) => tec.disponibilidad !== "Fuera_de_Servicio"
+    const graficoSemanal = (general.serie_semanal || []).map((s) => {
+      const tot = (s.abiertos || 0) + (s.cerrados || 0) || 1;
+      return {
+        etiqueta: s.semana,
+        abiertos: s.abiertos,
+        cerrados: s.cerrados,
+        porcentaje: Math.round(((s.cerrados || 0) / tot) * 100)
+      };
+    });
+
+    const tecnicosMonitoreo = (tecnicosList || []).map((tec) => {
+      const ticketEnProceso = (ticketsList || []).find(
+        (t) => t.id_tecnico === tec.id_usuario && t.estado === "En_Proceso"
       );
-      const tecnicosActivos = tecnicosActivosLista.length;
+      return {
+        id: tec.id_usuario,
+        nombre: `${tec.nombre} ${tec.apellido}`,
+        estado: tec.disponibilidad,
+        ticketActual: ticketEnProceso ? `TKT-${ticketEnProceso.id_ticket}` : "-"
+      };
+    });
 
-      // Tabla de monitoreo en tiempo real con datos de v2.0
-      const tecnicosMonitoreo = tecnicosActivosLista.map((tec) => {
-        const usuario = usuariosIniciales.find((u) => u.id_usuario === tec.id_usuario);
-        const ticketEnProceso = ticketsMemoria.find(
-          (t) => t.id_tecnico === tec.id_usuario && t.estado === "En_Proceso"
-        );
-        return {
-          id: tec.id_usuario,
-          nombre: usuario ? `${usuario.nombre} ${usuario.apellido}` : `Técnico #${tec.id_usuario}`,
-          estado: tec.disponibilidad, // 'Disponible', 'Ocupado', 'En_Almuerzo'
-          ticketActual: ticketEnProceso ? `TKT-${ticketEnProceso.id_ticket}` : "-"
-        };
-      });
-
-      resolve({
-        ticketsTotales,
-        ticketsAbiertos,
-        ticketsCerrados,
-        tecnicosActivos,
-        graficoSemanal: [
-          { etiqueta: "Sem 1", abiertos: 4, cerrados: 2, porcentaje: 60 },
-          { etiqueta: "Sem 2", abiertos: 6, cerrados: 3, porcentaje: 75 },
-          { etiqueta: "Sem 3", abiertos: 5, cerrados: 3, porcentaje: 65 },
-          { etiqueta: "Sem 4", abiertos: ticketsAbiertos, cerrados: ticketsCerrados, porcentaje: Math.round(((ticketsCerrados || 1) / (ticketsTotales || 1)) * 100) }
-        ],
-        graficoMensual: [
-          { etiqueta: "Mayo", abiertos: 12, cerrados: 10, porcentaje: 70 },
-          { etiqueta: "Junio", abiertos: 15, cerrados: 12, porcentaje: 80 },
-          { etiqueta: "Julio", abiertos: 18, cerrados: 16, porcentaje: 88 },
-          { etiqueta: "Agosto", abiertos: ticketsAbiertos, cerrados: ticketsCerrados, porcentaje: 95 }
-        ],
-        tecnicosMonitoreo
-      });
-    }, 100);
-  });
+    return {
+      ticketsTotales: general.tickets_totales,
+      ticketsAbiertos: general.abiertos,
+      ticketsCerrados: general.cerrados,
+      tecnicosActivos: general.tecnicos_activos,
+      graficoSemanal: graficoSemanal.length ? graficoSemanal : [
+        { etiqueta: "Sem 1", abiertos: general.abiertos, cerrados: general.cerrados, porcentaje: 50 }
+      ],
+      graficoMensual: [
+        { etiqueta: "Mes actual", abiertos: general.abiertos, cerrados: general.cerrados, porcentaje: Math.round(((general.cerrados || 0) / (general.tickets_totales || 1)) * 100) }
+      ],
+      tecnicosMonitoreo
+    };
+  } catch (error) {
+    console.error("Error al obtener métricas del dashboard:", error);
+    throw error;
+  }
 }
 
 // ==============================================================================
@@ -228,55 +228,28 @@ export async function obtenerMetricasDashboard() {
  * Obtiene el listado completo de categorías registradas.
  */
 export async function obtenerCategorias() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([...categoriasMemoria]);
-    }, 100);
-  });
+  const { data } = await cliente.get("/categorias");
+  return data;
 }
 
-/**
- * Registra una nueva categoría en la colección en memoria.
- */
 export async function crearCategoria(datos) {
-  const nombreLimpio = (datos.nombre_categoria || "").trim();
-  if (!nombreLimpio) {
-    throw new Error("El nombre de la categoría es obligatorio");
+  try {
+    const { data } = await cliente.post("/categorias", datos);
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al crear la categoría");
   }
-
-  const nueva = {
-    id_categoria: Date.now(),
-    nombre_categoria: nombreLimpio,
-    descripcion: (datos.descripcion || "").trim()
-  };
-
-  categoriasMemoria = [...categoriasMemoria, nueva];
-  return nueva;
 }
 
-/**
- * Actualiza los datos de una categoría existente.
- */
 export async function actualizarCategoria(idCategoria, datos) {
-  const nombreLimpio = (datos.nombre_categoria || "").trim();
-  if (!nombreLimpio) {
-    throw new Error("El nombre de la categoría es obligatorio");
+  try {
+    const { data } = await cliente.put(`/categorias/${idCategoria}`, datos);
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al actualizar la categoría");
   }
-
-  const idNum = Number(idCategoria);
-  const index = categoriasMemoria.findIndex((c) => c.id_categoria === idNum);
-  if (index === -1) {
-    throw new Error("Categoría no encontrada");
-  }
-
-  const categoriaActualizada = {
-    ...categoriasMemoria[index],
-    nombre_categoria: nombreLimpio,
-    descripcion: (datos.descripcion || "").trim()
-  };
-
-  categoriasMemoria[index] = categoriaActualizada;
-  return categoriaActualizada;
 }
 
 /**
@@ -379,106 +352,78 @@ export async function eliminarServicio(idServicio) {
  * Obtiene la lista de tickets pendientes de asignación con opción de filtro por prioridad.
  */
 export async function obtenerTicketsPendientes(filtroPrioridad = "TODAS") {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      let resultado = [...ticketsPendientesMemoria];
-      if (filtroPrioridad && filtroPrioridad !== "TODAS") {
-        resultado = resultado.filter(
-          (t) => t.prioridad.toUpperCase() === filtroPrioridad.toUpperCase()
-        );
-      }
-      resolve(resultado);
-    }, 100);
-  });
+  const params = { estado: "Abierto" };
+  if (filtroPrioridad && filtroPrioridad !== "TODAS") {
+    params.prioridad = filtroPrioridad;
+  }
+  const { data } = await cliente.get("/tickets", { params });
+  return data.map((t) => ({
+    id_ticket: t.id_ticket,
+    codigo: `TKT-${t.id_ticket}`,
+    titulo: t.titulo,
+    cliente: t.cliente_nombre || `Cliente #${t.id_cliente}`,
+    falla: t.titulo,
+    descripcion: t.descripcion,
+    prioridad: t.prioridad,
+    modalidad: t.modalidad,
+    fecha_creacion: t.fecha_creacion,
+    fecha_creacion_texto: t.fecha_creacion ? t.fecha_creacion.substring(0, 10) : "",
+    categorias: (t.categorias || []).map((c) => c.nombre_categoria || c),
+    categoria: (t.categorias || []).map((c) => c.nombre_categoria || c).join(", ") || "General",
+    estado: t.estado,
+    id_tecnico: t.id_tecnico,
+  }));
 }
 
-/**
- * Obtiene el detalle de un ticket específico para asignación.
- */
 export async function obtenerDetalleTicketAsignar(idTicket) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const idStr = String(idTicket).replace(/^(TKT-|#)/i, "");
-      const ticket = ticketsPendientesMemoria.find(
-        (t) => String(t.id_ticket) === idStr || t.codigo.toLowerCase().includes(idStr.toLowerCase())
-      );
-      resolve(ticket || ticketsPendientesMemoria[0] || null);
-    }, 80);
-  });
+  const idStr = String(idTicket).replace(/^(TKT-|#)/i, "");
+  const { data } = await cliente.get(`/tickets/${idStr}`);
+  return {
+    id_ticket: data.id_ticket,
+    codigo: `TKT-${data.id_ticket}`,
+    titulo: data.titulo,
+    cliente: data.cliente_nombre || `Cliente #${data.id_cliente}`,
+    falla: data.titulo,
+    descripcion: data.descripcion,
+    prioridad: data.prioridad,
+    modalidad: data.modalidad,
+    fecha_creacion: data.fecha_creacion,
+    fecha_creacion_texto: data.fecha_creacion ? data.fecha_creacion.substring(0, 10) : "",
+    categorias: (data.categorias || []).map((c) => c.nombre_categoria || c),
+    categoria: (data.categorias || []).map((c) => c.nombre_categoria || c).join(", ") || "General",
+    estado: data.estado,
+    id_tecnico: data.id_tecnico,
+  };
 }
 
-/**
- * Obtiene el listado de técnicos con su disponibilidad y cantidad de tickets en En_Proceso (v2.0).
- * Los técnicos en Fuera_de_Servicio aparecen marcados como deshabilitados.
- * Si un técnico tiene 5 o más tickets en En_Proceso, se marca con alerta de sobrecarga.
- */
 export async function obtenerTecnicosParaAsignar() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const lista = tecnicos.map((tec) => {
-        const usuario = usuariosIniciales.find((u) => u.id_usuario === tec.id_usuario);
-        const ticketsEnProceso = ticketsMemoria.filter(
-          (t) => t.id_tecnico === tec.id_usuario && t.estado === "En_Proceso"
-        ).length;
-
-        return {
-          id_tecnico: tec.id_usuario,
-          nombre: usuario ? `${usuario.nombre} ${usuario.apellido}` : `Técnico #${tec.id_usuario}`,
-          especialidad: tec.especialidad,
-          disponibilidad: tec.disponibilidad, // 'Disponible', 'Ocupado', 'En_Almuerzo', 'Fuera_de_Servicio'
-          ticketsEnProceso,
-          alertaCarga: ticketsEnProceso >= 5,
-          deshabilitado: tec.disponibilidad === "Fuera_de_Servicio",
-          estado: tec.disponibilidad.replace(/_/g, " ")
-        };
-      });
-      resolve(lista);
-    }, 80);
-  });
+  const { data } = await cliente.get("/tecnicos");
+  return data.map((tec) => ({
+    id_tecnico: tec.id_usuario,
+    nombre: `${tec.nombre} ${tec.apellido}`,
+    especialidad: tec.especialidad,
+    disponibilidad: tec.disponibilidad,
+    ticketsEnProceso: tec.tickets_en_proceso,
+    alertaCarga: tec.tickets_en_proceso >= 5,
+    deshabilitado: tec.disponibilidad === "Fuera_de_Servicio",
+    estado: tec.disponibilidad.replace(/_/g, " "),
+  }));
 }
 
-/**
- * Asigna un técnico responsable a un ticket pendiente (v2.0).
- * Guarda id_tecnico, id_asignado_por, la prioridad elegida y pasa a 'En_Proceso'.
- */
 export async function asignarTecnicoATicket(idTicket, idTecnico, prioridadAjustada = null) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const idNum = Number(idTicket);
-      const ticket = ticketsMemoria.find((t) => t.id_ticket === idNum);
-      if (!ticket) {
-        return reject(new Error("Ticket no encontrado en la lista"));
-      }
-
-      const tec = tecnicos.find((tc) => tc.id_usuario === Number(idTecnico));
-      if (!tec) {
-        return reject(new Error("Debe seleccionar un técnico válido"));
-      }
-      if (tec.disponibilidad === "Fuera_de_Servicio") {
-        return reject(new Error("No se puede asignar un ticket a un técnico fuera de servicio"));
-      }
-
-      const usuarioTec = usuariosIniciales.find((u) => u.id_usuario === tec.id_usuario);
-      const nombreTecnico = usuarioTec ? `${usuarioTec.nombre} ${usuarioTec.apellido}` : `Técnico #${tec.id_usuario}`;
-
-      // Actualizar el ticket en memoria
-      ticket.id_tecnico = tec.id_usuario;
-      ticket.id_asignado_por = 1; // Administrador Carlos
-      if (prioridadAjustada) {
-        ticket.prioridad = prioridadAjustada;
-      }
-      ticket.estado = "En_Proceso";
-
-      // Remover de tickets pendientes
-      ticketsPendientesMemoria = ticketsPendientesMemoria.filter((t) => t.id_ticket !== idNum);
-
-      resolve({
-        exito: true,
-        mensaje: `Ticket TKT-${ticket.id_ticket} asignado exitosamente a ${nombreTecnico} con prioridad ${ticket.prioridad}.`,
-        ticketActualizado: { ...ticket }
-      });
-    }, 120);
-  });
+  try {
+    const payload = {
+      id_tecnico: Number(idTecnico),
+    };
+    if (prioridadAjustada && prioridadAjustada !== "TODAS") {
+      payload.prioridad = prioridadAjustada;
+    }
+    const { data } = await cliente.patch(`/tickets/${idTicket}/asignar`, payload);
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al asignar el técnico");
+  }
 }
 
 // ==============================================================================
@@ -492,101 +437,96 @@ export async function asignarTecnicoATicket(idTicket, idTecnico, prioridadAjusta
  * Obtiene las métricas de satisfacción general para las tarjetas superiores de la Vista 20 (v2.0).
  */
 export async function obtenerMetricasSatisfaccion() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      if (calificacionesMemoria.length === 0) {
-        return resolve({
-          promedioGeneral: "0.0",
-          mejorValorado: { nombre: "Sin registros", promedio: "0.0" },
-          alertasBajaCalif: 0
-        });
+  try {
+    const { data } = await cliente.get("/calificaciones");
+    if (!data || data.length === 0) {
+      return {
+        promedioGeneral: "0.0",
+        mejorValorado: { nombre: "Sin registros", promedio: "0.0" },
+        alertasBajaCalif: 0
+      };
+    }
+
+    const totalPuntos = data.reduce((acc, c) => acc + c.puntuacion, 0);
+    const promedioGeneral = (totalPuntos / data.length).toFixed(1);
+
+    const promediosPorTecnico = {};
+    data.forEach((c) => {
+      if (!promediosPorTecnico[c.id_tecnico]) {
+        promediosPorTecnico[c.id_tecnico] = { nombre: c.tecnico_nombre, suma: 0, count: 0 };
       }
+      promediosPorTecnico[c.id_tecnico].suma += c.puntuacion;
+      promediosPorTecnico[c.id_tecnico].count += 1;
+    });
 
-      const totalPuntos = calificacionesMemoria.reduce((acc, c) => acc + c.puntuacion, 0);
-      const promedioGeneral = (totalPuntos / calificacionesMemoria.length).toFixed(1);
+    let mejor = { nombre: "-", promedio: "0.0" };
+    let maxProm = -1;
+    Object.values(promediosPorTecnico).forEach((t) => {
+      const prom = t.suma / t.count;
+      if (prom > maxProm) {
+        maxProm = prom;
+        mejor = { nombre: t.nombre, promedio: prom.toFixed(1) };
+      }
+    });
 
-      // Calcular técnico mejor valorado
-      const promediosPorTecnico = {};
-      calificacionesMemoria.forEach((c) => {
-        if (!promediosPorTecnico[c.id_tecnico]) {
-          promediosPorTecnico[c.id_tecnico] = { nombre: c.tecnico, suma: 0, count: 0 };
-        }
-        promediosPorTecnico[c.id_tecnico].suma += c.puntuacion;
-        promediosPorTecnico[c.id_tecnico].count += 1;
-      });
+    const alertasBajaCalif = data.filter((c) => c.puntuacion <= 2).length;
 
-      let mejor = { nombre: "Diana Paz", promedio: "5.0" };
-      let maxProm = -1;
-      Object.values(promediosPorTecnico).forEach((t) => {
-        const prom = t.suma / t.count;
-        if (prom > maxProm) {
-          maxProm = prom;
-          mejor = { nombre: t.nombre, promedio: prom.toFixed(1) };
-        }
-      });
-
-      const alertasBajaCalif = calificacionesMemoria.filter((c) => c.puntuacion <= 2).length;
-
-      resolve({
-        promedioGeneral,
-        mejorValorado: mejor,
-        alertasBajaCalif
-      });
-    }, 80);
-  });
+    return {
+      promedioGeneral,
+      mejorValorado: mejor,
+      alertasBajaCalif
+    };
+  } catch {
+    return {
+      promedioGeneral: "0.0",
+      mejorValorado: { nombre: "-", promedio: "0.0" },
+      alertasBajaCalif: 0
+    };
+  }
 }
 
-/**
- * Obtiene la lista de calificaciones con filtros aplicados (Técnico, Rango de fechas sobre fecha_calificacion, Puntaje 1-5).
- */
 export async function obtenerCalificacionesSupervision(filtros = {}) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      let resultado = [...calificacionesMemoria];
+  const params = {};
+  if (filtros.tecnico && filtros.tecnico !== "todos") {
+    params.id_tecnico = Number(filtros.tecnico);
+  }
+  if (filtros.fechaInicio) params.desde = filtros.fechaInicio;
+  if (filtros.fechaFin) params.hasta = filtros.fechaFin;
+  if (filtros.puntaje && filtros.puntaje !== "todos") {
+    params.puntuacion = Number(filtros.puntaje);
+  }
 
-      // Filtro por técnico
-      if (filtros.tecnico && filtros.tecnico !== "todos") {
-        resultado = resultado.filter((c) =>
-          c.tecnico.toLowerCase().includes(filtros.tecnico.toLowerCase()) ||
-          String(c.id_tecnico) === String(filtros.tecnico)
-        );
-      }
+  const { data } = await cliente.get("/calificaciones", { params });
 
-      // Filtro por rango de fechas (sobre fecha_calificacion)
-      if (filtros.fechaInicio) {
-        resultado = resultado.filter((c) => c.fecha_calificacion >= filtros.fechaInicio);
-      }
-      if (filtros.fechaFin) {
-        resultado = resultado.filter((c) => c.fecha_calificacion <= filtros.fechaFin + " 23:59:59");
-      }
-      if (filtros.rango && filtros.rango !== "todos" && !filtros.fechaInicio && !filtros.fechaFin) {
-        if (filtros.rango === "este_mes") {
-          resultado = resultado.filter((c) => (c.fecha_calificacion || "").startsWith("2026-08"));
-        }
-      }
-
-      // Filtro por puntaje (1 a 5)
-      if (filtros.puntaje && filtros.puntaje !== "todos") {
-        const numPuntaje = Number(filtros.puntaje);
-        resultado = resultado.filter((c) => c.puntuacion === numPuntaje);
-      }
-
-      resolve(resultado);
-    }, 100);
-  });
+  return data.map((c) => ({
+    id_calificacion: c.id_calificacion,
+    id_ticket: c.id_ticket,
+    codigo_ticket: `TKT-${c.id_ticket}`,
+    id_tecnico: c.id_tecnico,
+    tecnico: c.tecnico_nombre || `Técnico #${c.id_tecnico}`,
+    id_cliente: c.id_cliente,
+    cliente: c.cliente_nombre || `Cliente #${c.id_cliente}`,
+    contacto: "-",
+    correo_cliente: "-",
+    puntuacion: c.puntuacion,
+    comentario: c.comentario || "",
+    comentario_resumen: c.comentario && c.comentario.length > 28 ? c.comentario.substring(0, 25) + "..." : (c.comentario || "Sin comentario"),
+    comentario_completo: c.comentario || "Sin comentario",
+    fecha_calificacion: c.fecha_calificacion,
+    fecha: c.fecha_calificacion ? c.fecha_calificacion.substring(0, 10) : "",
+    rango: "este_mes",
+    esAlerta: c.puntuacion <= 2,
+    titulo_ticket: `Ticket #${c.id_ticket}`
+  }));
 }
 
-/**
- * Obtiene las filas de Historial_Ticket correspondientes al ticket de una calificación (Requisito D4).
- */
 export async function obtenerHistorialTicketCalificacion(idTicket) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const idNum = Number(idTicket);
-      const rows = historial.filter((h) => h.id_ticket === idNum);
-      resolve(rows);
-    }, 80);
-  });
+  try {
+    const { data } = await cliente.get(`/tickets/${idTicket}/historial`);
+    return data;
+  } catch {
+    return [];
+  }
 }
 
 /**

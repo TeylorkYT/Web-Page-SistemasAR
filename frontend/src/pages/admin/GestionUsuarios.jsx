@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import Tabla from "../../components/Tabla";
 import EstadoBadge from "../../components/EstadoBadge";
-import { listarUsuarios } from "../../services/usuariosService";
+import { listarUsuarios, crearUsuario, actualizarUsuario } from "../../services/usuariosService";
 
 const POR_PAGINA = 10;
 const formVacio = {
@@ -58,7 +58,7 @@ export default function GestionUsuarios() {
     setError("");
   }
 
-  function guardar(e) {
+  async function guardar(e) {
     e.preventDefault();
     const esNuevo = !form.id_usuario;
 
@@ -71,24 +71,34 @@ export default function GestionUsuarios() {
       return;
     }
 
-    if (esNuevo) {
-      const nuevoId = Math.max(0, ...usuarios.map((u) => u.id_usuario)) + 1;
-      setUsuarios([
-        ...usuarios,
-        { ...form, id_usuario: nuevoId, fecha_registro: new Date().toISOString().slice(0, 10) },
-      ]);
-      setMensaje("Usuario creado correctamente");
-    } else {
-      setUsuarios(
-        usuarios.map((u) =>
-          u.id_usuario === form.id_usuario
-            ? { ...form, contrasena: form.contrasena.trim() ? form.contrasena : u.contrasena }
-            : u
-        )
-      );
-      setMensaje("Usuario actualizado correctamente");
+    try {
+      if (esNuevo) {
+        const nuevo = await crearUsuario({
+          ...form,
+          rol: form.rol.toLowerCase(),
+        });
+        setUsuarios([...usuarios, nuevo]);
+        setMensaje("Usuario creado correctamente");
+      } else {
+        const payload = {
+          nombre: form.nombre,
+          apellido: form.apellido,
+          correo_electronico: form.correo_electronico,
+          estado: form.estado,
+        };
+        if (form.contrasena && form.contrasena.trim()) {
+          payload.contrasena = form.contrasena.trim();
+        }
+        const actualizado = await actualizarUsuario(form.id_usuario, payload);
+        setUsuarios(
+          usuarios.map((u) => (u.id_usuario === form.id_usuario ? actualizado : u))
+        );
+        setMensaje("Usuario actualizado correctamente");
+      }
+      cerrar();
+    } catch (err) {
+      setError(err.message || "Error al guardar el usuario");
     }
-    cerrar();
   }
 
   const columnas = [
