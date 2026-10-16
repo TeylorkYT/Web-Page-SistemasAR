@@ -1,88 +1,157 @@
-// Funciones con datos falsos de este módulo
-import { tickets, categorias, historialTickets, usuarios } from '../data/datosFalsos';
+import { cliente } from "../api/client";
 
-// ------------------------------------------------------------------
-// Tickets
-// ------------------------------------------------------------------
-
-/** Devuelve todos los tickets del cliente con id_cliente = 1 (usuario de prueba) */
-export async function listarTickets() {
-  // Enriquecer cada ticket con los nombres de sus categorías
-  return tickets
-    .filter((t) => t.id_cliente === 1)
-    .map((t) => ({
-      ...t,
-      categorias: (t.categorias_ids || []).map(
-        (cid) => categorias.find((c) => c.id_categoria === cid)?.nombre_categoria ?? ''
-      )
-    }));
+/**
+ * Lista todos los tickets aplicando filtros según el rol del usuario autenticado
+ * @param {Object} [filtros={}] - Filtros opcionales (estado, prioridad, id_tecnico)
+ */
+export async function listarTickets(filtros = {}) {
+  const { data } = await cliente.get("/tickets", { params: filtros });
+  return data.map((t) => ({
+    ...t,
+    codigo: `TKT-${t.id_ticket}`,
+    categorias: (t.categorias || []).map((c) =>
+      typeof c === "object" ? c.nombre_categoria : c
+    ),
+  }));
 }
 
-/** Devuelve un ticket por id con su historial enriquecido */
+/**
+ * Obtiene el detalle completo de un ticket (incluye reporte, calificación, historial y comentarios)
+ * @param {number|string} id
+ */
 export async function obtenerTicket(id) {
-  const ticket = tickets.find((t) => String(t.id_ticket) === String(id));
-  if (!ticket) return null;
+  const [ticketResp, histResp, comResp] = await Promise.all([
+    cliente.get(`/tickets/${id}`),
+    cliente.get(`/tickets/${id}/historial`),
+    cliente.get(`/tickets/${id}/comentarios`),
+  ]);
 
-  const historial = historialTickets
-    .filter((h) => h.id_ticket === ticket.id_ticket)
-    .map((h) => ({
-      ...h,
-      nombre_usuario:
-        usuarios.find((u) => u.id_usuario === h.id_usuario)?.nombre ?? 'Sistema'
-    }));
-
+  const t = ticketResp.data;
   return {
-    ...ticket,
-    categorias: (ticket.categorias_ids || []).map(
-      (cid) => categorias.find((c) => c.id_categoria === cid)?.nombre_categoria ?? ''
+    ...t,
+    codigo: `TKT-${t.id_ticket}`,
+    categorias: (t.categorias || []).map((c) =>
+      typeof c === "object" ? c.nombre_categoria : c
     ),
-    historial
+    historial: histResp.data.map((h) => ({
+      ...h,
+      nombre_usuario: h.usuario_nombre,
+    })),
+    comentarios: comResp.data.map((c) => ({
+      ...c,
+      autor: c.usuario_nombre,
+      rolAutor: c.rol,
+    })),
   };
 }
 
 /**
- * Simula la creación de un ticket.
- * @param {{ titulo: string, descripcion: string, categorias_ids: number[], id_equipo: number|null }} datos
+ * Registra un nuevo ticket en el sistema
+ * @param {{ titulo: string, descripcion: string, modalidad?: string, id_equipo?: number|null, categorias?: number[], categorias_ids?: number[] }} datos
  */
 export async function crearTicket(datos) {
-  const nuevoId = tickets.length + 1;
-  const nuevo = {
-    id_ticket: nuevoId,
-    titulo: datos.titulo,
-    descripcion: datos.descripcion,
-    fecha_creacion: new Date().toISOString().slice(0, 10),
-    fecha_resolucion: null,
-    fecha_cierre: null,
-    prioridad: 'Media',
-    estado: 'Abierto',
-    id_cliente: 1,
-    id_tecnico: null,
-    id_asignado_por: null,
-    id_equipo: datos.id_equipo ?? null,
-    categorias_ids: datos.categorias_ids ?? []
-  };
-  tickets.push(nuevo);
-  return nuevo;
+  try {
+    const payload = {
+      titulo: datos.titulo,
+      descripcion: datos.descripcion,
+      modalidad: datos.modalidad || "Presencial",
+      id_equipo: datos.id_equipo ?? null,
+      categorias: datos.categorias || datos.categorias_ids || [],
+    };
+    const { data } = await cliente.post("/tickets", payload);
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al crear el ticket");
+  }
 }
-
-// ------------------------------------------------------------------
-// Categorías
-// ------------------------------------------------------------------
-
-/** Devuelve todas las categorías disponibles */
-export async function listarCategorias() {
-  return categorias;
-}
-
-// ------------------------------------------------------------------
-// Calificación
-// ------------------------------------------------------------------
 
 /**
- * Simula enviar una calificación para un ticket.
- * @param {{ id_ticket: number, puntuacion: number, comentario: string }} datos
+ * Obtiene el historial cronológico de acciones sobre el ticket
+ * @param {number|string} id
+ */
+export async function obtenerHistorial(id) {
+  const { data } = await cliente.get(`/tickets/${id}/historial`);
+  return data.map((h) => ({
+    ...h,
+    nombre_usuario: h.usuario_nombre,
+  }));
+}
+
+/**
+ * Obtiene los comentarios del ticket (oculta notas internas si el usuario es cliente)
+ * @param {number|string} id
+ */
+export async function obtenerComentarios(id) {
+  const { data } = await cliente.get(`/tickets/${id}/comentarios`);
+  return data.map((c) => ({
+    ...c,
+    autor: c.usuario_nombre,
+    rolAutor: c.rol,
+  }));
+}
+
+/**
+ * Agrega un nuevo comentario o nota interna
+ * @param {number|string} id
+ * @param {{ contenido: string, es_nota_interna?: boolean }} datos
+ */
+export async function comentar(id, datos) {
+  try {
+    const { data } = await cliente.post(`/tickets/${id}/comentarios`, datos);
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al enviar el comentario");
+  }
+}
+
+/**
+ * Califica la atención de un ticket resuelto y lo transiciona a Cerrado
+ * @param {number|string} id
+ * @param {{ puntuacion: number, comentario?: string }} datos
+ */
+export async function calificar(id, datos) {
+  try {
+    const { data } = await cliente.post(`/tickets/${id}/calificacion`, datos);
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al enviar la calificación");
+  }
+}
+
+/**
+ * Calificar ticket (versión con id_ticket dentro del objeto para compatibilidad de vistas existentes)
  */
 export async function calificarTicket(datos) {
-  // Solo actualización local del estado; el backend real lo persistiría
-  return { ...datos, id_calificacion: Date.now() };
+  const id = datos.id_ticket;
+  return calificar(id, {
+    puntuacion: datos.puntuacion,
+    comentario: datos.comentario || null,
+  });
+}
+
+/**
+ * Cierra un ticket resuelto sin calificar
+ * @param {number|string} id
+ */
+export async function cerrarTicket(id) {
+  try {
+    const { data } = await cliente.patch(`/tickets/${id}/estado`, {
+      estado_nuevo: "Cerrado",
+    });
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al cerrar el ticket");
+  }
+}
+
+/**
+ * Lista las categorías activas
+ */
+export async function listarCategorias() {
+  const { data } = await cliente.get("/categorias");
+  return data;
 }
