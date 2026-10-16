@@ -1,5 +1,5 @@
 import jwt
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.deps import usuario_actual
@@ -12,6 +12,7 @@ from app.core.security import (
 from app.db.database import get_db
 from app.models.usuario import Usuario
 from app.schemas.auth import LoginIn, PerfilOut, RefreshIn, TokenOut
+from app.schemas.usuario import RecuperarIn, RegistroClienteIn, UsuarioOut
 from app.services import usuario_service
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
@@ -24,6 +25,16 @@ def _tokens(usuario: Usuario) -> TokenOut:
         rol=usuario.rol.lower(),
         nombre=f"{usuario.nombre} {usuario.apellido}",
     )
+
+
+@router.post("/register", response_model=UsuarioOut, status_code=status.HTTP_201_CREATED)
+def registrar(datos: RegistroClienteIn, db: Session = Depends(get_db)):
+    return usuario_service.registrar_cliente(db, datos)
+
+
+@router.post("/recuperar")
+def recuperar(_datos: RecuperarIn):
+    return {"detail": "Si el correo existe, recibirás instrucciones"}
 
 
 @router.post("/login", response_model=TokenOut)
