@@ -24,8 +24,7 @@ import {
   equipos as equiposIniciales,
   categorias as categoriasIniciales,
   historialTickets as historialInicial,
-  comentarios as comentariosIniciales,
-  inventario as inventarioInicial
+  comentarios as comentariosIniciales
 } from "../data/datosFalsos";
 
 // ------------------------------------------------------------------------------
@@ -34,7 +33,6 @@ import {
 let ticketsMemoria = JSON.parse(JSON.stringify(ticketsIniciales));
 let historialMemoria = JSON.parse(JSON.stringify(historialInicial));
 let comentariosMemoria = JSON.parse(JSON.stringify(comentariosIniciales));
-let inventarioMemoria = JSON.parse(JSON.stringify(inventarioInicial));
 
 // Técnico por defecto para la sesión simulada (Diana Paz - ID 2)
 export const TECNICO_ACTUAL = {
@@ -106,7 +104,7 @@ export async function obtenerTicketsTecnico(idTecnico = TECNICO_ACTUAL.id_usuari
   }));
 }
 
-export async function obtenerMetricasDashboardTecnico(idTecnico = TECNICO_ACTUAL.id_usuario) {
+export async function obtenerMetricasDashboardTecnico() {
   const { data: tickets } = await cliente.get("/tickets");
   const asignados = tickets.length;
   const enProceso = tickets.filter((t) => t.estado === "En_Proceso").length;
@@ -118,7 +116,7 @@ export async function obtenerMetricasDashboardTecnico(idTecnico = TECNICO_ACTUAL
     ticketsEnProceso: enProceso,
     ticketsResueltos: resueltos,
     ticketsCerrados: cerrados,
-    disponiblesRepuestos: inventarioMemoria.filter((i) => i.estado === "Disponible").length,
+    disponiblesRepuestos: 0,
   };
 }
 
@@ -196,35 +194,4 @@ export async function registrarAvance(idTicket, { detalles, tipoAccion = "Coment
     const detalle = error.response?.data?.detail;
     throw new Error(typeof detalle === "string" ? detalle : "Error al registrar el avance");
   }
-}
-
-/**
- * Vista 13: Consulta de inventario / repuestos para el técnico (solo lectura)
- * Permite filtrar por texto y por tipo de componente
- */
-export async function consultarInventarioTecnico({ termino = "", tipo = "Todos", soloDisponibles = false } = {}) {
-  await simularLatencia(100);
-
-  let resultado = [...inventarioMemoria];
-
-  if (soloDisponibles) {
-    resultado = resultado.filter((item) => item.estado === "Disponible" && item.stock > 0);
-  }
-
-  if (tipo && tipo !== "Todos") {
-    resultado = resultado.filter((item) => item.tipo.toLowerCase() === tipo.toLowerCase());
-  }
-
-  if (termino && termino.trim()) {
-    const q = termino.trim().toLowerCase();
-    resultado = resultado.filter(
-      (item) =>
-        item.nombre.toLowerCase().includes(q) ||
-        item.codigo.toLowerCase().includes(q) ||
-        item.descripcion.toLowerCase().includes(q) ||
-        item.ubicacion.toLowerCase().includes(q)
-    );
-  }
-
-  return resultado;
 }

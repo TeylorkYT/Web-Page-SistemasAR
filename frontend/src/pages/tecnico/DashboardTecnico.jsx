@@ -16,7 +16,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "../../components/Layout";
-import Boton from "../../components/Boton";
 import {
   obtenerTicketsTecnico,
   obtenerMetricasDashboardTecnico,
@@ -76,8 +75,6 @@ export default function DashboardTecnico() {
   const manejarCambioMenu = (id) => {
     if (id === "dashboard" || id === "tickets-asignados") {
       navigate("/tecnico");
-    } else if (id === "inventario-repuestos") {
-      navigate("/tecnico/inventario");
     }
   };
 
@@ -101,15 +98,8 @@ export default function DashboardTecnico() {
             <h1 className="dashboard-tecnico-titulo">Dashboard del Técnico</h1>
             <p className="dashboard-tecnico-subtitulo">
               Bienvenida(o), {tecnico ? `${tecnico.nombre} ${tecnico.apellido}` : "Diana Paz"}.
-              Aquí puedes gestionar tus tickets asignados y consultar el inventario.
+              Aquí puedes gestionar y dar seguimiento a tus tickets asignados.
             </p>
-          </div>
-          <div className="dashboard-tecnico-acciones-rapidas">
-            <Boton
-              variante="secundario"
-              onClick={() => navigate("/tecnico/inventario")}
-              texto="📦 Consultar Inventario"
-            />
           </div>
         </header>
 
@@ -154,15 +144,15 @@ export default function DashboardTecnico() {
 
           <div className="metrica-card">
             <div className="metrica-card-header">
-              <span className="metrica-card-titulo">Repuestos Disp.</span>
+              <span className="metrica-card-titulo">Cerrados</span>
               <span className="metrica-card-icono" style={{ backgroundColor: "#f1f5f9", color: "#475569" }}>
-                📦
+                🔒
               </span>
             </div>
             <span className="metrica-card-valor" style={{ color: "#334155" }}>
-              {cargando ? "..." : metricas.disponiblesRepuestos}
+              {cargando ? "..." : metricas.ticketsCerrados}
             </span>
-            <span className="metrica-card-desc">En inventario para servicio</span>
+            <span className="metrica-card-desc">Histórico con ciclo completado</span>
           </div>
         </section>
 

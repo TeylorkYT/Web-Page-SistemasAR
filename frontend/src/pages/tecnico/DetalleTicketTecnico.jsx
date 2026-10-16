@@ -104,8 +104,6 @@ export default function DetalleTicketTecnico() {
   const manejarCambioMenu = (itemId) => {
     if (itemId === "dashboard" || itemId === "tickets-asignados") {
       navigate("/tecnico");
-    } else if (itemId === "inventario-repuestos") {
-      navigate("/tecnico/inventario");
     }
   };
 
