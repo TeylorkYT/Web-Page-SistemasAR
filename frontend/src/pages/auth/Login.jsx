@@ -1,15 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Campo from "../../components/Campo";
 import Boton from "../../components/Boton";
 import { iniciarSesion } from "../../services/authService";
 import { rutaPorRol } from "../../routes/rutaPorRol";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
   const [correo_electronico, setCorreoElectronico] = useState("");
   const [contrasena, setContrasena] = useState("");
+  const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { sesion, guardarSesion } = useAuth();
+
+  // Si ya hay sesión activa, redirigir al panel correspondiente
+  useEffect(() => {
+    if (sesion?.rol && rutaPorRol[sesion.rol]) {
+      navigate(rutaPorRol[sesion.rol], { replace: true });
+    }
+  }, [sesion, navigate]);
 
   const manejarEnvio = async (e) => {
     e.preventDefault();
@@ -20,12 +30,16 @@ export default function Login() {
       return;
     }
 
+    setCargando(true);
     try {
-      const respuesta = await iniciarSesion(correo_electronico, contrasena);
+      const respuesta = await iniciarSesion(correo_electronico.trim(), contrasena);
+      guardarSesion(respuesta);
       const destino = rutaPorRol[respuesta.rol] || "/cliente";
-      navigate(destino);
+      navigate(destino, { replace: true });
     } catch (err) {
       setError(err.message || "Correo o contraseña incorrectos");
+    } finally {
+      setCargando(false);
     }
   };
 
@@ -111,6 +125,7 @@ export default function Login() {
             valor={correo_electronico}
             onChange={(e) => setCorreoElectronico(e.target.value)}
             placeholder="ejemplo@prueba.com"
+            deshabilitado={cargando}
             requerido
           />
           <Campo
@@ -119,6 +134,7 @@ export default function Login() {
             valor={contrasena}
             onChange={(e) => setContrasena(e.target.value)}
             placeholder="Ingresa tu contraseña"
+            deshabilitado={cargando}
             requerido
           />
 
@@ -135,8 +151,8 @@ export default function Login() {
             </Link>
           </div>
 
-          <Boton tipo="submit" variante="primario" anchoCompleto>
-            Ingresar
+          <Boton tipo="submit" variante="primario" anchoCompleto deshabilitado={cargando}>
+            {cargando ? "Ingresando..." : "Ingresar"}
           </Boton>
         </form>
 

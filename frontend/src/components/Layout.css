@@ -332,6 +332,28 @@
   color: var(--color-texto-secundario);
 }
 
+.header-boton-cerrar-sesion {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: transparent;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radio-boton, 6px);
+  padding: 6px 12px;
+  color: var(--color-texto-secundario, #64748b);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 8px;
+}
+
+.header-boton-cerrar-sesion:hover {
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+
 /* 5. ZONA PRINCIPAL DE CONTENIDO (Main) */
 .layout-contenido {
   flex: 1;

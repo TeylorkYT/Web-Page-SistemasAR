@@ -7,17 +7,18 @@
 USE sistemas_ar;
 
 -- ------------------------------------------------------------
--- 1. TABLA USUARIO Y SUBTIPOS (1 Admin, 3 Técnicos, 3 Clientes)
--- Nota: La columna contrasena almacena HASH_PENDIENTE hasta daily 3 (login)
+-- 1. TABLA USUARIO Y SUBTIPOS (1 Admin, 3 Técnicos, 4 Clientes)
+-- Nota: La contraseña de prueba para todos los usuarios es Prueba123*
 -- ------------------------------------------------------------
 INSERT INTO Usuario (id_usuario, nombre, apellido, correo_electronico, contrasena, rol, fecha_registro, estado) VALUES
-(1, 'Carlos', 'Administrador', 'admin@prueba.com',              'HASH_PENDIENTE', 'Administrador', '2026-08-01', 'Activo'),
-(2, 'Diana',  'Paz',           'tecnico@prueba.com',            'HASH_PENDIENTE', 'Tecnico',       '2026-08-01', 'Activo'),
-(3, 'Andres', 'Rojas',         'andres.rojas@sistemasar.net',   'HASH_PENDIENTE', 'Tecnico',       '2026-08-01', 'Activo'),
-(4, 'Mario',  'Mendoza',       'mario.mendoza@sistemasar.net',  'HASH_PENDIENTE', 'Tecnico',       '2026-08-02', 'Activo'),
-(5, 'Laura',  'Ramirez',       'cliente@prueba.com',            'HASH_PENDIENTE', 'Cliente',       '2026-08-02', 'Activo'),
-(6, 'Carlos', 'Ordonez',       'carlos.ordonez@empresa.com',    'HASH_PENDIENTE', 'Cliente',       '2026-08-03', 'Activo'),
-(7, 'Maria',  'Gomez',         'maria.gomez@empresa.com',       'HASH_PENDIENTE', 'Cliente',       '2026-08-04', 'Activo');
+(1, 'Carlos', 'Administrador', 'admin@prueba.com',              '$2b$12$PZJy1fimRbHjk5ZLI0wlXuGWlh61u8ybMUYz2IS3bXB4Sx0s.tS0e', 'Administrador', '2026-08-01', 'Activo'),
+(2, 'Diana',  'Paz',           'tecnico@prueba.com',            '$2b$12$PZJy1fimRbHjk5ZLI0wlXuGWlh61u8ybMUYz2IS3bXB4Sx0s.tS0e', 'Tecnico',       '2026-08-01', 'Activo'),
+(3, 'Andres', 'Rojas',         'andres.rojas@sistemasar.net',   '$2b$12$PZJy1fimRbHjk5ZLI0wlXuGWlh61u8ybMUYz2IS3bXB4Sx0s.tS0e', 'Tecnico',       '2026-08-01', 'Activo'),
+(4, 'Mario',  'Mendoza',       'mario.mendoza@sistemasar.net',  '$2b$12$PZJy1fimRbHjk5ZLI0wlXuGWlh61u8ybMUYz2IS3bXB4Sx0s.tS0e', 'Tecnico',       '2026-08-02', 'Activo'),
+(5, 'Laura',  'Ramirez',       'cliente@prueba.com',            '$2b$12$PZJy1fimRbHjk5ZLI0wlXuGWlh61u8ybMUYz2IS3bXB4Sx0s.tS0e', 'Cliente',       '2026-08-02', 'Activo'),
+(6, 'Carlos', 'Ordonez',       'carlos.ordonez@empresa.com',    '$2b$12$PZJy1fimRbHjk5ZLI0wlXuGWlh61u8ybMUYz2IS3bXB4Sx0s.tS0e', 'Cliente',       '2026-08-03', 'Activo'),
+(7, 'Maria',  'Gomez',         'maria.gomez@empresa.com',       '$2b$12$PZJy1fimRbHjk5ZLI0wlXuGWlh61u8ybMUYz2IS3bXB4Sx0s.tS0e', 'Cliente',       '2026-08-04', 'Activo'),
+(8, 'Usuario', 'Inactivo',     'inactivo@prueba.com',           '$2b$12$PZJy1fimRbHjk5ZLI0wlXuGWlh61u8ybMUYz2IS3bXB4Sx0s.tS0e', 'Cliente',       '2026-08-05', 'Inactivo');
 
 -- Subtipo Administrador
 INSERT INTO Administrador (id_usuario, cargo) VALUES
@@ -29,11 +30,12 @@ INSERT INTO Tecnico (id_usuario, especialidad, disponibilidad) VALUES
 (3, 'Mantenimiento Hardware','Ocupado'),
 (4, 'Soporte Software',      'Fuera_de_Servicio');
 
--- Subtipo Cliente (3 clientes con diferente area_departamento)
+-- Subtipo Cliente (4 clientes con diferente area_departamento)
 INSERT INTO Cliente (id_usuario, telefono, direccion, area_departamento) VALUES
 (5, '3101234567', 'Calle 10 # 5-20',          'Administracion'),
 (6, '3119876543', 'Carrera 7 # 12-40',        'Ventas'),
-(7, '3125558899', 'Avenida Colombia # 3-15',   'Operaciones');
+(7, '3125558899', 'Avenida Colombia # 3-15',   'Operaciones'),
+(8, '3100000000', 'Calle Inactiva # 0-00',     'Pruebas');
 
 -- ------------------------------------------------------------
 -- 2. CATEGORÍAS DE SOPORTE TÉCNICO (5 categorías)
