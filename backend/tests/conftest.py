@@ -116,7 +116,7 @@ def test_engine():
 
 
 @pytest.fixture()
-def client(test_engine):
+def client(test_engine, monkeypatch):
     sesiones = sessionmaker(bind=test_engine, autoflush=False, autocommit=False)
 
     def get_db_pruebas():
@@ -126,6 +126,7 @@ def client(test_engine):
         finally:
             db.close()
 
+    monkeypatch.setattr("app.main.engine", test_engine)
     app.dependency_overrides[get_db] = get_db_pruebas
     yield TestClient(app)
     app.dependency_overrides.clear()

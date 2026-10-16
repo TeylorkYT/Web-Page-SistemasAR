@@ -37,8 +37,9 @@ def test_t09_produccion_con_secreto_valido_no_falla(monkeypatch):
     assert token is not None
 
 
-def test_t12_db_check_dev_responde_ok(client):
+def test_t12_db_check_dev_responde_ok(client, test_engine, monkeypatch):
     """T-T12: En entorno no productivo, /db-check devuelve 200 si la BD está activa."""
+    monkeypatch.setattr("app.main.engine", test_engine)
     r = client.get("/db-check")
     assert r.status_code == 200
     assert r.json() == {"database": "ok"}
