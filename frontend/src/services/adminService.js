@@ -172,53 +172,52 @@ let calificacionesMemoria = calificacionesIniciales.map(enriquecerCalificacion);
  * series para el gráfico comparativo y el listado de técnicos activos en tiempo real.
  */
 export async function obtenerMetricasDashboard() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const ticketsTotales = ticketsMemoria.length;
-      const ticketsAbiertos = ticketsMemoria.filter((t) => t.estado !== "Cerrado").length;
-      const ticketsCerrados = ticketsMemoria.filter((t) => t.estado === "Cerrado").length;
+  try {
+    const [{ data: general }, { data: tecnicosList }, { data: ticketsList }] = await Promise.all([
+      cliente.get("/reportes/estado_general"),
+      cliente.get("/tecnicos"),
+      cliente.get("/tickets")
+    ]);
 
-      // Técnicos activos: disponibilidad distinta de 'Fuera_de_Servicio'
-      const tecnicosActivosLista = tecnicos.filter(
-        (tec) => tec.disponibilidad !== "Fuera_de_Servicio"
+    const graficoSemanal = (general.serie_semanal || []).map((s) => {
+      const tot = (s.abiertos || 0) + (s.cerrados || 0) || 1;
+      return {
+        etiqueta: s.semana,
+        abiertos: s.abiertos,
+        cerrados: s.cerrados,
+        porcentaje: Math.round(((s.cerrados || 0) / tot) * 100)
+      };
+    });
+
+    const tecnicosMonitoreo = (tecnicosList || []).map((tec) => {
+      const ticketEnProceso = (ticketsList || []).find(
+        (t) => t.id_tecnico === tec.id_usuario && t.estado === "En_Proceso"
       );
-      const tecnicosActivos = tecnicosActivosLista.length;
+      return {
+        id: tec.id_usuario,
+        nombre: `${tec.nombre} ${tec.apellido}`,
+        estado: tec.disponibilidad,
+        ticketActual: ticketEnProceso ? `TKT-${ticketEnProceso.id_ticket}` : "-"
+      };
+    });
 
-      // Tabla de monitoreo en tiempo real con datos de v2.0
-      const tecnicosMonitoreo = tecnicosActivosLista.map((tec) => {
-        const usuario = usuariosIniciales.find((u) => u.id_usuario === tec.id_usuario);
-        const ticketEnProceso = ticketsMemoria.find(
-          (t) => t.id_tecnico === tec.id_usuario && t.estado === "En_Proceso"
-        );
-        return {
-          id: tec.id_usuario,
-          nombre: usuario ? `${usuario.nombre} ${usuario.apellido}` : `Técnico #${tec.id_usuario}`,
-          estado: tec.disponibilidad, // 'Disponible', 'Ocupado', 'En_Almuerzo'
-          ticketActual: ticketEnProceso ? `TKT-${ticketEnProceso.id_ticket}` : "-"
-        };
-      });
-
-      resolve({
-        ticketsTotales,
-        ticketsAbiertos,
-        ticketsCerrados,
-        tecnicosActivos,
-        graficoSemanal: [
-          { etiqueta: "Sem 1", abiertos: 4, cerrados: 2, porcentaje: 60 },
-          { etiqueta: "Sem 2", abiertos: 6, cerrados: 3, porcentaje: 75 },
-          { etiqueta: "Sem 3", abiertos: 5, cerrados: 3, porcentaje: 65 },
-          { etiqueta: "Sem 4", abiertos: ticketsAbiertos, cerrados: ticketsCerrados, porcentaje: Math.round(((ticketsCerrados || 1) / (ticketsTotales || 1)) * 100) }
-        ],
-        graficoMensual: [
-          { etiqueta: "Mayo", abiertos: 12, cerrados: 10, porcentaje: 70 },
-          { etiqueta: "Junio", abiertos: 15, cerrados: 12, porcentaje: 80 },
-          { etiqueta: "Julio", abiertos: 18, cerrados: 16, porcentaje: 88 },
-          { etiqueta: "Agosto", abiertos: ticketsAbiertos, cerrados: ticketsCerrados, porcentaje: 95 }
-        ],
-        tecnicosMonitoreo
-      });
-    }, 100);
-  });
+    return {
+      ticketsTotales: general.tickets_totales,
+      ticketsAbiertos: general.abiertos,
+      ticketsCerrados: general.cerrados,
+      tecnicosActivos: general.tecnicos_activos,
+      graficoSemanal: graficoSemanal.length ? graficoSemanal : [
+        { etiqueta: "Sem 1", abiertos: general.abiertos, cerrados: general.cerrados, porcentaje: 50 }
+      ],
+      graficoMensual: [
+        { etiqueta: "Mes actual", abiertos: general.abiertos, cerrados: general.cerrados, porcentaje: Math.round(((general.cerrados || 0) / (general.tickets_totales || 1)) * 100) }
+      ],
+      tecnicosMonitoreo
+    };
+  } catch (error) {
+    console.error("Error al obtener métricas del dashboard:", error);
+    throw error;
+  }
 }
 
 // ==============================================================================
@@ -438,101 +437,96 @@ export async function asignarTecnicoATicket(idTicket, idTecnico, prioridadAjusta
  * Obtiene las métricas de satisfacción general para las tarjetas superiores de la Vista 20 (v2.0).
  */
 export async function obtenerMetricasSatisfaccion() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      if (calificacionesMemoria.length === 0) {
-        return resolve({
-          promedioGeneral: "0.0",
-          mejorValorado: { nombre: "Sin registros", promedio: "0.0" },
-          alertasBajaCalif: 0
-        });
+  try {
+    const { data } = await cliente.get("/calificaciones");
+    if (!data || data.length === 0) {
+      return {
+        promedioGeneral: "0.0",
+        mejorValorado: { nombre: "Sin registros", promedio: "0.0" },
+        alertasBajaCalif: 0
+      };
+    }
+
+    const totalPuntos = data.reduce((acc, c) => acc + c.puntuacion, 0);
+    const promedioGeneral = (totalPuntos / data.length).toFixed(1);
+
+    const promediosPorTecnico = {};
+    data.forEach((c) => {
+      if (!promediosPorTecnico[c.id_tecnico]) {
+        promediosPorTecnico[c.id_tecnico] = { nombre: c.tecnico_nombre, suma: 0, count: 0 };
       }
+      promediosPorTecnico[c.id_tecnico].suma += c.puntuacion;
+      promediosPorTecnico[c.id_tecnico].count += 1;
+    });
 
-      const totalPuntos = calificacionesMemoria.reduce((acc, c) => acc + c.puntuacion, 0);
-      const promedioGeneral = (totalPuntos / calificacionesMemoria.length).toFixed(1);
+    let mejor = { nombre: "-", promedio: "0.0" };
+    let maxProm = -1;
+    Object.values(promediosPorTecnico).forEach((t) => {
+      const prom = t.suma / t.count;
+      if (prom > maxProm) {
+        maxProm = prom;
+        mejor = { nombre: t.nombre, promedio: prom.toFixed(1) };
+      }
+    });
 
-      // Calcular técnico mejor valorado
-      const promediosPorTecnico = {};
-      calificacionesMemoria.forEach((c) => {
-        if (!promediosPorTecnico[c.id_tecnico]) {
-          promediosPorTecnico[c.id_tecnico] = { nombre: c.tecnico, suma: 0, count: 0 };
-        }
-        promediosPorTecnico[c.id_tecnico].suma += c.puntuacion;
-        promediosPorTecnico[c.id_tecnico].count += 1;
-      });
+    const alertasBajaCalif = data.filter((c) => c.puntuacion <= 2).length;
 
-      let mejor = { nombre: "Diana Paz", promedio: "5.0" };
-      let maxProm = -1;
-      Object.values(promediosPorTecnico).forEach((t) => {
-        const prom = t.suma / t.count;
-        if (prom > maxProm) {
-          maxProm = prom;
-          mejor = { nombre: t.nombre, promedio: prom.toFixed(1) };
-        }
-      });
-
-      const alertasBajaCalif = calificacionesMemoria.filter((c) => c.puntuacion <= 2).length;
-
-      resolve({
-        promedioGeneral,
-        mejorValorado: mejor,
-        alertasBajaCalif
-      });
-    }, 80);
-  });
+    return {
+      promedioGeneral,
+      mejorValorado: mejor,
+      alertasBajaCalif
+    };
+  } catch {
+    return {
+      promedioGeneral: "0.0",
+      mejorValorado: { nombre: "-", promedio: "0.0" },
+      alertasBajaCalif: 0
+    };
+  }
 }
 
-/**
- * Obtiene la lista de calificaciones con filtros aplicados (Técnico, Rango de fechas sobre fecha_calificacion, Puntaje 1-5).
- */
 export async function obtenerCalificacionesSupervision(filtros = {}) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      let resultado = [...calificacionesMemoria];
+  const params = {};
+  if (filtros.tecnico && filtros.tecnico !== "todos") {
+    params.id_tecnico = Number(filtros.tecnico);
+  }
+  if (filtros.fechaInicio) params.desde = filtros.fechaInicio;
+  if (filtros.fechaFin) params.hasta = filtros.fechaFin;
+  if (filtros.puntaje && filtros.puntaje !== "todos") {
+    params.puntuacion = Number(filtros.puntaje);
+  }
 
-      // Filtro por técnico
-      if (filtros.tecnico && filtros.tecnico !== "todos") {
-        resultado = resultado.filter((c) =>
-          c.tecnico.toLowerCase().includes(filtros.tecnico.toLowerCase()) ||
-          String(c.id_tecnico) === String(filtros.tecnico)
-        );
-      }
+  const { data } = await cliente.get("/calificaciones", { params });
 
-      // Filtro por rango de fechas (sobre fecha_calificacion)
-      if (filtros.fechaInicio) {
-        resultado = resultado.filter((c) => c.fecha_calificacion >= filtros.fechaInicio);
-      }
-      if (filtros.fechaFin) {
-        resultado = resultado.filter((c) => c.fecha_calificacion <= filtros.fechaFin + " 23:59:59");
-      }
-      if (filtros.rango && filtros.rango !== "todos" && !filtros.fechaInicio && !filtros.fechaFin) {
-        if (filtros.rango === "este_mes") {
-          resultado = resultado.filter((c) => (c.fecha_calificacion || "").startsWith("2026-08"));
-        }
-      }
-
-      // Filtro por puntaje (1 a 5)
-      if (filtros.puntaje && filtros.puntaje !== "todos") {
-        const numPuntaje = Number(filtros.puntaje);
-        resultado = resultado.filter((c) => c.puntuacion === numPuntaje);
-      }
-
-      resolve(resultado);
-    }, 100);
-  });
+  return data.map((c) => ({
+    id_calificacion: c.id_calificacion,
+    id_ticket: c.id_ticket,
+    codigo_ticket: `TKT-${c.id_ticket}`,
+    id_tecnico: c.id_tecnico,
+    tecnico: c.tecnico_nombre || `Técnico #${c.id_tecnico}`,
+    id_cliente: c.id_cliente,
+    cliente: c.cliente_nombre || `Cliente #${c.id_cliente}`,
+    contacto: "-",
+    correo_cliente: "-",
+    puntuacion: c.puntuacion,
+    comentario: c.comentario || "",
+    comentario_resumen: c.comentario && c.comentario.length > 28 ? c.comentario.substring(0, 25) + "..." : (c.comentario || "Sin comentario"),
+    comentario_completo: c.comentario || "Sin comentario",
+    fecha_calificacion: c.fecha_calificacion,
+    fecha: c.fecha_calificacion ? c.fecha_calificacion.substring(0, 10) : "",
+    rango: "este_mes",
+    esAlerta: c.puntuacion <= 2,
+    titulo_ticket: `Ticket #${c.id_ticket}`
+  }));
 }
 
-/**
- * Obtiene las filas de Historial_Ticket correspondientes al ticket de una calificación (Requisito D4).
- */
 export async function obtenerHistorialTicketCalificacion(idTicket) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const idNum = Number(idTicket);
-      const rows = historial.filter((h) => h.id_ticket === idNum);
-      resolve(rows);
-    }, 80);
-  });
+  try {
+    const { data } = await cliente.get(`/tickets/${idTicket}/historial`);
+    return data;
+  } catch {
+    return [];
+  }
 }
 
 /**

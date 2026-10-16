@@ -12,9 +12,10 @@
  * ==============================================================================
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { obtenerNotificaciones, marcarNotificacionLeida } from '../services/reportesService';
 import './Layout.css';
 
 /**
@@ -281,6 +282,35 @@ export default function Layout({
 
   // Estado local para abrir o cerrar el menú lateral en dispositivos móviles
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
+  const [notificaciones, setNotificaciones] = useState([]);
+  const [panelNotifAbierto, setPanelNotifAbierto] = useState(false);
+
+  useEffect(() => {
+    let cancelado = false;
+    if (localStorage.getItem("token")) {
+      obtenerNotificaciones()
+        .then((data) => {
+          if (!cancelado) setNotificaciones(data || []);
+        })
+        .catch(() => {});
+    }
+    return () => {
+      cancelado = true;
+    };
+  }, [location.pathname]);
+
+  const noLeidas = notificaciones.filter((n) => !n.leida).length;
+
+  const marcarComoLeida = async (id) => {
+    try {
+      await marcarNotificacionLeida(id);
+      setNotificaciones((prev) =>
+        prev.map((n) => (n.id_notificacion === id ? { ...n, leida: true } : n))
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   // Obtener la configuración visual del rol actual (fallback a administrador)
   const configActual = CONFIG_POR_ROL[rol] || CONFIG_POR_ROL.administrador;
@@ -425,19 +455,84 @@ export default function Layout({
               </div>
             )}
 
-            {/* Campana de alertas con punto rojo */}
-            <button 
-              type="button" 
-              className="header-icono-alerta"
-              aria-label="Notificaciones"
-              title="Notificaciones"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-              </svg>
-              <span className="header-badge-notificacion"></span>
-            </button>
+            {/* Campana de alertas interactiva */}
+            <div style={{ position: 'relative' }}>
+              <button 
+                type="button" 
+                className="header-icono-alerta"
+                aria-label="Notificaciones"
+                title="Notificaciones"
+                onClick={() => setPanelNotifAbierto(!panelNotifAbierto)}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                {noLeidas > 0 && <span className="header-badge-notificacion">{noLeidas}</span>}
+              </button>
+
+              {panelNotifAbierto && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    right: 0,
+                    width: '320px',
+                    background: 'white',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    zIndex: 1000,
+                    padding: '12px',
+                    color: '#1e293b',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
+                    <strong style={{ fontSize: '14px' }}>Notificaciones ({noLeidas} sin leer)</strong>
+                    <button
+                      type="button"
+                      onClick={() => setPanelNotifAbierto(false)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', color: '#64748b' }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div style={{ maxHeight: '280px', overflowY: 'auto' }}>
+                    {notificaciones.length === 0 ? (
+                      <p style={{ fontSize: '13px', color: '#64748b', textAlign: 'center', margin: '16px 0' }}>No tienes notificaciones</p>
+                    ) : (
+                      notificaciones.map((n) => (
+                        <div
+                          key={n.id_notificacion}
+                          style={{
+                            padding: '8px',
+                            borderBottom: '1px solid #f8fafc',
+                            background: n.leida ? '#ffffff' : '#f0fdf4',
+                            borderRadius: '4px',
+                            marginBottom: '4px',
+                            fontSize: '12px',
+                          }}
+                        >
+                          <div style={{ fontWeight: n.leida ? 'normal' : '600', color: '#0f172a' }}>{n.mensaje}</div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px', color: '#64748b', fontSize: '11px' }}>
+                            <span>{new Date(n.fecha_envio).toLocaleString()}</span>
+                            {!n.leida && (
+                              <button
+                                type="button"
+                                onClick={() => marcarComoLeida(n.id_notificacion)}
+                                style={{ background: 'none', border: 'none', color: '#2563eb', cursor: 'pointer', padding: 0 }}
+                              >
+                                Marcar leída
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Avatar del usuario con inicial y rol */}
             <div className="header-avatar-perfil" title={`Sesión: ${nombreActivo} (${rol})`}>

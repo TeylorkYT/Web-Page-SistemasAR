@@ -15,6 +15,7 @@ from app.schemas.flujo import (
 )
 from app.schemas.ticket import CalificacionOut, ReporteOut, TicketOut
 from app.services.historial_service import registrar_historial
+from app.services.notificacion_service import notificar
 from app.services.ticket_service import armar_ticket_out
 
 
@@ -59,6 +60,21 @@ def asignar_tecnico(
         detalles=f"Asignado a técnico {tecnico_u.nombre} {tecnico_u.apellido}",
     )
 
+    notificar(
+        db=db,
+        id_usuario_destino=datos.id_tecnico,
+        id_ticket=ticket.id_ticket,
+        tipo="Asignacion",
+        mensaje=f"Se te ha asignado el ticket #{ticket.id_ticket}: {ticket.titulo}",
+    )
+    notificar(
+        db=db,
+        id_usuario_destino=ticket.id_cliente,
+        id_ticket=ticket.id_ticket,
+        tipo="Asignacion",
+        mensaje=f"Tu ticket #{ticket.id_ticket} ha sido asignado al técnico {tecnico_u.nombre} {tecnico_u.apellido}",
+    )
+
     db.commit()
     db.refresh(ticket)
     return armar_ticket_out(db, ticket)
@@ -97,6 +113,30 @@ def cambiar_estado_cierre(
         estado_nuevo="Cerrado",
         detalles="Ticket cerrado sin calificar",
     )
+
+    if ticket.id_tecnico:
+        notificar(
+            db=db,
+            id_usuario_destino=ticket.id_tecnico,
+            id_ticket=ticket.id_ticket,
+            tipo="Actualizacion",
+            mensaje=f"El ticket #{ticket.id_ticket} ha sido cerrado",
+        )
+    admins = list(
+        db.scalars(
+            select(Usuario).where(
+                Usuario.rol == "Administrador", Usuario.estado == "Activo"
+            )
+        ).all()
+    )
+    for a in admins:
+        notificar(
+            db=db,
+            id_usuario_destino=a.id_usuario,
+            id_ticket=ticket.id_ticket,
+            tipo="Actualizacion",
+            mensaje=f"El ticket #{ticket.id_ticket} ha sido cerrado",
+        )
 
     db.commit()
     db.refresh(ticket)
@@ -147,6 +187,14 @@ def registrar_reporte(
         estado_anterior="En_Proceso",
         estado_nuevo="Resuelto",
         detalles="Solución técnica aplicada y ticket resuelto",
+    )
+
+    notificar(
+        db=db,
+        id_usuario_destino=ticket.id_cliente,
+        id_ticket=ticket.id_ticket,
+        tipo="Resolucion",
+        mensaje=f"Tu ticket #{ticket.id_ticket} ha sido resuelto",
     )
 
     db.commit()
@@ -205,6 +253,38 @@ def registrar_calificacion(
         estado_nuevo="Cerrado",
         detalles=f"Ticket calificado con {datos.puntuacion} estrellas y cerrado",
     )
+
+    if ticket.id_tecnico:
+        notificar(
+            db=db,
+            id_usuario_destino=ticket.id_tecnico,
+            id_ticket=ticket.id_ticket,
+            tipo="Actualizacion",
+            mensaje=f"El ticket #{ticket.id_ticket} ha sido cerrado y calificado",
+        )
+    admins = list(
+        db.scalars(
+            select(Usuario).where(
+                Usuario.rol == "Administrador", Usuario.estado == "Activo"
+            )
+        ).all()
+    )
+    for a in admins:
+        notificar(
+            db=db,
+            id_usuario_destino=a.id_usuario,
+            id_ticket=ticket.id_ticket,
+            tipo="Actualizacion",
+            mensaje=f"El ticket #{ticket.id_ticket} ha sido cerrado y calificado",
+        )
+        if datos.puntuacion <= 2:
+            notificar(
+                db=db,
+                id_usuario_destino=a.id_usuario,
+                id_ticket=ticket.id_ticket,
+                tipo="Actualizacion",
+                mensaje=f"Alerta: El ticket #{ticket.id_ticket} recibió una calificación baja ({datos.puntuacion}/5)",
+            )
 
     db.commit()
     db.refresh(calif)

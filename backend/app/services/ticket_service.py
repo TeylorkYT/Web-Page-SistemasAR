@@ -25,6 +25,7 @@ from app.schemas.ticket import (
     TicketOut,
 )
 from app.services.historial_service import registrar_historial
+from app.services.notificacion_service import notificar
 
 
 def validar_acceso_ticket(usuario: Usuario, ticket: Ticket | None) -> None:
@@ -174,6 +175,22 @@ def crear_ticket(db: Session, id_cliente: int, datos: TicketCrearIn) -> TicketOu
         detalles="Ticket creado",
     )
 
+    admins = list(
+        db.scalars(
+            select(Usuario).where(
+                Usuario.rol == "Administrador", Usuario.estado == "Activo"
+            )
+        ).all()
+    )
+    for a in admins:
+        notificar(
+            db=db,
+            id_usuario_destino=a.id_usuario,
+            id_ticket=ticket.id_ticket,
+            tipo="Actualizacion",
+            mensaje=f"Nuevo ticket #{ticket.id_ticket}: {ticket.titulo}",
+        )
+
     db.commit()
     db.refresh(ticket)
 
@@ -308,6 +325,43 @@ def crear_comentario(
         id_usuario=usuario.id_usuario,
         detalles=detalles_hist,
     )
+
+    # Notificaciones según sección 3.7
+    # Comentario: la otra parte del ticket (si lo escribe cliente -> técnico; si lo escribe técnico -> cliente salvo en notas internas)
+    if not es_nota_interna:
+        if usuario.id_usuario == ticket.id_cliente and ticket.id_tecnico:
+            notificar(
+                db=db,
+                id_usuario_destino=ticket.id_tecnico,
+                id_ticket=id_ticket,
+                tipo="Comentario",
+                mensaje=f"Nuevo comentario en ticket #{id_ticket}",
+            )
+        elif usuario.id_usuario == ticket.id_tecnico:
+            notificar(
+                db=db,
+                id_usuario_destino=ticket.id_cliente,
+                id_ticket=id_ticket,
+                tipo="Comentario",
+                mensaje=f"Nuevo comentario en ticket #{id_ticket}",
+            )
+        elif usuario.rol == "Administrador":
+            if ticket.id_cliente != usuario.id_usuario:
+                notificar(
+                    db=db,
+                    id_usuario_destino=ticket.id_cliente,
+                    id_ticket=id_ticket,
+                    tipo="Comentario",
+                    mensaje=f"Nuevo comentario en ticket #{id_ticket}",
+                )
+            if ticket.id_tecnico and ticket.id_tecnico != usuario.id_usuario:
+                notificar(
+                    db=db,
+                    id_usuario_destino=ticket.id_tecnico,
+                    id_ticket=id_ticket,
+                    tipo="Comentario",
+                    mensaje=f"Nuevo comentario en ticket #{id_ticket}",
+                )
 
     db.commit()
     db.refresh(comentario)
