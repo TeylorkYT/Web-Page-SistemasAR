@@ -1,2 +1,5 @@
-// Funciones con datos falsos de este módulo
-export const datosSimulados = [];
+import { usuarios } from "../data/datosFalsos";
+
+export async function listarUsuarios() {
+    return [...usuarios];
+}
