@@ -4,7 +4,7 @@ import Tabla from "../../components/Tabla";
 import EstadoBadge from "../../components/EstadoBadge";
 import { listarInventario } from "../../services/inventarioService";
 
-const STOCK_MINIMO = 2; // No existe en los datos. Cámbialo aquí si quieres otro umbral.
+const STOCK_MINIMO = 2;
 const motivos = ["Daño irreparable", "Obsoleto", "Extravío", "Otro"];
 const formVacio = {
   codigo: "",
