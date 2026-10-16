@@ -1,0 +1,346 @@
+/**
+ * ==============================================================================
+ * SISTEMASAR - ESTILOS VISTA 10: DASHBOARD TÉCNICO (DashboardTecnico.css)
+ * ==============================================================================
+ */
+
+.dashboard-tecnico-contenedor {
+  padding: 24px;
+  max-width: 1300px;
+  margin: 0 auto;
+  font-family: var(--fuente-principal, system-ui, sans-serif);
+  color: var(--color-texto-principal, #0f172a);
+}
+
+/* Header del Dashboard */
+.dashboard-tecnico-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.dashboard-tecnico-titulo {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0f2e5e;
+  margin: 0;
+}
+
+.dashboard-tecnico-subtitulo {
+  font-size: 0.92rem;
+  color: var(--color-texto-secundario, #64748b);
+  margin-top: 4px;
+}
+
+.dashboard-tecnico-acciones-rapidas {
+  display: flex;
+  gap: 12px;
+}
+
+/* Grid de Tarjetas Métricas */
+.dashboard-tecnico-metricas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.metrica-card {
+  background-color: #ffffff;
+  border: 1px solid var(--color-borde, #e2e8f0);
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.metrica-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.metrica-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.metrica-card-titulo {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-texto-secundario, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metrica-card-icono {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.metrica-card-valor {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #0a369d;
+  line-height: 1.1;
+}
+
+.metrica-card-desc {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 6px;
+}
+
+/* Sección de la Tabla */
+.dashboard-tabla-seccion {
+  background-color: #ffffff;
+  border: 1px solid var(--color-borde, #e2e8f0);
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+  overflow: hidden;
+}
+
+.dashboard-tabla-header-barra {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--color-borde, #e2e8f0);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.dashboard-tabla-titulo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0;
+  color: #0f2e5e;
+}
+
+/* Filtros por pestaña */
+.filtros-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filtro-pill-btn {
+  background: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filtro-pill-btn:hover {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.filtro-pill-btn.activo {
+  background-color: #0a369d;
+  color: #ffffff;
+  border-color: #0a369d;
+}
+
+/* Tabla de Tickets */
+.tabla-responsive-wrapper {
+  overflow-x: auto;
+}
+
+.tabla-tickets {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.tabla-tickets thead th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  padding: 12px 18px;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.tabla-tickets tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.15s ease;
+}
+
+.tabla-tickets tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.tabla-tickets td {
+  padding: 14px 18px;
+  vertical-align: middle;
+}
+
+.ticket-id-tag {
+  font-weight: 700;
+  color: #0a369d;
+  font-size: 0.9rem;
+}
+
+.ticket-titulo-texto {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.ticket-categorias-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.cat-chip {
+  background-color: #f1f5f9;
+  color: #475569;
+  font-size: 0.72rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.cliente-nombre {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.cliente-correo {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.equipo-resumen {
+  font-size: 0.85rem;
+  color: #334155;
+}
+
+.equipo-serial {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* Badges de Estado y Prioridad */
+.badge-estado {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-estado.En_Proceso {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.badge-estado.Resuelto {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.badge-estado.Abierto {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.badge-estado.Cerrado {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.badge-prioridad {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.badge-prioridad.Alta {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.badge-prioridad.Critica {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #f87171;
+}
+
+.badge-prioridad.Media {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.badge-prioridad.Baja {
+  background-color: #f0fdf4;
+  color: #16a34a;
+}
+
+/* Estado vacío */
+.estado-vacio-tabla {
+  text-align: center;
+  padding: 48px 20px;
+  color: #64748b;
+}
+
+.estado-vacio-icono {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+.estado-vacio-texto {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+.estado-vacio-subtexto {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+/* Botón de acción rectangular */
+.btn-ver-detalle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #0a369d;
+  color: #ffffff;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-ver-detalle:hover {
+  background-color: #082875;
+}

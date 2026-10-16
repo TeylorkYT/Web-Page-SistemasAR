@@ -1,0 +1,279 @@
+/**
+ * ==============================================================================
+ * SISTEMASAR - ESTILOS VISTA 11: DETALLE TICKET TÉCNICO (DetalleTicketTecnico.css)
+ * ==============================================================================
+ */
+
+.detalle-ticket-contenedor {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: var(--fuente-principal, system-ui, sans-serif);
+  color: var(--color-texto-principal, #0f172a);
+}
+
+/* Header */
+.detalle-ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.detalle-ticket-titulo-grupo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ticket-id-badge {
+  font-size: 1.1rem;
+  font-weight: 800;
+  background-color: #0a369d;
+  color: #ffffff;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.detalle-ticket-titulo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f2e5e;
+  margin: 0;
+}
+
+.detalle-ticket-acciones-header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Panel de Cambio de Estado Rápido */
+.control-estado-banner {
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2f6 100%);
+  border: 1px solid var(--color-borde, #e2e8f0);
+  border-radius: 12px;
+  padding: 18px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.control-estado-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.control-estado-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.control-estado-selector-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.select-cambio-estado {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0f172a;
+  outline: none;
+  cursor: pointer;
+}
+
+.select-cambio-estado:focus {
+  border-color: #0a369d;
+}
+
+/* Notificación de Éxito al actualizar estado */
+.alerta-exito-flotante {
+  background-color: #dcfce7;
+  border: 1px solid #86efac;
+  color: #166534;
+  padding: 12px 18px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  font-size: 0.9rem;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Grid Principal de 2 Columnas */
+.detalle-grid-principal {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .detalle-grid-principal {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tarjetas de Información */
+.detalle-card {
+  background-color: #ffffff;
+  border: 1px solid var(--color-borde, #e2e8f0);
+  border-radius: 12px;
+  padding: 22px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+}
+
+.detalle-card-titulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f2e5e;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.detalle-descripcion-box {
+  background-color: #f8fafc;
+  border-left: 4px solid #0a369d;
+  padding: 14px 18px;
+  border-radius: 4px 8px 8px 4px;
+  color: #334155;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+/* Fila de campos clave-valor */
+.campo-fila {
+  display: flex;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.campo-etiqueta {
+  width: 140px;
+  color: #64748b;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.campo-valor {
+  color: #1e293b;
+  font-weight: 500;
+  flex: 1;
+}
+
+/* Historial / Línea de Tiempo */
+.timeline-historial {
+  position: relative;
+  padding-left: 24px;
+  margin-top: 14px;
+}
+
+.timeline-historial::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background-color: #e2e8f0;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.timeline-punto {
+  position: absolute;
+  left: -24px;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #0a369d;
+  border: 3px solid #ffffff;
+  box-shadow: 0 0 0 1px #cbd5e1;
+}
+
+.timeline-contenido {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 0.8rem;
+}
+
+.timeline-tipo {
+  font-weight: 700;
+  color: #0a369d;
+  text-transform: uppercase;
+}
+
+.timeline-fecha {
+  color: #94a3b8;
+}
+
+.timeline-detalles {
+  font-size: 0.88rem;
+  color: #334155;
+  line-height: 1.4;
+}
+
+/* Comentarios en bitácora */
+.comentario-item {
+  border-bottom: 1px solid #f1f5f9;
+  padding: 12px 0;
+}
+
+.comentario-item:last-child {
+  border-bottom: none;
+}
+
+.comentario-autor-fila {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  margin-bottom: 4px;
+}
+
+.comentario-autor {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.comentario-texto {
+  font-size: 0.88rem;
+  color: #475569;
+  line-height: 1.4;
+}
