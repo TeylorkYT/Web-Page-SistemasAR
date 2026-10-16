@@ -14,6 +14,7 @@
  * ==============================================================================
  */
 
+import { cliente } from "../api/client";
 import {
   categorias as categoriasIniciales,
   tickets as ticketsIniciales,
@@ -228,55 +229,28 @@ export async function obtenerMetricasDashboard() {
  * Obtiene el listado completo de categorías registradas.
  */
 export async function obtenerCategorias() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([...categoriasMemoria]);
-    }, 100);
-  });
+  const { data } = await cliente.get("/categorias");
+  return data;
 }
 
-/**
- * Registra una nueva categoría en la colección en memoria.
- */
 export async function crearCategoria(datos) {
-  const nombreLimpio = (datos.nombre_categoria || "").trim();
-  if (!nombreLimpio) {
-    throw new Error("El nombre de la categoría es obligatorio");
+  try {
+    const { data } = await cliente.post("/categorias", datos);
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al crear la categoría");
   }
-
-  const nueva = {
-    id_categoria: Date.now(),
-    nombre_categoria: nombreLimpio,
-    descripcion: (datos.descripcion || "").trim()
-  };
-
-  categoriasMemoria = [...categoriasMemoria, nueva];
-  return nueva;
 }
 
-/**
- * Actualiza los datos de una categoría existente.
- */
 export async function actualizarCategoria(idCategoria, datos) {
-  const nombreLimpio = (datos.nombre_categoria || "").trim();
-  if (!nombreLimpio) {
-    throw new Error("El nombre de la categoría es obligatorio");
+  try {
+    const { data } = await cliente.put(`/categorias/${idCategoria}`, datos);
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al actualizar la categoría");
   }
-
-  const idNum = Number(idCategoria);
-  const index = categoriasMemoria.findIndex((c) => c.id_categoria === idNum);
-  if (index === -1) {
-    throw new Error("Categoría no encontrada");
-  }
-
-  const categoriaActualizada = {
-    ...categoriasMemoria[index],
-    nombre_categoria: nombreLimpio,
-    descripcion: (datos.descripcion || "").trim()
-  };
-
-  categoriasMemoria[index] = categoriaActualizada;
-  return categoriaActualizada;
 }
 
 /**
@@ -379,106 +353,78 @@ export async function eliminarServicio(idServicio) {
  * Obtiene la lista de tickets pendientes de asignación con opción de filtro por prioridad.
  */
 export async function obtenerTicketsPendientes(filtroPrioridad = "TODAS") {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      let resultado = [...ticketsPendientesMemoria];
-      if (filtroPrioridad && filtroPrioridad !== "TODAS") {
-        resultado = resultado.filter(
-          (t) => t.prioridad.toUpperCase() === filtroPrioridad.toUpperCase()
-        );
-      }
-      resolve(resultado);
-    }, 100);
-  });
+  const params = { estado: "Abierto" };
+  if (filtroPrioridad && filtroPrioridad !== "TODAS") {
+    params.prioridad = filtroPrioridad;
+  }
+  const { data } = await cliente.get("/tickets", { params });
+  return data.map((t) => ({
+    id_ticket: t.id_ticket,
+    codigo: `TKT-${t.id_ticket}`,
+    titulo: t.titulo,
+    cliente: t.cliente_nombre || `Cliente #${t.id_cliente}`,
+    falla: t.titulo,
+    descripcion: t.descripcion,
+    prioridad: t.prioridad,
+    modalidad: t.modalidad,
+    fecha_creacion: t.fecha_creacion,
+    fecha_creacion_texto: t.fecha_creacion ? t.fecha_creacion.substring(0, 10) : "",
+    categorias: (t.categorias || []).map((c) => c.nombre_categoria || c),
+    categoria: (t.categorias || []).map((c) => c.nombre_categoria || c).join(", ") || "General",
+    estado: t.estado,
+    id_tecnico: t.id_tecnico,
+  }));
 }
 
-/**
- * Obtiene el detalle de un ticket específico para asignación.
- */
 export async function obtenerDetalleTicketAsignar(idTicket) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const idStr = String(idTicket).replace(/^(TKT-|#)/i, "");
-      const ticket = ticketsPendientesMemoria.find(
-        (t) => String(t.id_ticket) === idStr || t.codigo.toLowerCase().includes(idStr.toLowerCase())
-      );
-      resolve(ticket || ticketsPendientesMemoria[0] || null);
-    }, 80);
-  });
+  const idStr = String(idTicket).replace(/^(TKT-|#)/i, "");
+  const { data } = await cliente.get(`/tickets/${idStr}`);
+  return {
+    id_ticket: data.id_ticket,
+    codigo: `TKT-${data.id_ticket}`,
+    titulo: data.titulo,
+    cliente: data.cliente_nombre || `Cliente #${data.id_cliente}`,
+    falla: data.titulo,
+    descripcion: data.descripcion,
+    prioridad: data.prioridad,
+    modalidad: data.modalidad,
+    fecha_creacion: data.fecha_creacion,
+    fecha_creacion_texto: data.fecha_creacion ? data.fecha_creacion.substring(0, 10) : "",
+    categorias: (data.categorias || []).map((c) => c.nombre_categoria || c),
+    categoria: (data.categorias || []).map((c) => c.nombre_categoria || c).join(", ") || "General",
+    estado: data.estado,
+    id_tecnico: data.id_tecnico,
+  };
 }
 
-/**
- * Obtiene el listado de técnicos con su disponibilidad y cantidad de tickets en En_Proceso (v2.0).
- * Los técnicos en Fuera_de_Servicio aparecen marcados como deshabilitados.
- * Si un técnico tiene 5 o más tickets en En_Proceso, se marca con alerta de sobrecarga.
- */
 export async function obtenerTecnicosParaAsignar() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const lista = tecnicos.map((tec) => {
-        const usuario = usuariosIniciales.find((u) => u.id_usuario === tec.id_usuario);
-        const ticketsEnProceso = ticketsMemoria.filter(
-          (t) => t.id_tecnico === tec.id_usuario && t.estado === "En_Proceso"
-        ).length;
-
-        return {
-          id_tecnico: tec.id_usuario,
-          nombre: usuario ? `${usuario.nombre} ${usuario.apellido}` : `Técnico #${tec.id_usuario}`,
-          especialidad: tec.especialidad,
-          disponibilidad: tec.disponibilidad, // 'Disponible', 'Ocupado', 'En_Almuerzo', 'Fuera_de_Servicio'
-          ticketsEnProceso,
-          alertaCarga: ticketsEnProceso >= 5,
-          deshabilitado: tec.disponibilidad === "Fuera_de_Servicio",
-          estado: tec.disponibilidad.replace(/_/g, " ")
-        };
-      });
-      resolve(lista);
-    }, 80);
-  });
+  const { data } = await cliente.get("/tecnicos");
+  return data.map((tec) => ({
+    id_tecnico: tec.id_usuario,
+    nombre: `${tec.nombre} ${tec.apellido}`,
+    especialidad: tec.especialidad,
+    disponibilidad: tec.disponibilidad,
+    ticketsEnProceso: tec.tickets_en_proceso,
+    alertaCarga: tec.tickets_en_proceso >= 5,
+    deshabilitado: tec.disponibilidad === "Fuera_de_Servicio",
+    estado: tec.disponibilidad.replace(/_/g, " "),
+  }));
 }
 
-/**
- * Asigna un técnico responsable a un ticket pendiente (v2.0).
- * Guarda id_tecnico, id_asignado_por, la prioridad elegida y pasa a 'En_Proceso'.
- */
 export async function asignarTecnicoATicket(idTicket, idTecnico, prioridadAjustada = null) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const idNum = Number(idTicket);
-      const ticket = ticketsMemoria.find((t) => t.id_ticket === idNum);
-      if (!ticket) {
-        return reject(new Error("Ticket no encontrado en la lista"));
-      }
-
-      const tec = tecnicos.find((tc) => tc.id_usuario === Number(idTecnico));
-      if (!tec) {
-        return reject(new Error("Debe seleccionar un técnico válido"));
-      }
-      if (tec.disponibilidad === "Fuera_de_Servicio") {
-        return reject(new Error("No se puede asignar un ticket a un técnico fuera de servicio"));
-      }
-
-      const usuarioTec = usuariosIniciales.find((u) => u.id_usuario === tec.id_usuario);
-      const nombreTecnico = usuarioTec ? `${usuarioTec.nombre} ${usuarioTec.apellido}` : `Técnico #${tec.id_usuario}`;
-
-      // Actualizar el ticket en memoria
-      ticket.id_tecnico = tec.id_usuario;
-      ticket.id_asignado_por = 1; // Administrador Carlos
-      if (prioridadAjustada) {
-        ticket.prioridad = prioridadAjustada;
-      }
-      ticket.estado = "En_Proceso";
-
-      // Remover de tickets pendientes
-      ticketsPendientesMemoria = ticketsPendientesMemoria.filter((t) => t.id_ticket !== idNum);
-
-      resolve({
-        exito: true,
-        mensaje: `Ticket TKT-${ticket.id_ticket} asignado exitosamente a ${nombreTecnico} con prioridad ${ticket.prioridad}.`,
-        ticketActualizado: { ...ticket }
-      });
-    }, 120);
-  });
+  try {
+    const payload = {
+      id_tecnico: Number(idTecnico),
+    };
+    if (prioridadAjustada && prioridadAjustada !== "TODAS") {
+      payload.prioridad = prioridadAjustada;
+    }
+    const { data } = await cliente.patch(`/tickets/${idTicket}/asignar`, payload);
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al asignar el técnico");
+  }
 }
 
 // ==============================================================================

@@ -1,11 +1,12 @@
 import { cliente } from "../api/client";
-import { usuarios } from "../data/datosFalsos";
 
 export async function iniciarSesion(correo_electronico, contrasena) {
   try {
     const { data } = await cliente.post("/auth/login", { correo_electronico, contrasena });
     return data;
   } catch (error) {
+    const detalle = error.response?.data?.detail;
+    if (detalle) throw new Error(detalle);
     const estado = error.response?.status;
     if (estado === 401) throw new Error("Correo o contraseña incorrectos");
     if (estado === 403) throw new Error("Tu cuenta está inactiva. Habla con el administrador");
@@ -23,30 +24,38 @@ export async function solicitarRecuperacion(correo) {
   if (!correoLimpio) {
     throw new Error("El correo electrónico es obligatorio");
   }
-  return {
-    mensaje: `Se han enviado las instrucciones de recuperación a ${correoLimpio}.`,
-  };
+  try {
+    const { data } = await cliente.post("/auth/recuperar", { correo_electronico: correoLimpio });
+    return {
+      mensaje: data.detail || `Se han enviado las instrucciones de recuperación a ${correoLimpio}.`,
+    };
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(detalle || "Ocurrió un error al procesar tu solicitud.");
+  }
 }
 
+export const recuperarContrasena = solicitarRecuperacion;
+
 export async function registrarCliente(datos) {
-  const existe = usuarios.some(
-    (u) =>
-      u.correo_electronico.toLowerCase() ===
-      (datos.correo_electronico || "").trim().toLowerCase()
-  );
-
-  if (existe) {
-    throw new Error("Este correo electrónico ya está registrado");
+  try {
+    const payload = {
+      nombre: datos.nombre,
+      apellido: datos.apellido,
+      correo_electronico: (datos.correo_electronico || "").trim(),
+      contrasena: datos.contrasena || "Prueba123*",
+      telefono: datos.telefono || "3000000000",
+      direccion: datos.direccion || "Dirección de prueba",
+      area_departamento: datos.area_departamento || "General",
+    };
+    const { data } = await cliente.post("/auth/register", payload);
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    if (typeof detalle === "string") throw new Error(detalle);
+    if (Array.isArray(detalle)) {
+      throw new Error(detalle.map((d) => d.msg).join(", "));
+    }
+    throw new Error("Error al registrar el cliente.");
   }
-
-  const nuevoUsuario = {
-    id_usuario: usuarios.length + 1,
-    nombre: datos.nombre,
-    apellido: datos.apellido,
-    correo_electronico: datos.correo_electronico,
-    rol: "Cliente",
-    fecha_registro: new Date().toISOString().split("T")[0],
-    estado: "Activo",
-  };
-  return nuevoUsuario;
 }
