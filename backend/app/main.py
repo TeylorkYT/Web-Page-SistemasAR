@@ -4,7 +4,18 @@ from sqlalchemy import text
 
 from app.core import config
 from app.db.database import engine
-from app.routers import auth
+from app.routers import (
+    auth,
+    calificaciones,
+    categorias,
+    equipos,
+    notificaciones,
+    reportes,
+    tecnicos,
+    tickets,
+    tickets_flujo,
+    usuarios,
+)
 
 app = FastAPI(title="sistemasar.net")
 
@@ -16,6 +27,15 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(usuarios.router)
+app.include_router(categorias.router)
+app.include_router(equipos.router)
+app.include_router(tecnicos.router)
+app.include_router(tickets.router)
+app.include_router(tickets_flujo.router)
+app.include_router(calificaciones.router)
+app.include_router(notificaciones.router)
+app.include_router(reportes.router)
 
 
 @app.get("/")
