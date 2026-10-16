@@ -111,8 +111,18 @@ uvicorn app.main:app --reload
 
 #### Ejecutar Pruebas Automatizadas
 
+**Pruebas herméticas por defecto (SQLite en memoria):**
 ```bash
 pytest
+```
+
+**Pruebas contra base de datos real (MySQL 8.0):**
+```bash
+# Linux / macOS / Bash
+TEST_DB_HOST=127.0.0.1 TEST_DB_USER=root TEST_DB_PASSWORD=tu_clave TEST_DB_NAME=sistemas_ar_test pytest
+
+# Windows (PowerShell)
+$env:TEST_DB_HOST="127.0.0.1"; $env:TEST_DB_USER="root"; $env:TEST_DB_PASSWORD="tu_clave"; $env:TEST_DB_NAME="sistemas_ar_test"; pytest
 ```
 
 ### 4. Configurar y Ejecutar el Frontend
@@ -158,6 +168,16 @@ Para pruebas locales y demostraciones, el sistema cuenta con cuentas preconfigur
 Para consultar el inventario detallado de los 18 requisitos funcionales (RF-01 a RF-18), las tareas diferidas a Prioridad 3 (P3) y las especificaciones de despliegue en servidor VPS, consulta el documento técnico de pendientes:
 
 👉 **[Ver Documento de Pendientes y Cierre (docs/PENDIENTES.md)](docs/PENDIENTES.md)**
+
+---
+
+## 🔄 Integración Continua (CI / CD)
+
+El repositorio implementa un pipeline automatizado en **GitHub Actions** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) activado en cada Pull Request y push hacia las ramas `develop` y `main`:
+
+* **`backend-sqlite`:** Ejecuta la suite completa de pruebas herméticas con Python 3.12 y SQLite en memoria sin requerir dependencias externas.
+* **`backend-mysql`:** Inicializa un contenedor de servicio con **MySQL 8.0**, importa el esquema relacional oficial desde [`database/mibasededatos.sql`](database/mibasededatos.sql) y ejecuta las pruebas de integración contra la base de datos MySQL real.
+* **`frontend`:** Valida sintaxis y buenas prácticas con `oxlint` (`npm run lint`) y compila los bundles de producción con Vite (`npm run build`).
 
 ---
 
