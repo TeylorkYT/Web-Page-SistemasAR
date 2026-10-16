@@ -26,9 +26,9 @@ Alinear la base de datos, los datos de prueba, los datos falsos del frontend y l
 Entregables:
 
 - Base compartida `sistemas_ar` creada con las 14 tablas y los 10 índices del script v2.0.
-- Archivos `database/mibasededatos.sql` y `database/datos_prueba.sql` en el repositorio, iguales a lo que quedó en la base.
-- `src/data/datosFalsos.js` con los campos reales del esquema v2.0.
-- Las vistas 17, 14, 16 y 20 ajustadas al esquema.
+- Archivos `database/mibasededatos.sql` y `database/datos_prueba.sql` en el repositorio, iguales a lo que quedó en la base. El archivo obsoleto `database/ddl.sql` se retira definitivamente del repositorio.
+- `frontend/src/data/datosFalsos.js` con los campos reales del esquema v2.0.
+- Las vistas 17, 14, 16 y 20 ajustadas al esquema en `frontend/src/pages/admin/`.
 - Lista de decisiones comunicada al equipo (sección 7).
 
 ---
@@ -60,13 +60,14 @@ Entregables:
 2. Listar las bases existentes con `SHOW DATABASES;` y confirmar si ya existe `sistemasar_db` o `sistemas_ar`.
 3. Si `sistemasar_db` existe, NO borrarla todavía: se deja intacta hasta confirmar con el equipo que nadie la usa.
 
-**A2. Preparar el script**
+**A2. Preparar el script y retirar ddl.sql**
 
-1. Guardar el script SQL del documento (sección 5.1) como `database/mibasededatos.sql`.
-2. Quitar o comentar estas dos cosas antes de ejecutarlo en el servidor compartido:
+1. Guardar el script SQL del documento (sección 5.1) como `database/mibasededatos.sql`. Este es el nombre oficial del script según las secciones 5.1 y 7.3 del Documento Definitivo v2.0.
+2. Retirar `database/ddl.sql` de `database/` en el mismo pull request del Bloque A (`git rm database/ddl.sql`). Se elimina para evitar tener dos scripts DDL que puedan desincronizarse; Git preserva su historial completo. Si algún documento o prompt del equipo lo menciona, se actualiza la referencia a `mibasededatos.sql`.
+3. Quitar o comentar estas dos cosas antes de ejecutarlo en el servidor compartido:
    - La línea `DROP DATABASE IF EXISTS sistemas_ar;`, porque borraría todo lo que otros ya hayan cargado.
    - El bloque `-- 5. CONTROL DE PERMISOS DCL`. Esos usuarios (`admin_user`, `tecnico_user`, `cliente_user`) están creados con host `localhost`, que sirve en el VPS de producción donde la base y el backend están en la misma máquina, pero no sirve para un servidor compartido al que se conecta cada integrante desde su computador. Ese bloque se guarda aparte como `database/permisos_dcl_produccion.sql` y se ejecuta solo en el VPS.
-3. Las contraseñas de los usuarios DCL del documento son de ejemplo. En el archivo de producción se reemplazan por contraseñas reales que no se suben al repositorio.
+4. Las contraseñas de los usuarios DCL del documento son de ejemplo. En el archivo de producción se reemplazan por contraseñas reales que no se suben al repositorio.
 
 **A3. Crear el esquema**
 
@@ -119,7 +120,7 @@ La columna `contrasena` guarda un hash bcrypt. Mientras el hash real no exista, 
 
 ### Bloque C - Datos falsos del frontend (rama `feature/front-datos-falsos`)
 
-**C1. Crear `src/data/datosFalsos.js`**
+**C1. Crear `frontend/src/data/datosFalsos.js`**
 
 1. Exportar una lista por cada tabla del esquema, con los MISMOS nombres de campo y los mismos valores de enumeración de la sección 4: `usuarios`, `clientes`, `tecnicos`, `administradores`, `categorias`, `equipos`, `tickets`, `ticketCategorias`, `comentarios`, `historial`, `reportes`, `notificaciones`, `calificaciones` y `adjuntos`.
 2. Que los ids y las relaciones coincidan con `datos_prueba.sql`, para que más adelante cambiar a datos reales sea directo.
@@ -128,16 +129,16 @@ La columna `contrasena` guarda un hash bcrypt. Mientras el hash real no exista, 
 
 ### Bloque D - Las 4 vistas de Teylork (una rama por vista)
 
-Antes de empezar: el pull request de KIT-1 (entorno de Cristian) debe estar en `develop`. Orden: 17, 14, 16, 20. Cada vista obtiene sus datos solo de `src/services/adminService.js`, sin `fetch` y sin importar `datosFalsos.js` dentro de la vista.
+Antes de empezar: el pull request de KIT-1 (entorno de Cristian) debe estar en `develop`. Orden: 17, 14, 16, 20. Cada vista obtiene sus datos solo de `frontend/src/services/adminService.js`, sin `fetch` y sin importar `datosFalsos.js` dentro de la vista.
 
-**D1. Vista 17 - Gestión de categorías** (`/admin/categorias`, `pages/admin/GestionCategorias.jsx`)
+**D1. Vista 17 - Gestión de categorías** (`/admin/categorias`, `frontend/src/pages/admin/GestionCategorias.jsx`)
 
 - Lista de categorías con botón «+ Nueva categoría» y editar.
 - El panel derecho del mockup («Servicios asociados») se reemplaza por el detalle de la categoría elegida: nombre y descripción.
 - La ventana de crear o editar tiene solo dos campos: `nombre_categoria` (obligatorio y único) y `descripcion`. Se quitan el botón «+ Nuevo servicio», el tiempo estimado (SLA) y el costo referencial.
-- Borrar o inactivar: pendiente de la decisión 4 de la sección 7. Mientras tanto, dejar solo crear y editar.
+- Mantener `Categoria` simple (solo crear y editar): Según la Decisión 4, la tabla queda con `id_categoria`, `nombre_categoria` y `descripcion`, igual que el DDL v2.0. No se ofrece opción de borrar categorías, ya que en el script `Ticket_Categoria` tiene `ON DELETE CASCADE` y borrar una categoría quitaría esa categoría de todos los tickets que la usan. Esto deja un desfase técnico con el documento (RF-06 dice «inactivar»); queda anotado en la entrega como un requisito no implementado a nivel de base de datos ni frontend.
 
-**D2. Vista 14 - Dashboard del administrador** (`/admin`, `pages/admin/DashboardAdmin.jsx`)
+**D2. Vista 14 - Dashboard del administrador** (`/admin`, `frontend/src/pages/admin/DashboardAdmin.jsx`)
 
 - Tickets totales: cantidad de tickets.
 - Tickets abiertos: los que no están en estado `Cerrado`. Tickets cerrados: los de estado `Cerrado`. (Definición asumida: confirmar con el equipo.)
@@ -145,7 +146,7 @@ Antes de empezar: el pull request de KIT-1 (entorno de Cristian) debe estar en `
 - Gráfico semanal de abiertos contra cerrados, con barras simples y datos falsos, sin instalar librería.
 - Tabla de técnicos activos: nombre y apellido, estado (su `disponibilidad`) y ticket actual (su ticket en estado `En_Proceso`, o «-» si no tiene).
 
-**D3. Vista 16 - Asignación de técnico** (`/admin/tickets/:id/asignar`, `pages/admin/AsignarTecnico.jsx`)
+**D3. Vista 16 - Asignación de técnico** (`/admin/tickets/:id/asignar`, `frontend/src/pages/admin/AsignarTecnico.jsx`)
 
 - Tickets pendientes: los de estado `Abierto` sin técnico. Filtro por prioridad con los 4 valores (Baja, Media, Alta, Critica); agregar el color de `Critica`, que el mockup no tiene.
 - Detalle del ticket: código «TKT-» más el id, cliente (nombre y apellido), título, descripción, categorías (desde `Ticket_Categoria`) y fecha de creación.
@@ -154,7 +155,7 @@ Antes de empezar: el pull request de KIT-1 (entorno de Cristian) debe estar en `
 - Al asignar (en el frontend falso, solo estado local): el ticket guarda `id_tecnico`, `id_asignado_por`, la prioridad elegida y pasa a `En_Proceso`, y sale de la lista de pendientes.
 - La ruta lleva el id del ticket: abre esta pantalla con ese ticket ya elegido.
 
-**D4. Vista 20 - Calificaciones recibidas** (`/admin/calificaciones`, `pages/admin/CalificacionesRecibidas.jsx`)
+**D4. Vista 20 - Calificaciones recibidas** (`/admin/calificaciones`, `frontend/src/pages/admin/CalificacionesRecibidas.jsx`)
 
 - Filtros por técnico, rango de fechas (sobre `fecha_calificacion`) y puntaje de 1 a 5.
 - Métricas: promedio general, técnico mejor valorado y alertas de tickets con calificación de 2 estrellas o menos.
@@ -173,20 +174,20 @@ Base de datos: `sistemas_ar` (MySQL 8.0, InnoDB, `utf8mb4`).
 
 | Tabla | Columnas |
 | --- | --- |
-| `Usuario` | `id_usuario` (PK, auto), `nombre`, `apellido`, `correo_electronico` (único), `contrasena` (hash bcrypt), `rol` (`Cliente`, `Administrador`, `Tecnico`), `fecha_registro` (fecha), `estado` (`Activo`, `Inactivo`; por defecto `Activo`) |
+| `Usuario` | `id_usuario` (PK, auto), `nombre`, `apellido`, `correo_electronico` (único), `contrasena` (hash bcrypt), `rol` (`Cliente`, `Administrador`, `Tecnico`), `fecha_registro` (DATE), `estado` (`Activo`, `Inactivo`; por defecto `Activo`) |
 | `Cliente` | `id_usuario` (PK y FK a `Usuario`), `telefono`, `direccion`, `area_departamento` (por defecto `General`) |
 | `Administrador` | `id_usuario` (PK y FK a `Usuario`), `cargo` |
 | `Tecnico` | `id_usuario` (PK y FK a `Usuario`), `especialidad`, `disponibilidad` (`Disponible`, `Ocupado`, `En_Almuerzo`, `Fuera_de_Servicio`; por defecto `Disponible`) |
 | `Categoria` | `id_categoria` (PK, auto), `nombre_categoria` (único), `descripcion` |
 | `Equipo` | `id_equipo` (PK, auto), `tipo` (`Computador`, `Impresora`, `Servidor`, `Red`, `Otro`), `marca`, `modelo`, `serial` (único), `sistema_operativo`, `area_departamento`, `id_cliente` (FK a `Cliente`), `estado_equipo` (`Operativo`, `En_Reparacion`, `Fuera_de_Servicio`) |
-| `Ticket` | `id_ticket` (PK, auto), `titulo`, `descripcion`, `modalidad` (`Remoto`, `Presencial`), `fecha_creacion`, `fecha_resolucion`, `fecha_cierre` (fecha y hora; las dos últimas pueden ser nulas), `prioridad` (`Baja`, `Media`, `Alta`, `Critica`; por defecto `Media`), `estado` (`Abierto`, `En_Proceso`, `Resuelto`, `Cerrado`; por defecto `Abierto`), `id_cliente` (FK), `id_tecnico` (FK, puede ser nulo), `id_asignado_por` (FK a `Administrador`, puede ser nulo), `id_equipo` (FK, puede ser nulo) |
+| `Ticket` | `id_ticket` (PK, auto), `titulo`, `descripcion`, `modalidad` (`Remoto`, `Presencial`), `fecha_creacion` (DATETIME), `fecha_resolucion` (DATETIME, puede ser nula), `fecha_cierre` (DATETIME, puede ser nula), `prioridad` (`Baja`, `Media`, `Alta`, `Critica`; por defecto `Media`), `estado` (`Abierto`, `En_Proceso`, `Resuelto`, `Cerrado`; por defecto `Abierto`), `id_cliente` (FK), `id_tecnico` (FK, puede ser nulo), `id_asignado_por` (FK a `Administrador`, puede ser nulo), `id_equipo` (FK, puede ser nulo) |
 | `Ticket_Categoria` | `id_ticket` y `id_categoria` (clave primaria compuesta) |
-| `Adjunto_Ticket` | `id_adjunto` (PK, auto), `id_ticket`, `id_usuario`, `nombre_archivo`, `ruta_url`, `tipo_mime` (`image/jpeg`, `image/png`, `application/pdf`), `tamano_bytes` (mayor que 0 y hasta 5242880), `fecha_subida` |
-| `Historial_Ticket` | `id_historial` (PK, auto), `id_ticket`, `tipo_accion` (`Creacion`, `Asignacion`, `Cambio_Estado`, `Resolucion`, `Cierre`, `Comentario`), `estado_anterior`, `estado_nuevo` (valores de estado del ticket, pueden ser nulos), `fecha_accion`, `id_usuario`, `detalles` |
-| `Comentario` | `id_comentario` (PK, auto), `contenido`, `es_nota_interna` (por defecto falso), `fecha_creacion`, `id_usuario`, `id_ticket` |
-| `Reporte` | `id_reporte` (PK, auto), `id_ticket`, `id_tecnico`, `solucion_aplicada` (obligatoria), `fecha_reporte`, `estado` (`Pendiente`, `En_Revision`, `Aprobado`; por defecto `Pendiente`) |
-| `Notificacion` | `id_notificacion` (PK, auto), `mensaje`, `tipo` (`Asignacion`, `Actualizacion`, `Resolucion`, `Comentario`), `leida` (por defecto falso), `fecha_envio`, `id_usuario_destino`, `id_ticket` |
-| `Calificacion` | `id_calificacion` (PK, auto), `id_ticket` (único: una sola por ticket), `id_cliente`, `id_tecnico`, `puntuacion` (de 1 a 5), `comentario`, `fecha_calificacion` |
+| `Adjunto_Ticket` | `id_adjunto` (PK, auto), `id_ticket`, `id_usuario`, `nombre_archivo`, `ruta_url`, `tipo_mime` (`image/jpeg`, `image/png`, `application/pdf`), `tamano_bytes` (mayor que 0 y hasta 5242880), `fecha_subida` (DATETIME) |
+| `Historial_Ticket` | `id_historial` (PK, auto), `id_ticket`, `tipo_accion` (`Creacion`, `Asignacion`, `Cambio_Estado`, `Resolucion`, `Cierre`, `Comentario`), `estado_anterior`, `estado_nuevo` (valores de estado del ticket, pueden ser nulos), `fecha_accion` (DATETIME), `id_usuario`, `detalles` |
+| `Comentario` | `id_comentario` (PK, auto), `contenido`, `es_nota_interna` (por defecto falso), `fecha_creacion` (DATETIME), `id_usuario`, `id_ticket` |
+| `Reporte` | `id_reporte` (PK, auto), `id_ticket`, `id_tecnico`, `solucion_aplicada` (obligatoria), `fecha_reporte` (DATE), `estado` (`Pendiente`, `En_Revision`, `Aprobado`; por defecto `Pendiente`) |
+| `Notificacion` | `id_notificacion` (PK, auto), `mensaje`, `tipo` (`Asignacion`, `Actualizacion`, `Resolucion`, `Comentario`), `leida` (por defecto falso), `fecha_envio` (DATETIME), `id_usuario_destino`, `id_ticket` |
+| `Calificacion` | `id_calificacion` (PK, auto), `id_ticket` (único: una sola por ticket), `id_cliente`, `id_tecnico`, `puntuacion` (de 1 a 5), `comentario`, `fecha_calificacion` (DATE) |
 
 Índices del script (10): `idx_equipo_cliente`, `idx_equipo_area`, `idx_ticket_cliente`, `idx_ticket_tecnico`, `idx_ticket_estado`, `idx_adjunto_ticket`, `idx_historial_ticket`, `idx_comentario_ticket`, `idx_reporte_ticket` e `idx_notificacion_destino`.
 
@@ -218,26 +219,27 @@ Base de datos: `sistemas_ar` (MySQL 8.0, InnoDB, `utf8mb4`).
 | 1 | Sacar las vistas 13 y 18 (inventario) del alcance. Quedan 18 vistas. Cristian no crea esas dos rutas y el menú de Jaider no muestra «Inventario». Cristian pasa a 3 vistas (10, 11 y 12) y Magleony a 2 (15 y 19). | Cristian, Magleony, Jaider |
 | 2 | La base se llama `sistemas_ar`. Cada uno cambia `DB_NAME` en su `.env` y se actualiza `.env.example`. | Todos |
 | 3 | El rol vive en la base con mayúscula (`Cliente`, `Tecnico`, `Administrador`). La API lo devuelve en minúscula en el login, para que el frontend use `cliente`, `tecnico` y `administrador`. | Magleony, Cristian, Vidal, Jaider |
-| 4 | Inactivar categorías (RF-06) no tiene columna en `Categoria`. Opciones: agregar una columna `estado` con `Activa` e `Inactiva`, o quitar «inactivar» del requisito. Falta que Teylork decida. | Cristian, Magleony |
+| 4 | Mantener `Categoria` simple, solo crear y editar. La tabla queda con `id_categoria`, `nombre_categoria` y `descripcion` (igual que el DDL v2.0). No se ofrece opción de borrar categorías para no romper la integridad referencial (`Ticket_Categoria` tiene `ON DELETE CASCADE` y borrarla desvincularía la categoría de todos sus tickets asociados). Esto deja un desfase con el documento, porque RF-06 todavía dice «inactivar». Queda anotado en la entrega como un requisito no implementado a nivel de base de datos ni interfaz por diseño del esquema v2.0. | Cristian, Magleony, Jaider, Vidal |
 | 5 | El código del ticket se muestra como `TKT-` más `id_ticket`, solo para mostrar. No se guarda aparte. | Todos |
 | 6 | Estructura del backend según el documento: carpeta `backend/app/` con `routers/`, `models/`, `schemas/` y `services/`, y SQLAlchemy. Se aplica antes de construir el login del daily 3. | Cristian, Magleony |
 | 7 | Contrato del login para el daily 3: ruta `POST /api/v1/auth/login`, token JWT de 60 minutos con renovación (refresh token), según RF-01. | Magleony, Vidal, Jaider |
 | 8 | En el dashboard, «tickets abiertos» son los que no están `Cerrado`. Confirmar con el equipo. | Todos |
+| 9 | El script DDL oficial es `database/mibasededatos.sql` (nombre oficial en las secciones 5.1 y 7.3 del Documento Definitivo). El archivo obsoleto `database/ddl.sql` se retira de `database/` en el pull request de BD para evitar dos archivos que puedan desincronizarse por separado. | Todos |
 
 ---
 
 ## 8. Criterios de aceptación
 
 - `SHOW TABLES;` en `sistemas_ar` devuelve 14 tablas y los 10 índices existen.
-- `database/mibasededatos.sql` y `database/datos_prueba.sql` están en el repositorio y reproducen exactamente la base.
+- `database/mibasededatos.sql` y `database/datos_prueba.sql` están en el repositorio y reproducen exactamente la base. El archivo `database/ddl.sql` fue retirado del repositorio.
 - El script que se ejecuta en el servidor compartido no tiene `DROP DATABASE` ni el bloque DCL con usuarios `localhost`.
 - `datos_prueba.sql` cubre los 4 estados, las 4 prioridades, ambas modalidades, una nota interna, un reporte por ticket resuelto o cerrado y una calificación de 1 estrella.
-- `datosFalsos.js` usa solo campos y valores del esquema de la sección 4.
-- Las vistas 17, 14, 16 y 20 cumplen lo de la sección 3 (bloque D), usan solo `adminService.js` y no contienen inventario, SLA ni costos.
+- `frontend/src/data/datosFalsos.js` usa solo campos y valores del esquema de la sección 4.
+- Las vistas 17, 14, 16 y 20 cumplen lo de la sección 3 (bloque D), usan solo `frontend/src/services/adminService.js` y no contienen inventario, SLA ni costos.
 - Ningún archivo del repositorio contiene contraseñas reales, hashes reales ni datos de conexión.
 
 ---
 
 ## 9. Prompt sugerido para el agente
 
-> Lee `docs/daily-teylork-adaptacion-documentacion.md`. Soy Teylork. Ejecuta el Bloque A primero y no ejecutes ningún SQL destructivo sin mi confirmación escrita. Luego los Bloques B y C, y por último las vistas del Bloque D en el orden 17, 14, 16 y 20. Usa solo los nombres de campo de la sección 4 y pregúntame si algo no está claro.
+> Lee `docs/dailies/daily-teylork-adaptacion-documentacion.md`. Soy Teylork. Ejecuta el Bloque A primero (asegurando el uso oficial de `database/mibasededatos.sql` y retirando `database/ddl.sql`) y no ejecutes ningún SQL destructivo sin mi confirmación escrita. Luego los Bloques B y C, y por último las vistas del Bloque D en el orden 17, 14, 16 y 20. Usa solo los nombres de campo de la sección 4 y pregúntame si algo no está claro.
