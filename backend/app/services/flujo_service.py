@@ -1,5 +1,6 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models.calificacion import Calificacion
@@ -286,7 +287,14 @@ def registrar_calificacion(
                 mensaje=f"Alerta: El ticket #{ticket.id_ticket} recibió una calificación baja ({datos.puntuacion}/5)",
             )
 
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="El ticket ya tiene una calificación registrada",
+        )
     db.refresh(calif)
 
     cliente_u = db.get(Usuario, calif.id_cliente)

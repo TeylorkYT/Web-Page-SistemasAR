@@ -65,7 +65,6 @@ export default function DashboardAdmin() {
       usuarios: "/admin/usuarios",
       asignacion: "/admin/tickets/1/asignar",
       categorias: "/admin/categorias",
-      inventario: "/admin/inventario",
       reportes: "/admin/reportes",
       calificaciones: "/admin/calificaciones"
     };

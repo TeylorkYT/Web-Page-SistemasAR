@@ -76,7 +76,7 @@ export default function PerfilCliente() {
             </div>
 
             <div style={{ marginTop: "24px", paddingTop: "20px", borderTop: "1px solid #e2e8f0", textAlign: "right" }}>
-              <Boton variante="secundario">Editar Perfil</Boton>
+              <Boton variante="secundario" deshabilitado>Editar Perfil</Boton>
             </div>
           </div>
 
@@ -88,7 +88,7 @@ export default function PerfilCliente() {
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
               <h2 style={{ margin: 0, fontSize: "18px", color: "#0f172a" }}>Mis Equipos Registrados</h2>
-              <Boton variante="primario" estilo={{ padding: "6px 12px", fontSize: "12px" }}>+ Añadir Equipo</Boton>
+              <Boton variante="primario" deshabilitado estilo={{ padding: "6px 12px", fontSize: "12px" }}>+ Añadir Equipo</Boton>
             </div>
 
             {equipos.length > 0 ? (

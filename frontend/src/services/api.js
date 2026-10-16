@@ -7,4 +7,5 @@
  */
 
 // URL principal del servidor backend (FastAPI en local)
-export const API_URL = "http://127.0.0.1:8000";
+// En producción define VITE_API_URL (ej. https://sistemasar.net). Vacío = mismo origen vía Nginx.
+export const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8000";

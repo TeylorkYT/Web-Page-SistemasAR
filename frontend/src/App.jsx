@@ -1,6 +1,7 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import RutaProtegida from "./routes/RutaProtegida";
+import RedireccionRaiz from "./routes/RedireccionRaiz";
 
 import Indice from "./pages/Indice";
 import Estado from "./pages/Estado";
@@ -22,14 +23,12 @@ import PerfilCliente from "./pages/cliente/PerfilCliente";
 import DashboardTecnico from "./pages/tecnico/DashboardTecnico";
 import DetalleTicketTecnico from "./pages/tecnico/DetalleTicketTecnico";
 import ActualizarAvance from "./pages/tecnico/ActualizarAvance";
-import InventarioTecnico from "./pages/tecnico/InventarioTecnico";
 
 // Admin
 import DashboardAdmin from "./pages/admin/DashboardAdmin";
 import GestionUsuarios from "./pages/admin/GestionUsuarios";
 import AsignarTecnico from "./pages/admin/AsignarTecnico";
 import GestionCategorias from "./pages/admin/GestionCategorias";
-import GestionInventario from "./pages/admin/GestionInventario";
 import Reportes from "./pages/admin/Reportes";
 import CalificacionesRecibidas from "./pages/admin/CalificacionesRecibidas";
 
@@ -38,9 +37,10 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Rutas públicas */}
-          <Route path="/" element={<Indice />} />
+          {/* Rutas públicas y de redirección inteligente */}
+          <Route path="/" element={<RedireccionRaiz />} />
           <Route path="/estado" element={<Estado />} />
+          <Route path="/dev-indice" element={<Indice />} />
           <Route path="/login" element={<Login />} />
           <Route path="/recuperar" element={<RecuperarContrasena />} />
           <Route path="/registro" element={<Registro />} />
@@ -60,7 +60,6 @@ export default function App() {
             <Route path="/tecnico" element={<DashboardTecnico />} />
             <Route path="/tecnico/tickets/:id" element={<DetalleTicketTecnico />} />
             <Route path="/tecnico/tickets/:id/avance" element={<ActualizarAvance />} />
-            <Route path="/tecnico/inventario" element={<InventarioTecnico />} />
           </Route>
 
           {/* Rutas protegidas: Administrador */}
@@ -69,15 +68,14 @@ export default function App() {
             <Route path="/admin/usuarios" element={<GestionUsuarios />} />
             <Route path="/admin/tickets/:id/asignar" element={<AsignarTecnico />} />
             <Route path="/admin/categorias" element={<GestionCategorias />} />
-            <Route path="/admin/inventario" element={<GestionInventario />} />
             <Route path="/admin/reportes" element={<Reportes />} />
             <Route path="/admin/calificaciones" element={<CalificacionesRecibidas />} />
           </Route>
 
-          {/* Redirección por defecto */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* Redirección por defecto inteligente */}
+          <Route path="*" element={<RedireccionRaiz />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
   );
-}
+}

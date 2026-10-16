@@ -1,6 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.core import config
 from app.db.database import engine
@@ -40,13 +41,15 @@ app.include_router(reportes.router)
 
 @app.get("/")
 def raiz():
-    return {
+    info = {
         "status": "online",
         "mensaje": "API de SistemasAR activa",
         "documentacion": "/docs",
         "health": "/health",
-        "db_check": "/db-check",
     }
+    if config.ENV != "production":
+        info["db_check"] = "/db-check"
+    return info
 
 
 @app.get("/health")
@@ -56,6 +59,18 @@ def health():
 
 @app.get("/db-check")
 def db_check():
-    with engine.connect() as conexion:
-        conexion.execute(text("SELECT 1"))
-    return {"database": "ok"}
+    if config.ENV == "production":
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Endpoint no disponible en producción",
+        )
+    try:
+        with engine.connect() as conexion:
+            conexion.execute(text("SELECT 1"))
+        return {"database": "ok"}
+    except SQLAlchemyError:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Error de conexión con la base de datos",
+        )
+

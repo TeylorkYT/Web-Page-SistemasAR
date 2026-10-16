@@ -4,9 +4,14 @@ import { API_URL } from "../services/api";
 export const cliente = axios.create({ baseURL: `${API_URL}/api/v1` });
 
 cliente.interceptors.request.use((config) => {
-  const sesion = JSON.parse(localStorage.getItem("sesion") || "null");
-  if (sesion?.access_token) {
-    config.headers.Authorization = `Bearer ${sesion.access_token}`;
+  try {
+    const raw = localStorage.getItem("sesion");
+    const sesion = raw ? JSON.parse(raw) : null;
+    if (sesion?.access_token) {
+      config.headers.Authorization = `Bearer ${sesion.access_token}`;
+    }
+  } catch {
+    localStorage.removeItem("sesion");
   }
   return config;
 });
@@ -17,7 +22,13 @@ cliente.interceptors.response.use(
   (respuesta) => respuesta,
   async (error) => {
     const original = error.config;
-    const sesion = JSON.parse(localStorage.getItem("sesion") || "null");
+    let sesion = null;
+    try {
+      const raw = localStorage.getItem("sesion");
+      sesion = raw ? JSON.parse(raw) : null;
+    } catch {
+      localStorage.removeItem("sesion");
+    }
     const esRutaDeAuth = original?.url ? original.url.includes("/auth/") : false;
 
     if (
@@ -36,7 +47,7 @@ cliente.interceptors.response.use(
         localStorage.setItem("sesion", JSON.stringify(data));
         original.headers.Authorization = `Bearer ${data.access_token}`;
         return cliente(original);
-      } catch (e) {
+      } catch {
         renovando = null;
         localStorage.removeItem("sesion");
         window.location.href = "/login";
@@ -45,3 +56,4 @@ cliente.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+

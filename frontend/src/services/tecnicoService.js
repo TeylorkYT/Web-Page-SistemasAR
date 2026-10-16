@@ -18,23 +18,6 @@
  */
 
 import { cliente } from "../api/client";
-import {
-  tickets as ticketsIniciales,
-  usuarios as usuariosIniciales,
-  equipos as equiposIniciales,
-  categorias as categoriasIniciales,
-  historialTickets as historialInicial,
-  comentarios as comentariosIniciales,
-  inventario as inventarioInicial
-} from "../data/datosFalsos";
-
-// ------------------------------------------------------------------------------
-// ESTADO MUTABLE EN MEMORIA PARA LA SESIÓN ACTIVA
-// ------------------------------------------------------------------------------
-let ticketsMemoria = JSON.parse(JSON.stringify(ticketsIniciales));
-let historialMemoria = JSON.parse(JSON.stringify(historialInicial));
-let comentariosMemoria = JSON.parse(JSON.stringify(comentariosIniciales));
-let inventarioMemoria = JSON.parse(JSON.stringify(inventarioInicial));
 
 // Técnico por defecto para la sesión simulada (Diana Paz - ID 2)
 export const TECNICO_ACTUAL = {
@@ -46,53 +29,16 @@ export const TECNICO_ACTUAL = {
 };
 
 /**
- * Simula una breve latencia de red para dar realismo a las promesas
- */
-const simularLatencia = (ms = 120) => new Promise((resolve) => setTimeout(resolve, ms));
-
-/**
- * Obtiene los datos del técnico activo en la sesión simulada
+ * Obtiene los datos del técnico activo
  */
 export async function obtenerTecnicoActual() {
-  await simularLatencia(60);
   return { ...TECNICO_ACTUAL };
 }
 
 /**
- * Enriquece un objeto ticket con la información relacionada de cliente, equipo y categorías
- */
-function enriquecerTicket(ticket) {
-  if (!ticket) return null;
-
-  const cliente = usuariosIniciales.find((u) => u.id_usuario === ticket.id_cliente) || {
-    id_usuario: ticket.id_cliente,
-    nombre: "Cliente",
-    apellido: "Desconocido",
-    correo_electronico: "sin_correo@empresa.com"
-  };
-
-  const equipo = equiposIniciales.find((e) => e.id_equipo === ticket.id_equipo) || null;
-
-  const categoriasAsociadas = (ticket.categorias_ids || [])
-    .map((catId) => {
-      const cat = categoriasIniciales.find((c) => c.id_categoria === catId);
-      return cat ? cat.nombre_categoria : null;
-    })
-    .filter(Boolean);
-
-  return {
-    ...ticket,
-    cliente,
-    equipo,
-    nombresCategorias: categoriasAsociadas
-  };
-}
-
-/**
  * Vista 10: Obtiene todos los tickets asignados al técnico especificado
- * @param {number} [idTecnico=2] - ID del técnico
  */
-export async function obtenerTicketsTecnico(idTecnico = TECNICO_ACTUAL.id_usuario) {
+export async function obtenerTicketsTecnico() {
   const { data } = await cliente.get("/tickets");
   return data.map((t) => ({
     ...t,
@@ -106,7 +52,7 @@ export async function obtenerTicketsTecnico(idTecnico = TECNICO_ACTUAL.id_usuari
   }));
 }
 
-export async function obtenerMetricasDashboardTecnico(idTecnico = TECNICO_ACTUAL.id_usuario) {
+export async function obtenerMetricasDashboardTecnico() {
   const { data: tickets } = await cliente.get("/tickets");
   const asignados = tickets.length;
   const enProceso = tickets.filter((t) => t.estado === "En_Proceso").length;
@@ -118,7 +64,7 @@ export async function obtenerMetricasDashboardTecnico(idTecnico = TECNICO_ACTUAL
     ticketsEnProceso: enProceso,
     ticketsResueltos: resueltos,
     ticketsCerrados: cerrados,
-    disponiblesRepuestos: inventarioMemoria.filter((i) => i.estado === "Disponible").length,
+    disponiblesRepuestos: 0,
   };
 }
 
@@ -173,7 +119,7 @@ export async function cambiarEstadoTicket(idTicket, nuevoEstado, detalles = "") 
   }
 }
 
-export async function registrarAvance(idTicket, { detalles, tipoAccion = "Comentario", nuevoEstado = null, solucion_aplicada = null, es_nota_interna = false }) {
+export async function registrarAvance(idTicket, { detalles, tipoAccion: _tipoAccion = "Comentario", nuevoEstado = null, solucion_aplicada = null, es_nota_interna = false }) {
   const idStr = String(idTicket).replace(/^(TKT-|#)/i, "");
   try {
     if (detalles && detalles.trim()) {
@@ -196,35 +142,4 @@ export async function registrarAvance(idTicket, { detalles, tipoAccion = "Coment
     const detalle = error.response?.data?.detail;
     throw new Error(typeof detalle === "string" ? detalle : "Error al registrar el avance");
   }
-}
-
-/**
- * Vista 13: Consulta de inventario / repuestos para el técnico (solo lectura)
- * Permite filtrar por texto y por tipo de componente
- */
-export async function consultarInventarioTecnico({ termino = "", tipo = "Todos", soloDisponibles = false } = {}) {
-  await simularLatencia(100);
-
-  let resultado = [...inventarioMemoria];
-
-  if (soloDisponibles) {
-    resultado = resultado.filter((item) => item.estado === "Disponible" && item.stock > 0);
-  }
-
-  if (tipo && tipo !== "Todos") {
-    resultado = resultado.filter((item) => item.tipo.toLowerCase() === tipo.toLowerCase());
-  }
-
-  if (termino && termino.trim()) {
-    const q = termino.trim().toLowerCase();
-    resultado = resultado.filter(
-      (item) =>
-        item.nombre.toLowerCase().includes(q) ||
-        item.codigo.toLowerCase().includes(q) ||
-        item.descripcion.toLowerCase().includes(q) ||
-        item.ubicacion.toLowerCase().includes(q)
-    );
-  }
-
-  return resultado;
 }
