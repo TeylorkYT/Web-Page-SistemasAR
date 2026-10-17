@@ -18,15 +18,72 @@ export function obtenerBaseDeDatos() {
     if (raw) {
       const db = JSON.parse(raw);
       let huboCambios = false;
+
+      // Sincronizar Ticket 10 para demo de calificación si no existe
+      if (!db.tickets.some((t) => t.id_ticket === 10)) {
+        const t10 = datosIniciales.tickets.find((t) => t.id_ticket === 10);
+        if (t10) {
+          db.tickets.push(JSON.parse(JSON.stringify(t10)));
+          huboCambios = true;
+        }
+      }
+
+      // Asegurar que ticketCategorias incluya el ticket 10
+      if (!db.ticketCategorias.some((tc) => tc.id_ticket === 10)) {
+        const tc10 = datosIniciales.ticketCategorias.filter((tc) => tc.id_ticket === 10);
+        db.ticketCategorias.push(...JSON.parse(JSON.stringify(tc10)));
+        huboCambios = true;
+      }
+
+      // Asegurar que reportes incluya el reporte del ticket 10
+      if (!db.reportes.some((r) => r.id_ticket === 10)) {
+        const rep10 = datosIniciales.reportes.find((r) => r.id_ticket === 10);
+        if (rep10) {
+          db.reportes.push(JSON.parse(JSON.stringify(rep10)));
+          huboCambios = true;
+        }
+      }
+
+      // Asegurar comentarios del ticket 10 y 4
+      [10, 4].forEach((tId) => {
+        if (!db.comentarios.some((c) => c.id_ticket === tId)) {
+          const coms = datosIniciales.comentarios.filter((c) => c.id_ticket === tId);
+          if (coms.length > 0) {
+            db.comentarios.push(...JSON.parse(JSON.stringify(coms)));
+            huboCambios = true;
+          }
+        }
+      });
+
+      // Asegurar historial del ticket 10
+      if (!db.historial.some((h) => h.id_ticket === 10)) {
+        const hist10 = datosIniciales.historial.filter((h) => h.id_ticket === 10);
+        db.historial.push(...JSON.parse(JSON.stringify(hist10)));
+        huboCambios = true;
+      }
+
+      // Asegurar notificación de resolución del ticket 10
+      if (!db.notificaciones.some((n) => n.id_ticket === 10)) {
+        const notif10 = datosIniciales.notificaciones.find((n) => n.id_ticket === 10);
+        if (notif10) {
+          db.notificaciones.push(JSON.parse(JSON.stringify(notif10)));
+          huboCambios = true;
+        }
+      }
+
       if (!db.calificaciones || db.calificaciones.length < 6) {
         db.calificaciones = JSON.parse(JSON.stringify(datosIniciales.calificaciones || []));
         huboCambios = true;
       }
-      // Sanitizar calificaciones para que ningún ticket sin resolver o sin asignar tenga calificación asociada
+      // Sanitizar calificaciones para que ningún ticket sin resolver o tickets en espera de calificación tengan calificación asociada
       if (db.calificaciones) {
         db.calificaciones.forEach((c) => {
           if (c.id_ticket === 5) {
             c.id_ticket = 3;
+            huboCambios = true;
+          }
+          if (c.id_ticket === 4 || c.id_ticket === 10) {
+            c.id_ticket = 6;
             huboCambios = true;
           }
         });

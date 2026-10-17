@@ -366,6 +366,21 @@ export const tickets = [
     id_tecnico: 2,
     id_asignado_por: 1,
     id_equipo: 3
+  },
+  {
+    id_ticket: 10,
+    titulo: "Mantenimiento preventivo y optimizacion de rendimiento",
+    descripcion: "Se solicita mantenimiento preventivo, limpieza logica de archivos temporales y optimizacion de arranque en equipo de Administracion.",
+    modalidad: "Presencial",
+    fecha_creacion: "2026-08-25 08:30:00",
+    fecha_resolucion: "2026-08-25 14:45:00",
+    fecha_cierre: null,
+    prioridad: "Media",
+    estado: "Resuelto",
+    id_cliente: 5,
+    id_tecnico: 2,
+    id_asignado_por: 1,
+    id_equipo: 4
   }
 ];
 
@@ -386,7 +401,9 @@ export const ticketCategorias = [
   { id_ticket: 8, id_categoria: 4 },
   { id_ticket: 8, id_categoria: 5 },
   { id_ticket: 9, id_categoria: 1 },
-  { id_ticket: 9, id_categoria: 5 }
+  { id_ticket: 9, id_categoria: 5 },
+  { id_ticket: 10, id_categoria: 1 },
+  { id_ticket: 10, id_categoria: 2 }
 ];
 
 // ------------------------------------------------------------------------------
@@ -452,7 +469,10 @@ export const historial = [
   { id_historial: 21, id_ticket: 8, tipo_accion: "Resolucion",    estado_anterior: "En_Proceso", estado_nuevo: "Resuelto",   fecha_accion: "2026-08-19 14:00:00", id_usuario: 3, detalles: "Politicas de backup programadas semanalmente" },
   { id_historial: 22, id_ticket: 8, tipo_accion: "Cierre",        estado_anterior: "Resuelto",   estado_nuevo: "Cerrado",    fecha_accion: "2026-08-19 17:00:00", id_usuario: 5, detalles: "Cliente valida almacenamiento de copias" },
   { id_historial: 23, id_ticket: 9, tipo_accion: "Creacion",      estado_anterior: null,         estado_nuevo: "Abierto",    fecha_accion: "2026-08-25 08:00:00", id_usuario: 7, detalles: "Reporte de fuga estatica en rack" },
-  { id_historial: 24, id_ticket: 9, tipo_accion: "Asignacion",    estado_anterior: "Abierto",    estado_nuevo: "En_Proceso", fecha_accion: "2026-08-25 08:30:00", id_usuario: 1, detalles: "Asignado a Diana Paz para revision electrica" }
+  { id_historial: 24, id_ticket: 9, tipo_accion: "Asignacion",    estado_anterior: "Abierto",    estado_nuevo: "En_Proceso", fecha_accion: "2026-08-25 08:30:00", id_usuario: 1, detalles: "Asignado a Diana Paz para revision electrica" },
+  { id_historial: 25, id_ticket: 10, tipo_accion: "Creacion",     estado_anterior: null,         estado_nuevo: "Abierto",    fecha_accion: "2026-08-25 08:30:00", id_usuario: 5, detalles: "Ticket creado por Laura Ramirez solicitando mantenimiento" },
+  { id_historial: 26, id_ticket: 10, tipo_accion: "Asignacion",   estado_anterior: "Abierto",    estado_nuevo: "En_Proceso", fecha_accion: "2026-08-25 09:00:00", id_usuario: 1, detalles: "Asignado a la tecnico Diana Paz por el Administrador" },
+  { id_historial: 27, id_ticket: 10, tipo_accion: "Resolucion",   estado_anterior: "En_Proceso", estado_nuevo: "Resuelto",   fecha_accion: "2026-08-25 14:45:00", id_usuario: 2, detalles: "Mantenimiento preventivo y optimizacion completados con informe tecnico" }
 ];
 
 // Compatibilidad con vistas/servicios existentes que busquen `historialTickets`
@@ -509,6 +529,46 @@ export const comentarios = [
     contenido: "Medicion de voltaje en chasis: 48V AC detectados por falta de linea a tierra.",
     es_nota_interna: true,
     fecha_creacion: "2026-08-25 09:10:00"
+  },
+  {
+    id_comentario: 7,
+    id_ticket: 10,
+    id_usuario: 2,
+    contenido: "Hola Laura, ya me encuentro atendiendo tu equipo Lenovo ThinkPad. Realizare una revision exhaustiva y mantenimiento preventivo.",
+    es_nota_interna: false,
+    fecha_creacion: "2026-08-25 09:15:00"
+  },
+  {
+    id_comentario: 8,
+    id_ticket: 10,
+    id_usuario: 5,
+    contenido: "Muchas gracias Diana, quedo atenta. Por favor revisa que el arranque no demore tanto.",
+    es_nota_interna: false,
+    fecha_creacion: "2026-08-25 09:20:00"
+  },
+  {
+    id_comentario: 9,
+    id_ticket: 10,
+    id_usuario: 2,
+    contenido: "Listo Laura, el mantenimiento ha finalizado con exito. El tiempo de inicio se redujo notablemente y el equipo quedo al 100%. He registrado el reporte tecnico con todos los detalles.",
+    es_nota_interna: false,
+    fecha_creacion: "2026-08-25 14:45:00"
+  },
+  {
+    id_comentario: 10,
+    id_ticket: 4,
+    id_usuario: 2,
+    contenido: "Hola Laura, ya configure el perfil de OpenVPN y los certificados de seguridad en tu equipo portatil.",
+    es_nota_interna: false,
+    fecha_creacion: "2026-08-22 15:30:00"
+  },
+  {
+    id_comentario: 11,
+    id_ticket: 4,
+    id_usuario: 5,
+    contenido: "Excelente Diana, probe la conexion remota y funciona perfecto.",
+    es_nota_interna: false,
+    fecha_creacion: "2026-08-22 15:40:00"
   }
 ];
 
@@ -554,6 +614,14 @@ export const reportes = [
     id_tecnico: 3,
     solucion_aplicada: "Se creo tarea automatizada con rsync cifrado hacia almacenamiento seguro en la nube y se configuro alerta por correo ante fallos de sincronizacion.",
     fecha_reporte: "2026-08-19 14:00:00",
+    estado: "Aprobado"
+  },
+  {
+    id_reporte: 6,
+    id_ticket: 10,
+    id_tecnico: 2,
+    solucion_aplicada: "Se ejecuto mantenimiento preventivo integral: limpieza de archivos temporales del sistema, desfragmentacion y optimizacion de la unidad de arranque, desinstalacion de aplicaciones en segundo plano no requeridas y actualizacion de drivers. Se valido temperatura y rendimiento optimo en pruebas de estres.",
+    fecha_reporte: "2026-08-25 14:45:00",
     estado: "Aprobado"
   }
 ];
@@ -606,6 +674,15 @@ export const notificaciones = [
     mensaje: "Se le ha asignado el ticket #9 de prioridad Critica.",
     leida: false,
     fecha_envio: "2026-08-25 08:31:00"
+  },
+  {
+    id_notificacion: 6,
+    id_ticket: 10,
+    id_usuario_destino: 5,
+    tipo: "Resolucion",
+    mensaje: "Su ticket #10 ha sido resuelto por la tecnico Diana Paz. Ya puedes calificar la atencion recibida.",
+    leida: false,
+    fecha_envio: "2026-08-25 14:46:00"
   }
 ];
 
@@ -660,12 +737,12 @@ export const calificaciones = [
   },
   {
     id_calificacion: 6,
-    id_ticket: 4,
+    id_ticket: 6,
     id_cliente: 6,
-    id_tecnico: 4,
+    id_tecnico: 3,
     puntuacion: 4,
-    comentario: "Mario atendio la solicitud rapidamente y dio explicaciones claras del proceso.",
-    fecha_calificacion: "2026-08-14 14:00:00"
+    comentario: "Atencion oportuna y explicaciones claras del proceso.",
+    fecha_calificacion: "2026-08-17 14:00:00"
   }
 ];
 
