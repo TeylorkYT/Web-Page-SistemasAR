@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
-import { obtenerTicket } from '../../services/ticketsService';
+import { obtenerTicket, comentar } from '../../services/ticketsService';
 import SeccionAdjuntos from '../../components/SeccionAdjuntos';
 import './DetalleTicketCliente.css';
 
@@ -24,6 +24,9 @@ export default function DetalleTicketCliente() {
   const navigate = useNavigate();
   const [ticket, setTicket] = useState(null);
   const [cargando, setCargando] = useState(true);
+  const [nuevoComentario, setNuevoComentario] = useState('');
+  const [enviandoComentario, setEnviandoComentario] = useState(false);
+  const [errorComentario, setErrorComentario] = useState('');
 
   useEffect(() => {
     obtenerTicket(id)
@@ -42,6 +45,37 @@ export default function DetalleTicketCliente() {
   const colorEstado = COLOR_ESTADO[ticket.estado] || {};
   const colorPrioridad = COLOR_PRIORIDAD[ticket.prioridad] || '#64748b';
   const puedeCalificar = ticket.estado === 'Resuelto' || ticket.estado === 'Cerrado';
+
+  const manejarEnviarComentario = async (e) => {
+    e.preventDefault();
+    if (!nuevoComentario.trim()) return;
+
+    setEnviandoComentario(true);
+    setErrorComentario('');
+    try {
+      const creado = await comentar(ticket.id_ticket, {
+        contenido: nuevoComentario.trim(),
+        es_nota_interna: false,
+      });
+
+      setTicket((prev) => ({
+        ...prev,
+        comentarios: [
+          ...(prev.comentarios || []),
+          {
+            ...creado,
+            autor: creado.usuario_nombre || 'Tú',
+            rolAutor: creado.rol || 'cliente',
+          },
+        ],
+      }));
+      setNuevoComentario('');
+    } catch (err) {
+      setErrorComentario(err.message || 'Error al enviar el comentario.');
+    } finally {
+      setEnviandoComentario(false);
+    }
+  };
 
   return (
     <Layout>
@@ -75,7 +109,7 @@ export default function DetalleTicketCliente() {
 
       <h1 className="detalle-ticket-titulo">{ticket.titulo}</h1>
 
-      {/* Información principal */}
+      {/* Información principal e Historial */}
       <div className="detalle-ticket-grid">
         <div className="detalle-ticket-tarjeta detalle-ticket-info">
           <h2 className="detalle-ticket-seccion">Detalles del ticket</h2>
@@ -141,6 +175,55 @@ export default function DetalleTicketCliente() {
             </ol>
           )}
         </div>
+      </div>
+
+      {/* Sección de Comentarios y Mensajes */}
+      <div className="detalle-ticket-tarjeta detalle-ticket-comentarios" style={{ marginTop: 24 }}>
+        <h2 className="detalle-ticket-seccion">Comentarios y Mensajes con Soporte</h2>
+
+        <div className="detalle-ticket-lista-comentarios">
+          {(!ticket.comentarios || ticket.comentarios.length === 0) ? (
+            <p className="detalle-ticket-vacio">No hay mensajes en este ticket aún.</p>
+          ) : (
+            <div className="detalle-comentarios-items">
+              {ticket.comentarios.map((c, idx) => (
+                <div key={c.id_comentario || idx} className="detalle-comentario-item">
+                  <div className="detalle-comentario-cabecera">
+                    <span className="detalle-comentario-autor">{c.autor || c.usuario_nombre}</span>
+                    <span className="detalle-comentario-rol">({c.rolAutor || c.rol})</span>
+                    <span className="detalle-comentario-fecha">{c.fecha_creacion}</span>
+                  </div>
+                  <p className="detalle-comentario-contenido">{c.contenido}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {ticket.estado === 'Cerrado' ? (
+          <p className="detalle-ticket-mensaje-cerrado">
+            Este ticket está cerrado, por lo que ya no admite nuevos comentarios.
+          </p>
+        ) : (
+          <form className="detalle-comentario-form" onSubmit={manejarEnviarComentario}>
+            <textarea
+              className="detalle-comentario-textarea"
+              placeholder="Escribe un mensaje o responde al equipo de soporte técnico…"
+              rows={3}
+              value={nuevoComentario}
+              onChange={(e) => setNuevoComentario(e.target.value)}
+              disabled={enviandoComentario}
+            />
+            {errorComentario && <p className="detalle-comentario-error">{errorComentario}</p>}
+            <button
+              type="submit"
+              className="detalle-comentario-btn-enviar"
+              disabled={enviandoComentario || !nuevoComentario.trim()}
+            >
+              {enviandoComentario ? 'Enviando…' : 'Enviar mensaje'}
+            </button>
+          </form>
+        )}
       </div>
     </Layout>
   );
