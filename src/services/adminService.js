@@ -248,7 +248,11 @@ export async function obtenerMetricasSatisfaccion() {
 export async function obtenerCalificacionesSupervision(filtros = {}) {
   const params = {};
   if (filtros.tecnico && filtros.tecnico !== "todos") {
-    params.id_tecnico = Number(filtros.tecnico);
+    if (!isNaN(Number(filtros.tecnico))) {
+      params.id_tecnico = Number(filtros.tecnico);
+    } else {
+      params.tecnico = filtros.tecnico;
+    }
   }
   if (filtros.fechaInicio) params.desde = filtros.fechaInicio;
   if (filtros.fechaFin) params.hasta = filtros.fechaFin;
