@@ -1,7 +1,21 @@
 import axios from "axios";
 import { API_URL } from "../services/api";
+import { despacharPeticionMock } from "./mockDataStore";
 
-export const cliente = axios.create({ baseURL: `${API_URL}/api/v1` });
+// Por defecto en la rama develop (frontend puro), opera en modo autónomo sin requerir backend
+const MODO_STANDALONE = import.meta.env.VITE_STANDALONE !== "false";
+
+export const cliente = axios.create({
+  baseURL: `${API_URL}/api/v1`,
+  timeout: 3000,
+  adapter: async (config) => {
+    if (MODO_STANDALONE) {
+      return despacharPeticionMock(config);
+    }
+    const defaultAdapter = axios.getAdapter(axios.defaults.adapter);
+    return defaultAdapter(config);
+  },
+});
 
 cliente.interceptors.request.use((config) => {
   try {
@@ -22,6 +36,22 @@ cliente.interceptors.response.use(
   (respuesta) => respuesta,
   async (error) => {
     const original = error.config;
+
+    // Fallback de contingencia si no se estuviese usando el adapter
+    if (
+      !error.response ||
+      error.code === "ERR_NETWORK" ||
+      error.message?.includes("Network Error") ||
+      error.code === "ECONNABORTED" ||
+      [502, 503, 504].includes(error.response?.status)
+    ) {
+      try {
+        return await despacharPeticionMock(original);
+      } catch (mockError) {
+        return Promise.reject(mockError);
+      }
+    }
+
     let sesion = null;
     try {
       const raw = localStorage.getItem("sesion");
@@ -29,6 +59,7 @@ cliente.interceptors.response.use(
     } catch {
       localStorage.removeItem("sesion");
     }
+
     const esRutaDeAuth = original?.url
       ? original.url.includes("/auth/login") ||
         original.url.includes("/auth/refresh") ||
@@ -57,7 +88,7 @@ cliente.interceptors.response.use(
         window.location.href = "/login";
       }
     }
+
     return Promise.reject(error);
   }
 );
-
