@@ -63,6 +63,11 @@ class RecuperarIn(BaseModel):
     correo_electronico: Correo
 
 
+class RestablecerIn(BaseModel):
+    token: str = Field(..., min_length=10)
+    contrasena: Clave
+
+
 class UsuarioCrearIn(BaseModel):
     nombre: TextoLimpio50
     apellido: TextoLimpio50

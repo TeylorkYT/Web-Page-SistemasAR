@@ -1,21 +1,31 @@
+import time
+from collections import defaultdict
 import jwt
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.deps import usuario_actual
 from app.core.security import (
     crear_access_token,
     crear_refresh_token,
+    crear_reset_token,
     decodificar_token,
+    hashear_contrasena,
     verificar_contrasena,
+    verificar_reset_token,
 )
 from app.db.database import get_db
 from app.models.usuario import Usuario
 from app.schemas.auth import LoginIn, PerfilOut, RefreshIn, TokenOut
-from app.schemas.usuario import RecuperarIn, RegistroClienteIn, UsuarioOut
-from app.services import usuario_service
+from app.schemas.usuario import RecuperarIn, RegistroClienteIn, RestablecerIn, UsuarioOut
+from app.services import email_service, usuario_service
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
+
+# Registro de solicitudes de recuperación en memoria (clave: correo normalizado, valor: lista de timestamps)
+_solicitudes_recuperacion: dict[str, list[float]] = defaultdict(list)
+_LIMITE_SOLICITUDES = 5
+_VENTANA_SEGUNDOS = 900  # 15 minutos
 
 
 def _tokens(usuario: Usuario) -> TokenOut:
@@ -28,13 +38,76 @@ def _tokens(usuario: Usuario) -> TokenOut:
 
 
 @router.post("/register", response_model=UsuarioOut, status_code=status.HTTP_201_CREATED)
-def registrar(datos: RegistroClienteIn, db: Session = Depends(get_db)):
-    return usuario_service.registrar_cliente(db, datos)
+def registrar(datos: RegistroClienteIn, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    nuevo_usuario = usuario_service.registrar_cliente(db, datos)
+    background_tasks.add_task(
+        email_service.enviar_correo_bienvenida,
+        destinatario=nuevo_usuario.correo_electronico,
+        nombre=nuevo_usuario.nombre,
+    )
+    return nuevo_usuario
 
 
 @router.post("/recuperar")
-def recuperar(_datos: RecuperarIn):
+def recuperar(datos: RecuperarIn, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    correo = datos.correo_electronico.strip().lower()
+    ahora = time.time()
+
+    # Limitar abuso de recuperación (máx 5 por 15 min)
+    timestamps = [t for t in _solicitudes_recuperacion[correo] if ahora - t < _VENTANA_SEGUNDOS]
+    if len(timestamps) >= _LIMITE_SOLICITUDES:
+        # Respondemos el mismo mensaje neutral sin confirmar bloqueo
+        return {"detail": "Si el correo existe, recibirás instrucciones"}
+
+    timestamps.append(ahora)
+    _solicitudes_recuperacion[correo] = timestamps
+
+    usuario = usuario_service.obtener_por_correo(db, correo)
+    if usuario and usuario.estado == "Activo":
+        token_reset = crear_reset_token(usuario.id_usuario, usuario.contrasena)
+        background_tasks.add_task(
+            email_service.enviar_correo_recuperacion,
+            destinatario=usuario.correo_electronico,
+            nombre=usuario.nombre,
+            token_reset=token_reset,
+        )
+
+    # Respuesta idéntica exista o no la cuenta (anti-enumeración de usuarios)
     return {"detail": "Si el correo existe, recibirás instrucciones"}
+
+
+@router.post("/restablecer")
+def restablecer(datos: RestablecerIn, db: Session = Depends(get_db)):
+    try:
+        # Decodificamos el sub (id_usuario) sin verificar aún para obtener el usuario y su hash actual
+        secreto = jwt.get_unverified_claims(datos.token) if hasattr(jwt, "get_unverified_claims") else jwt.decode(datos.token, options={"verify_signature": False})
+        id_usuario = int(secreto.get("sub", 0))
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Enlace de recuperación inválido o expirado",
+        )
+
+    usuario = usuario_service.obtener_por_id(db, id_usuario)
+    if not usuario or usuario.estado != "Activo":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Enlace de recuperación inválido o expirado",
+        )
+
+    try:
+        verificar_reset_token(datos.token, usuario.contrasena)
+    except jwt.PyJWTError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Enlace de recuperación inválido o expirado",
+        )
+
+    # Actualizamos la contraseña con un nuevo hash (lo que también invalida inmediatamente este token)
+    usuario.contrasena = hashear_contrasena(datos.contrasena)
+    db.commit()
+
+    return {"detail": "Contraseña restablecida exitosamente"}
 
 
 @router.post("/login", response_model=TokenOut)

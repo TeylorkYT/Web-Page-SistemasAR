@@ -37,6 +37,19 @@ export async function solicitarRecuperacion(correo) {
 
 export const recuperarContrasena = solicitarRecuperacion;
 
+export async function restablecerContrasena(token, contrasena) {
+  try {
+    const { data } = await cliente.post("/auth/restablecer", {
+      token: (token || "").trim(),
+      contrasena,
+    });
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "El enlace de recuperación es inválido o ha expirado.");
+  }
+}
+
 export async function registrarCliente(datos) {
   try {
     const payload = {

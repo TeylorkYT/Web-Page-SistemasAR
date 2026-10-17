@@ -53,3 +53,35 @@ def decodificar_token(token: str, tipo: str) -> dict:
         raise jwt.InvalidTokenError("Tipo de token incorrecto")
     return datos
 
+
+def _calcular_huella_clave(contrasena_hash: str) -> str:
+    import hashlib
+    return hashlib.sha256(contrasena_hash.encode("utf-8")).hexdigest()[:16]
+
+
+def crear_reset_token(id_usuario: int, contrasena_hash: str) -> str:
+    ahora = datetime.now(timezone.utc)
+    datos = {
+        "sub": str(id_usuario),
+        "tipo": "reset",
+        "fp": _calcular_huella_clave(contrasena_hash),
+        "iat": ahora,
+        "exp": ahora + timedelta(minutes=30),
+    }
+    secret = _obtener_secreto()
+    return jwt.encode(datos, secret, algorithm=config.JWT_ALGORITHM)
+
+
+def verificar_reset_token(token: str, contrasena_hash_actual: str) -> int:
+    """Valida token reset: tipo, caducidad (30 min) y huella del hash de contraseña actual."""
+    secret = _obtener_secreto()
+    datos = jwt.decode(token, secret, algorithms=[config.JWT_ALGORITHM])
+    if datos.get("tipo") != "reset":
+        raise jwt.InvalidTokenError("Tipo de token no válido para restablecimiento")
+
+    huella_esperada = _calcular_huella_clave(contrasena_hash_actual)
+    if datos.get("fp") != huella_esperada:
+        raise jwt.InvalidTokenError("El token de restablecimiento ya fue utilizado o no es válido")
+
+    return int(datos["sub"])
+

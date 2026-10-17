@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Campo from "../../components/Campo";
 import Boton from "../../components/Boton";
@@ -8,23 +8,36 @@ export default function RecuperarContrasena() {
   const [correo, setCorreo] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
+  const [enviando, setEnviando] = useState(false);
+  const [segundosBloqueo, setSegundosBloqueo] = useState(0);
+
+  useEffect(() => {
+    if (segundosBloqueo <= 0) return;
+    const temporizador = setInterval(() => {
+      setSegundosBloqueo((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(temporizador);
+  }, [segundosBloqueo]);
 
   const manejarEnvio = async (e) => {
     e.preventDefault();
     setError("");
     setMensaje("");
-    
+
     if (!correo.trim()) {
       setError("Por favor ingresa tu correo electrónico registrado.");
       return;
     }
-    
+
+    setEnviando(true);
     try {
       const respuesta = await solicitarRecuperacion(correo);
-      setMensaje(respuesta.mensaje);
-      setCorreo(""); // Limpiamos el campo tras el éxito
+      setMensaje(respuesta.mensaje || "Si el correo está registrado, recibirás las instrucciones para restablecer tu contraseña.");
+      setSegundosBloqueo(20);
     } catch (err) {
       setError(err.message || "Ocurrió un error al procesar tu solicitud.");
+    } finally {
+      setEnviando(false);
     }
   };
 
@@ -117,8 +130,17 @@ export default function RecuperarContrasena() {
           />
 
           <div style={{ marginTop: "10px" }}>
-            <Boton tipo="submit" variante="primario" anchoCompleto>
-              Enviar instrucciones
+            <Boton
+              tipo="submit"
+              variante="primario"
+              anchoCompleto
+              deshabilitado={enviando || segundosBloqueo > 0}
+            >
+              {enviando
+                ? "Enviando…"
+                : segundosBloqueo > 0
+                ? `Espera ${segundosBloqueo}s para reenviar`
+                : "Enviar instrucciones"}
             </Boton>
           </div>
         </form>
