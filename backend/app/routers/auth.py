@@ -15,8 +15,9 @@ from app.core.security import (
     verificar_reset_token,
 )
 from app.db.database import get_db
+from app.models.cliente import Cliente
 from app.models.usuario import Usuario
-from app.schemas.auth import LoginIn, PerfilOut, RefreshIn, TokenOut
+from app.schemas.auth import LoginIn, PerfilActualizarIn, PerfilOut, RefreshIn, TokenOut
 from app.schemas.usuario import RecuperarIn, RegistroClienteIn, RestablecerIn, UsuarioOut
 from app.services import email_service, usuario_service
 
@@ -140,11 +141,78 @@ def refrescar(datos: RefreshIn, db: Session = Depends(get_db)):
 
 
 @router.get("/me", response_model=PerfilOut)
-def perfil(usuario: Usuario = Depends(usuario_actual)):
+def perfil(usuario: Usuario = Depends(usuario_actual), db: Session = Depends(get_db)):
+    telefono = None
+    direccion = None
+    area_departamento = None
+    if usuario.rol == "Cliente":
+        cli = db.query(Cliente).filter(Cliente.id_usuario == usuario.id_usuario).first()
+        if cli:
+            telefono = cli.telefono
+            direccion = cli.direccion
+            area_departamento = cli.area_departamento
+
     return PerfilOut(
         id_usuario=usuario.id_usuario,
         nombre=usuario.nombre,
         apellido=usuario.apellido,
         correo_electronico=usuario.correo_electronico,
         rol=usuario.rol.lower(),
+        fecha_registro=usuario.fecha_registro,
+        telefono=telefono,
+        direccion=direccion,
+        area_departamento=area_departamento,
+    )
+
+
+@router.put("/me", response_model=PerfilOut)
+def actualizar_perfil(
+    datos: PerfilActualizarIn,
+    usuario: Usuario = Depends(usuario_actual),
+    db: Session = Depends(get_db),
+):
+    if datos.nombre is not None and datos.nombre.strip():
+        usuario.nombre = datos.nombre.strip()
+    if datos.apellido is not None and datos.apellido.strip():
+        usuario.apellido = datos.apellido.strip()
+
+    telefono = None
+    direccion = None
+    area_departamento = None
+
+    if usuario.rol == "Cliente":
+        cli = db.query(Cliente).filter(Cliente.id_usuario == usuario.id_usuario).first()
+        if not cli:
+            cli = Cliente(
+                id_usuario=usuario.id_usuario,
+                telefono=datos.telefono.strip() if datos.telefono else "",
+                direccion=datos.direccion.strip() if datos.direccion else "",
+                area_departamento=datos.area_departamento.strip() if datos.area_departamento else "General",
+            )
+            db.add(cli)
+        else:
+            if datos.telefono is not None:
+                cli.telefono = datos.telefono.strip()
+            if datos.direccion is not None:
+                cli.direccion = datos.direccion.strip()
+            if datos.area_departamento is not None:
+                cli.area_departamento = datos.area_departamento.strip()
+        db.flush()
+        telefono = cli.telefono
+        direccion = cli.direccion
+        area_departamento = cli.area_departamento
+
+    db.commit()
+    db.refresh(usuario)
+
+    return PerfilOut(
+        id_usuario=usuario.id_usuario,
+        nombre=usuario.nombre,
+        apellido=usuario.apellido,
+        correo_electronico=usuario.correo_electronico,
+        rol=usuario.rol.lower(),
+        fecha_registro=usuario.fecha_registro,
+        telefono=telefono,
+        direccion=direccion,
+        area_departamento=area_departamento,
     )

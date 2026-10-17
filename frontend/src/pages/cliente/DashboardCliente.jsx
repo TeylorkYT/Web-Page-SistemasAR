@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "../../components/Layout";
+import { useAuth } from "../../context/AuthContext";
 import { obtenerDashboardCliente } from "../../services/clienteService";
 
 export default function DashboardCliente() {
+  const { sesion } = useAuth();
   const [datos, setDatos] = useState(null);
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
     const cargarDatos = async () => {
       try {
-        const resultado = await obtenerDashboardCliente(1); // Simulamos ser Laura
+        const resultado = await obtenerDashboardCliente();
         setDatos(resultado);
       } catch (error) {
         console.error("Error al cargar dashboard:", error);
@@ -23,14 +25,14 @@ export default function DashboardCliente() {
 
   if (cargando) {
     return (
-      <Layout>
+      <Layout rol="cliente" itemActivo="dashboard" nombreUsuario={sesion?.nombre}>
         <div style={{ padding: "20px", textAlign: "center" }}>Cargando panel...</div>
       </Layout>
     );
   }
 
   return (
-    <Layout>
+    <Layout rol="cliente" itemActivo="dashboard" nombreUsuario={sesion?.nombre}>
       <div style={{ padding: "20px", fontFamily: "var(--fuente-principal, sans-serif)" }}>
         <h1 style={{ marginBottom: "20px", color: "var(--color-texto-principal, #0f172a)" }}>
           Mi Panel de Control
@@ -48,7 +50,7 @@ export default function DashboardCliente() {
         <div style={{ backgroundColor: "white", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.05)", border: "1px solid var(--color-borde, #e2e8f0)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
             <h2 style={{ fontSize: "18px", margin: 0 }}>Mis tickets recientes</h2>
-            <Link to="/cliente/crear" style={{ backgroundColor: "var(--color-primario, #0a369d)", color: "white", padding: "8px 16px", borderRadius: "6px", textDecoration: "none", fontSize: "14px", fontWeight: "bold" }}>+ Nuevo Ticket</Link>
+            <Link to="/cliente/tickets/nuevo" style={{ backgroundColor: "var(--color-primario, #0a369d)", color: "white", padding: "8px 16px", borderRadius: "6px", textDecoration: "none", fontSize: "14px", fontWeight: "bold" }}>+ Nuevo Ticket</Link>
           </div>
           
           {datos?.ticketsRecientes && datos.ticketsRecientes.length > 0 ? (

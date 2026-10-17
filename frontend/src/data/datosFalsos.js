@@ -642,9 +642,6 @@ export const calificaciones = [
   }
 ];
 
-// Compatibilidad para evitar errores en servicios desfasados mientras se descontinua el inventario
-export const inventario = [];
-
 // ------------------------------------------------------------------------------
 // EXPORTACIÓN POR DEFECTO
 // ------------------------------------------------------------------------------
@@ -663,6 +660,5 @@ export default {
   comentarios,
   reportes,
   notificaciones,
-  calificaciones,
-  inventario
+  calificaciones
 };

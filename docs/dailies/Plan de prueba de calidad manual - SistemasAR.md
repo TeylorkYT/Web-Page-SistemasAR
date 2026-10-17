@@ -127,7 +127,7 @@ Cuando los 5 terminan, Teylork junta todas las plantillas en un solo documento y
 
 | Integrante | Bloque | Vistas revisadas | Hallazgos | Entregó plantilla |
 | --- | --- | --- | --- | --- |
-| Teylork | Vistas del cliente |  |  |  |
+| Teylork | Vistas del cliente | 6 / 6 (100%) | 13 (12 corregidos) | Sí ([Ver plantilla](file:///c:/TEYLORK/WORKSPACE/SistemasAR/Web-Page-SistemasAR/docs/dailies/Plantilla%20de%20hallazgos%20-%20Teylork%20-%20Vistas%20del%20Cliente.md)) |
 | Vidal | Vistas del técnico |  |  |  |
 | Cristian | Vistas transversales |  |  |  |
 | Magleony | Administrador 1 a 4 |  |  |  |

@@ -1,3 +1,4 @@
+from datetime import date
 from pydantic import BaseModel, field_validator
 
 
@@ -29,3 +30,15 @@ class PerfilOut(BaseModel):
     apellido: str
     correo_electronico: str
     rol: str
+    fecha_registro: date | None = None
+    telefono: str | None = None
+    direccion: str | None = None
+    area_departamento: str | None = None
+
+
+class PerfilActualizarIn(BaseModel):
+    nombre: str | None = None
+    apellido: str | None = None
+    telefono: str | None = None
+    direccion: str | None = None
+    area_departamento: str | None = None

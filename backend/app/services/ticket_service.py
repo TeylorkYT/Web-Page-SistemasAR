@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -155,6 +157,7 @@ def crear_ticket(db: Session, id_cliente: int, datos: TicketCrearIn) -> TicketOu
         titulo=datos.titulo,
         descripcion=datos.descripcion,
         modalidad=datos.modalidad,
+        fecha_creacion=datetime.now(),
         prioridad="Media",
         estado="Abierto",
         id_cliente=id_cliente,

@@ -13,12 +13,10 @@ const vistas = [
   { numero: 10, nombre: "Dashboard del técnico", ruta: "/tecnico" },
   { numero: 11, nombre: "Detalle de ticket asignado", ruta: "/tecnico/tickets/1" },
   { numero: 12, nombre: "Actualizar avance", ruta: "/tecnico/tickets/1/avance" },
-  { numero: 13, nombre: "Consulta de inventario", ruta: "/tecnico/inventario" },
   { numero: 14, nombre: "Dashboard del administrador", ruta: "/admin" },
   { numero: 15, nombre: "Gestión de usuarios", ruta: "/admin/usuarios" },
   { numero: 16, nombre: "Asignación de técnico", ruta: "/admin/tickets/1/asignar" },
   { numero: 17, nombre: "Gestión de categorías", ruta: "/admin/categorias" },
-  { numero: 18, nombre: "Gestión de inventario", ruta: "/admin/inventario" },
   { numero: 19, nombre: "Reportes", ruta: "/admin/reportes" },
   { numero: 20, nombre: "Calificaciones recibidas", ruta: "/admin/calificaciones" },
 ];

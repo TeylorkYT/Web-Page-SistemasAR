@@ -1,13 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
-import { calificarTicket } from '../../services/ticketsService';
+import { useAuth } from '../../context/AuthContext';
+import { calificarTicket, obtenerTicket } from '../../services/ticketsService';
 import './CalificarTicket.css';
 
 export default function CalificarTicket() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { sesion } = useAuth();
 
+  const [ticket, setTicket] = useState(null);
+  const [cargando, setCargando] = useState(true);
   const [puntuacion, setPuntuacion] = useState(0);
   const [hover, setHover] = useState(0);
   const [comentario, setComentario] = useState('');
@@ -15,12 +19,15 @@ export default function CalificarTicket() {
   const [exito, setExito] = useState('');
   const [error, setError] = useState('');
 
-  const volverAlDetalle = () => navigate(`/cliente/tickets/${id}`);
+  useEffect(() => {
+    obtenerTicket(id)
+      .then(setTicket)
+      .catch(() => setTicket(null))
+      .finally(() => setCargando(false));
+  }, [id]);
 
-  // Omitir: cierra sin requerir puntuación
-  const handleOmitir = () => {
-    navigate(`/cliente/tickets/${id}`);
-  };
+  const volverAlDetalle = () => navigate(`/cliente/tickets/${id}`);
+  const handleOmitir = () => navigate(`/cliente/tickets/${id}`);
 
   const handleEnviar = async (e) => {
     e.preventDefault();
@@ -40,8 +47,8 @@ export default function CalificarTicket() {
       });
       setExito('¡Gracias por tu calificación! Redirigiendo…');
       setTimeout(() => navigate('/cliente/tickets'), 1800);
-    } catch {
-      setError('No se pudo enviar la calificación. Intenta de nuevo.');
+    } catch (err) {
+      setError(err.message || 'No se pudo enviar la calificación. Intenta de nuevo.');
     } finally {
       setEnviando(false);
     }
@@ -49,8 +56,96 @@ export default function CalificarTicket() {
 
   const estrellaActiva = hover || puntuacion;
 
+  if (cargando) {
+    return (
+      <Layout rol="cliente" itemActivo="mis-tickets" nombreUsuario={sesion?.nombre}>
+        <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748b' }}>
+          Cargando información del ticket…
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!ticket) {
+    return (
+      <Layout rol="cliente" itemActivo="mis-tickets" nombreUsuario={sesion?.nombre}>
+        <div style={{ textAlign: 'center', padding: '40px 0' }}>
+          <p style={{ color: '#dc2626', fontSize: '16px', fontWeight: 'bold' }}>Ticket no encontrado.</p>
+          <button className="calificar-btn-volver" onClick={() => navigate('/cliente/tickets')}>
+            ← Mis tickets
+          </button>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Si ya tiene una calificación registrada
+  if (ticket.calificacion) {
+    return (
+      <Layout rol="cliente" itemActivo="mis-tickets" nombreUsuario={sesion?.nombre}>
+        <div className="calificar-cabecera">
+          <button id="btn-volver-detalle" className="calificar-btn-volver" onClick={volverAlDetalle}>
+            ← Volver al ticket
+          </button>
+        </div>
+        <div className="calificar-tarjeta" style={{ textAlign: 'center' }}>
+          <h1 className="calificar-titulo">Ticket ya calificado</h1>
+          <p className="calificar-subtitulo">
+            Ticket <strong>#{ticket.id_ticket}</strong> · Ya has enviado tu opinión sobre esta atención.
+          </p>
+          <div style={{ margin: '24px 0', padding: '20px', background: '#fefce8', borderRadius: '10px', border: '1px solid #fef08a' }}>
+            <div style={{ fontSize: '28px', color: '#eab308', marginBottom: '8px' }}>
+              {'★'.repeat(ticket.calificacion.puntuacion || 0)}{'☆'.repeat(5 - (ticket.calificacion.puntuacion || 0))}
+            </div>
+            {ticket.calificacion.comentario && (
+              <p style={{ fontStyle: 'italic', color: '#713f12', margin: 0 }}>
+                "{ticket.calificacion.comentario}"
+              </p>
+            )}
+          </div>
+          <button
+            type="button"
+            className="calificar-btn-volver"
+            style={{ display: 'inline-block' }}
+            onClick={() => navigate('/cliente/tickets')}
+          >
+            Volver al listado de tickets
+          </button>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Si no está en estado Resuelto (ni Cerrado)
+  if (ticket.estado !== 'Resuelto' && ticket.estado !== 'Cerrado') {
+    return (
+      <Layout rol="cliente" itemActivo="mis-tickets" nombreUsuario={sesion?.nombre}>
+        <div className="calificar-cabecera">
+          <button id="btn-volver-detalle" className="calificar-btn-volver" onClick={volverAlDetalle}>
+            ← Volver al ticket
+          </button>
+        </div>
+        <div className="calificar-tarjeta" style={{ textAlign: 'center' }}>
+          <h1 className="calificar-titulo" style={{ color: '#0369a1' }}>Atención en curso</h1>
+          <p style={{ color: '#475569', fontSize: '15px', lineHeight: 1.6, margin: '16px 0 24px' }}>
+            Este ticket se encuentra actualmente en estado <strong>{ticket.estado.replace('_', ' ')}</strong>.<br />
+            Solo podrás calificar el servicio una vez que el técnico haya aplicado la solución y el ticket pase a estado <strong>Resuelto</strong>.
+          </p>
+          <button
+            type="button"
+            className="calificar-btn-volver"
+            style={{ display: 'inline-block' }}
+            onClick={volverAlDetalle}
+          >
+            ← Volver a los detalles del ticket
+          </button>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
-    <Layout>
+    <Layout rol="cliente" itemActivo="mis-tickets" nombreUsuario={sesion?.nombre}>
       <div className="calificar-cabecera">
         <button
           id="btn-volver-detalle"
@@ -145,4 +240,5 @@ export default function CalificarTicket() {
       </div>
     </Layout>
   );
-}
+}
+

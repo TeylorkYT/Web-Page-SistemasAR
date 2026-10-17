@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
+import { useAuth } from '../../context/AuthContext';
+import { obtenerEquiposCliente } from '../../services/clienteService';
 import { crearTicket, listarCategorias, subirAdjunto } from '../../services/ticketsService';
 import './CrearTicket.css';
 
@@ -17,11 +19,15 @@ function formatearTamano(bytes) {
 
 export default function CrearTicket() {
   const navigate = useNavigate();
+  const { sesion } = useAuth();
   const inputArchivoRef = useRef(null);
 
   const [categorias, setCategorias] = useState([]);
+  const [equipos, setEquipos] = useState([]);
   const [titulo, setTitulo] = useState('');
   const [descripcion, setDescripcion] = useState('');
+  const [modalidad, setModalidad] = useState('Presencial');
+  const [idEquipo, setIdEquipo] = useState('');
   const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState([]);
   const [archivos, setArchivos] = useState([]);
   const [enviando, setEnviando] = useState(false);
@@ -31,6 +37,7 @@ export default function CrearTicket() {
 
   useEffect(() => {
     listarCategorias().then(setCategorias);
+    obtenerEquiposCliente().then(setEquipos).catch(() => {});
   }, []);
 
   const toggleCategoria = (id) => {
@@ -79,6 +86,10 @@ export default function CrearTicket() {
       setError('El título es obligatorio.');
       return;
     }
+    if (titulo.trim().length > 100) {
+      setError('El título no puede superar los 100 caracteres.');
+      return;
+    }
     if (!descripcion.trim()) {
       setError('La descripción es obligatoria.');
       return;
@@ -94,8 +105,9 @@ export default function CrearTicket() {
       const ticketCreado = await crearTicket({
         titulo: titulo.trim(),
         descripcion: descripcion.trim(),
+        modalidad: modalidad,
         categorias_ids: categoriasSeleccionadas,
-        id_equipo: null
+        id_equipo: idEquipo ? Number(idEquipo) : null
       });
 
       if (archivos.length > 0) {
@@ -132,7 +144,7 @@ export default function CrearTicket() {
   };
 
   return (
-    <Layout>
+    <Layout rol="cliente" itemActivo="crear-ticket" nombreUsuario={sesion?.nombre}>
       <h1 className="crear-ticket-titulo">Crear nuevo ticket</h1>
 
       <div className="crear-ticket-tarjeta">
@@ -150,8 +162,45 @@ export default function CrearTicket() {
               placeholder="Describe brevemente el problema"
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
-              maxLength={120}
+              maxLength={100}
             />
+          </div>
+
+          {/* Modalidad y Equipo */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginBottom: '22px' }}>
+            <div className="crear-ticket-campo" style={{ marginBottom: 0 }}>
+              <label htmlFor="campo-modalidad" className="crear-ticket-label">
+                Modalidad de atención
+              </label>
+              <select
+                id="campo-modalidad"
+                className="crear-ticket-input"
+                value={modalidad}
+                onChange={(e) => setModalidad(e.target.value)}
+              >
+                <option value="Presencial">Presencial (en oficina)</option>
+                <option value="Remoto">Remoto (asistencia remota)</option>
+              </select>
+            </div>
+
+            <div className="crear-ticket-campo" style={{ marginBottom: 0 }}>
+              <label htmlFor="campo-equipo" className="crear-ticket-label">
+                Equipo asociado <span className="crear-ticket-ayuda">(opcional)</span>
+              </label>
+              <select
+                id="campo-equipo"
+                className="crear-ticket-input"
+                value={idEquipo}
+                onChange={(e) => setIdEquipo(e.target.value)}
+              >
+                <option value="">-- Sin equipo específico --</option>
+                {equipos.map((eq) => (
+                  <option key={eq.id_equipo} value={eq.id_equipo}>
+                    {eq.tipo} - {eq.marca} {eq.modelo} ({eq.serial})
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Descripción */}

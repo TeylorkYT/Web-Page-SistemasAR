@@ -26,7 +26,23 @@ export async function obtenerPerfilCliente() {
   return data;
 }
 
+export async function actualizarPerfilCliente(datos) {
+  const { data } = await cliente.put("/auth/me", datos);
+  return data;
+}
+
 export async function obtenerEquiposCliente() {
   const { data } = await cliente.get("/equipos");
   return data;
 }
+
+export async function crearEquipoCliente(datos) {
+  const { data } = await cliente.post("/equipos", datos);
+  return data;
+}
+
+export async function actualizarEquipoCliente(idEquipo, datos) {
+  const { data } = await cliente.put(`/equipos/${idEquipo}`, datos);
+  return data;
+}
+
