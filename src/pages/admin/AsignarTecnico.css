@@ -106,8 +106,8 @@
 }
 
 .filtro-prioridad-select:focus {
-  border-color: #1e3a8a;
-  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+  border-color: var(--color-primario, #00bba6);
+  box-shadow: 0 0 0 3px rgba(0, 187, 166, 0.15);
 }
 
 /* Lista de tarjetas de tickets */
@@ -120,11 +120,11 @@
 /* Tarjeta individual de ticket */
 .tarjeta-ticket-pendiente {
   background-color: #ffffff;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
+  border: 1px solid var(--color-borde, #e2e8f0);
+  border-radius: 14px;
   padding: 16px 20px;
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 8px rgba(7, 30, 51, 0.04);
   transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
@@ -132,16 +132,16 @@
 }
 
 .tarjeta-ticket-pendiente:hover {
-  border-color: #cbd5e1;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+  border-color: var(--color-primario, #00bba6);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(7, 30, 51, 0.08);
 }
 
 /* Estado seleccionado / activo según Mockup (Borde azul resaltado) */
 .tarjeta-ticket-pendiente.seleccionado {
-  border: 2px solid #1e3a8a;
+  border: 2px solid var(--color-primario, #00bba6);
   background-color: #ffffff;
-  box-shadow: 0 3px 10px rgba(30, 58, 138, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 187, 166, 0.15);
 }
 
 /* Cabecera de la tarjeta (ID y Badge de Prioridad) */
@@ -224,16 +224,16 @@
 
 .panel-detalle-asignacion {
   background-color: #ffffff;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
+  border: 1px solid var(--color-borde, #e2e8f0);
+  border-radius: 16px;
   padding: 24px 28px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 16px rgba(7, 30, 51, 0.04);
 }
 
 .detalle-header-titulo {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--color-texto-principal, #071e33);
   margin-top: 0;
   margin-bottom: 20px;
 }
@@ -265,7 +265,7 @@
 
 .detalle-dato-valor.id-destacado {
   font-weight: 700;
-  color: #0f172a;
+  color: var(--color-primario, #00bba6);
 }
 
 /* Bloque de descripción */
@@ -301,7 +301,7 @@
 .seleccionar-tecnico-titulo {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--color-texto-principal, #071e33);
   margin-bottom: 14px;
 }
 
@@ -316,21 +316,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid transparent;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--color-borde, #e2e8f0);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .opcion-tecnico-item:hover {
   background-color: #f8fafc;
-  border-color: #e2e8f0;
+  border-color: var(--color-primario, #00bba6);
 }
 
 .opcion-tecnico-item.seleccionado {
-  background-color: #f0f7ff;
-  border-color: #bfdbfe;
+  background-color: rgba(0, 187, 166, 0.06);
+  border-color: var(--color-primario, #00bba6);
 }
 
 .tecnico-radio-contenedor {
@@ -342,7 +342,7 @@
 .tecnico-radio-input {
   width: 18px;
   height: 18px;
-  accent-color: #1e3a8a;
+  accent-color: var(--color-primario, #00bba6);
   cursor: pointer;
 }
 
@@ -377,28 +377,28 @@
 /* Botón principal de asignación */
 .boton-asignar-tecnico-accion {
   width: 100%;
-  background-color: #1e3a8a;
+  background: linear-gradient(135deg, var(--color-primario, #00bba6) 0%, var(--color-primario-oscuro, #008f7e) 100%);
   color: #ffffff;
   border: none;
-  border-radius: 8px;
+  border-radius: 24px;
   padding: 14px 20px;
   font-size: 0.95rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(30, 58, 138, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 187, 166, 0.3);
   transition: all 0.2s ease;
 }
 
 .boton-asignar-tecnico-accion:hover:not(:disabled) {
-  background-color: #172554;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(30, 58, 138, 0.25);
+  opacity: 0.95;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 187, 166, 0.4);
 }
 
 .boton-asignar-tecnico-accion:disabled {
-  background-color: #94a3b8;
+  background: #94a3b8;
   cursor: not-allowed;
   box-shadow: none;
   transform: none;

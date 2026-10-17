@@ -7,7 +7,7 @@
  * ==============================================================================
  */
 
-import datosIniciales from "../data/datosFalsos";
+import datosIniciales from "../data/datosFalsos.js";
 
 const STORAGE_KEY = "sistemasar_mock_db_v2";
 
@@ -17,8 +17,78 @@ export function obtenerBaseDeDatos() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const db = JSON.parse(raw);
+      let huboCambios = false;
+
+      // Sincronizar Ticket 10 para demo de calificación si no existe
+      if (!db.tickets.some((t) => t.id_ticket === 10)) {
+        const t10 = datosIniciales.tickets.find((t) => t.id_ticket === 10);
+        if (t10) {
+          db.tickets.push(JSON.parse(JSON.stringify(t10)));
+          huboCambios = true;
+        }
+      }
+
+      // Asegurar que ticketCategorias incluya el ticket 10
+      if (!db.ticketCategorias.some((tc) => tc.id_ticket === 10)) {
+        const tc10 = datosIniciales.ticketCategorias.filter((tc) => tc.id_ticket === 10);
+        db.ticketCategorias.push(...JSON.parse(JSON.stringify(tc10)));
+        huboCambios = true;
+      }
+
+      // Asegurar que reportes incluya el reporte del ticket 10
+      if (!db.reportes.some((r) => r.id_ticket === 10)) {
+        const rep10 = datosIniciales.reportes.find((r) => r.id_ticket === 10);
+        if (rep10) {
+          db.reportes.push(JSON.parse(JSON.stringify(rep10)));
+          huboCambios = true;
+        }
+      }
+
+      // Asegurar comentarios del ticket 10 y 4
+      [10, 4].forEach((tId) => {
+        if (!db.comentarios.some((c) => c.id_ticket === tId)) {
+          const coms = datosIniciales.comentarios.filter((c) => c.id_ticket === tId);
+          if (coms.length > 0) {
+            db.comentarios.push(...JSON.parse(JSON.stringify(coms)));
+            huboCambios = true;
+          }
+        }
+      });
+
+      // Asegurar historial del ticket 10
+      if (!db.historial.some((h) => h.id_ticket === 10)) {
+        const hist10 = datosIniciales.historial.filter((h) => h.id_ticket === 10);
+        db.historial.push(...JSON.parse(JSON.stringify(hist10)));
+        huboCambios = true;
+      }
+
+      // Asegurar notificación de resolución del ticket 10
+      if (!db.notificaciones.some((n) => n.id_ticket === 10)) {
+        const notif10 = datosIniciales.notificaciones.find((n) => n.id_ticket === 10);
+        if (notif10) {
+          db.notificaciones.push(JSON.parse(JSON.stringify(notif10)));
+          huboCambios = true;
+        }
+      }
+
       if (!db.calificaciones || db.calificaciones.length < 6) {
         db.calificaciones = JSON.parse(JSON.stringify(datosIniciales.calificaciones || []));
+        huboCambios = true;
+      }
+      // Sanitizar calificaciones para que ningún ticket sin resolver o tickets en espera de calificación tengan calificación asociada
+      if (db.calificaciones) {
+        db.calificaciones.forEach((c) => {
+          if (c.id_ticket === 5) {
+            c.id_ticket = 3;
+            huboCambios = true;
+          }
+          if (c.id_ticket === 4 || c.id_ticket === 10) {
+            c.id_ticket = 6;
+            huboCambios = true;
+          }
+        });
+      }
+      if (huboCambios) {
         guardarBaseDeDatos(db);
       }
       return db;
@@ -96,10 +166,10 @@ function formatearTicket(t, db) {
     };
   });
 
-  // Reporte asociado si existe
-  const rep = db.reportes.find((r) => r.id_ticket === t.id_ticket) || null;
-  // Calificación asociada si existe
-  const cal = db.calificaciones.find((c) => c.id_ticket === t.id_ticket) || null;
+  // Reporte y calificación solo aplican a tickets que ya fueron resueltos o cerrados
+  const esResueltoOCerrado = t.estado === "Resuelto" || t.estado === "Cerrado";
+  const rep = esResueltoOCerrado ? (db.reportes.find((r) => r.id_ticket === t.id_ticket) || null) : null;
+  const cal = esResueltoOCerrado ? (db.calificaciones.find((c) => c.id_ticket === t.id_ticket) || null) : null;
 
   return {
     ...t,
@@ -107,6 +177,7 @@ function formatearTicket(t, db) {
     cliente_nombre: clienteUser ? `${clienteUser.nombre} ${clienteUser.apellido}` : `Cliente #${t.id_cliente}`,
     tecnico_nombre: tecnicoUser ? `${tecnicoUser.nombre} ${tecnicoUser.apellido}` : null,
     equipo: equipoObj ? `${equipoObj.marca} ${equipoObj.modelo}` : "Sin equipo asociado",
+    equipo_objeto: equipoObj ? { ...equipoObj } : null,
     categorias: cats,
     reporte: rep,
     calificacion: cal
@@ -353,9 +424,9 @@ export async function despacharPeticionMock(config) {
     return { data: formatearTicket(nuevoTicket, db), status: 201 };
   }
 
-  // Detalle de ticket individual
+  // Detalle de ticket individual / Actualización de ticket
   const matchTicketId = pathname.match(/^\/tickets\/(\d+)$/);
-  if (matchTicketId && metodo === "get") {
+  if (matchTicketId) {
     const ticketId = Number(matchTicketId[1]);
     const ticket = db.tickets.find((t) => t.id_ticket === ticketId);
     if (!ticket) {
@@ -363,7 +434,34 @@ export async function despacharPeticionMock(config) {
       err.response = { status: 404, data: { detail: "Ticket no encontrado" } };
       throw err;
     }
-    return { data: formatearTicket(ticket, db), status: 200 };
+    if (metodo === "get") {
+      return { data: formatearTicket(ticket, db), status: 200 };
+    }
+    if (metodo === "patch" || metodo === "put") {
+      const usuarioActual = obtenerUsuarioActual();
+      if (body.id_equipo !== undefined) {
+        ticket.id_equipo = body.id_equipo ? Number(body.id_equipo) : null;
+        const eq = db.equipos.find((e) => e.id_equipo === ticket.id_equipo);
+        db.historial.push({
+          id_historial: db.historial.length + 1,
+          id_ticket: ticketId,
+          tipo_accion: "Actualizacion",
+          estado_anterior: ticket.estado,
+          estado_nuevo: ticket.estado,
+          fecha_accion: new Date().toISOString().replace("T", " ").substring(0, 19),
+          id_usuario: usuarioActual?.id_usuario || 2,
+          detalles: eq
+            ? `Equipo vinculado al ticket: ${eq.tipo || "Equipo"} ${eq.marca} ${eq.modelo} (${eq.serial})`
+            : "Equipo desvinculado del ticket"
+        });
+      }
+      if (body.titulo) ticket.titulo = body.titulo;
+      if (body.descripcion) ticket.descripcion = body.descripcion;
+      if (body.prioridad) ticket.prioridad = body.prioridad;
+      if (body.modalidad) ticket.modalidad = body.modalidad;
+      guardarBaseDeDatos(db);
+      return { data: formatearTicket(ticket, db), status: 200 };
+    }
   }
 
   // Historial de un ticket
@@ -625,7 +723,9 @@ export async function despacharPeticionMock(config) {
     if (metodo === "get") {
       const usuarioActual = obtenerUsuarioActual();
       let lista = [...db.equipos];
-      if (usuarioActual?.rol === "Cliente") {
+      if (params.id_cliente) {
+        lista = lista.filter((e) => e.id_cliente === Number(params.id_cliente));
+      } else if (usuarioActual?.rol === "Cliente") {
         lista = lista.filter((e) => e.id_cliente === usuarioActual.id_usuario);
       }
       return { data: lista, status: 200 };
@@ -641,10 +741,30 @@ export async function despacharPeticionMock(config) {
         serial: body.serial,
         sistema_operativo: body.sistema_operativo || null,
         area_departamento: body.area_departamento || "General",
-        id_cliente: usuarioActual?.id_usuario || 5,
+        id_cliente: body.id_cliente ? Number(body.id_cliente) : (usuarioActual?.id_usuario || 5),
         estado_equipo: body.estado_equipo || "Operativo"
       };
       db.equipos.push(nuevoEquipo);
+
+      // Si se especificó vincular inmediatamente a un ticket
+      if (body.id_ticket) {
+        const ticketId = Number(body.id_ticket);
+        const t = db.tickets.find((tick) => tick.id_ticket === ticketId);
+        if (t) {
+          t.id_equipo = nuevoId;
+          db.historial.push({
+            id_historial: db.historial.length + 1,
+            id_ticket: ticketId,
+            tipo_accion: "Actualizacion",
+            estado_anterior: t.estado,
+            estado_nuevo: t.estado,
+            fecha_accion: new Date().toISOString().replace("T", " ").substring(0, 19),
+            id_usuario: usuarioActual?.id_usuario || 2,
+            detalles: `Equipo registrado y vinculado al ticket: ${nuevoEquipo.tipo} ${nuevoEquipo.marca} ${nuevoEquipo.modelo} (${nuevoEquipo.serial})`
+          });
+        }
+      }
+
       guardarBaseDeDatos(db);
       return { data: nuevoEquipo, status: 201 };
     }

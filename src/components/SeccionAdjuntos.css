@@ -1,10 +1,10 @@
 .seccion-adjuntos-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 20px;
-  margin-top: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  background: var(--color-superficie, #ffffff);
+  border: 1px solid var(--color-borde, #e2ebf1);
+  border-radius: var(--radio-tarjeta, 14px);
+  padding: 24px;
+  margin-top: 24px;
+  box-shadow: var(--sombra-tarjeta, 0 4px 20px rgba(7, 30, 51, 0.05));
 }
 
 .seccion-adjuntos-header {
@@ -12,53 +12,58 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
 }
 
 .seccion-adjuntos-titulo {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--color-texto-principal, #072137);
   margin: 0;
+  letter-spacing: -0.01em;
 }
 
 .seccion-adjuntos-subtitulo {
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--color-texto-secundario, #556980);
   margin: 4px 0 0;
 }
 
 .seccion-adjuntos-btn-subir {
-  background-color: #0284c7;
+  background-color: var(--color-primario, #00bba6);
   color: #ffffff;
   border: none;
-  border-radius: 8px;
-  padding: 8px 14px;
+  border-radius: var(--radio-boton, 10px);
+  padding: 9px 16px;
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: background-color 0.15s ease, transform 0.05s ease;
+  box-shadow: 0 4px 12px rgba(0, 187, 166, 0.25);
+  transition: all 0.2s ease;
 }
 
 .seccion-adjuntos-btn-subir:hover:not(:disabled) {
-  background-color: #0369a1;
+  background-color: var(--color-primario-hover, #009e8c);
+  transform: translateY(-1px);
 }
 
 .seccion-adjuntos-btn-subir:disabled {
   background-color: #94a3b8;
   cursor: not-allowed;
   opacity: 0.7;
+  transform: none;
+  box-shadow: none;
 }
 
 .seccion-adjuntos-alerta {
-  padding: 10px 14px;
-  border-radius: 8px;
+  padding: 12px 16px;
+  border-radius: var(--radio-boton, 10px);
   font-size: 0.88rem;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -72,9 +77,9 @@
 }
 
 .seccion-adjuntos-exito {
-  background-color: #f0fdf4;
-  color: #166534;
-  border: 1px solid #bbf7d0;
+  background-color: #e6f9f6;
+  color: #007a6c;
+  border: 1px solid #9ee7dc;
 }
 
 .seccion-adjuntos-cerrar-alerta {
@@ -89,48 +94,48 @@
 
 .seccion-adjuntos-aviso-cerrado {
   background-color: #f8fafc;
-  color: #64748b;
-  border: 1px dashed #cbd5e1;
-  padding: 10px 14px;
-  border-radius: 8px;
+  color: var(--color-texto-secundario, #556980);
+  border: 1px dashed var(--color-borde, #e2ebf1);
+  padding: 12px 16px;
+  border-radius: var(--radio-boton, 10px);
   font-size: 0.88rem;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .seccion-adjuntos-cargando {
-  padding: 24px;
   text-align: center;
-  color: #64748b;
+  padding: 24px;
+  color: var(--color-texto-secundario, #556980);
   font-size: 0.9rem;
 }
 
 .seccion-adjuntos-vacio {
   text-align: center;
-  padding: 24px;
+  padding: 30px 16px;
   background-color: #f8fafc;
-  border: 1px dashed #e2e8f0;
-  border-radius: 8px;
+  border: 1px dashed var(--color-borde, #e2ebf1);
+  border-radius: var(--radio-boton, 10px);
 }
 
 .seccion-adjuntos-vacio-texto {
-  color: #64748b;
+  color: var(--color-texto-secundario, #556980);
   font-size: 0.9rem;
-  margin: 0 0 8px;
+  margin: 0;
 }
 
 .seccion-adjuntos-btn-enlace {
   background: none;
   border: none;
-  color: #0284c7;
-  font-size: 0.88rem;
+  color: var(--color-primario, #00bba6);
   font-weight: 600;
+  font-size: 0.88rem;
   cursor: pointer;
-  text-decoration: underline;
+  margin-top: 8px;
   padding: 0;
 }
 
 .seccion-adjuntos-btn-enlace:hover {
-  color: #0369a1;
+  text-decoration: underline;
 }
 
 .seccion-adjuntos-lista {
@@ -145,37 +150,43 @@
 .seccion-adjuntos-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
+  gap: 14px;
+  padding: 12px 16px;
   background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  border: 1px solid var(--color-borde, #e2ebf1);
+  border-radius: var(--radio-boton, 10px);
+  transition: all 0.2s ease;
 }
 
 .seccion-adjuntos-item:hover {
-  background-color: #f1f5f9;
   border-color: #cbd5e1;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(7, 30, 51, 0.04);
 }
 
 .seccion-adjuntos-item-icono {
   font-size: 1.5rem;
-  line-height: 1;
-  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid var(--color-borde, #e2ebf1);
 }
 
 .seccion-adjuntos-item-info {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  min-width: 0;
-  flex: 1;
 }
 
 .seccion-adjuntos-item-nombre {
-  font-size: 0.9rem;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--color-texto-principal, #072137);
+  font-size: 0.9rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -183,55 +194,27 @@
 
 .seccion-adjuntos-item-meta {
   font-size: 0.78rem;
-  color: #64748b;
-  margin-top: 2px;
+  color: var(--color-texto-secundario, #556980);
 }
 
 .seccion-adjuntos-btn-descargar {
-  background-color: #ffffff;
-  color: #0284c7;
-  border: 1px solid #bae6fd;
-  border-radius: 6px;
-  padding: 6px 12px;
+  background-color: var(--color-superficie, #ffffff);
+  color: var(--color-texto-principal, #072137);
+  border: 1px solid var(--color-borde, #e2ebf1);
+  padding: 7px 14px;
+  border-radius: var(--radio-boton, 10px);
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
   white-space: nowrap;
-  transition: all 0.15s ease;
-  flex-shrink: 0;
 }
 
 .seccion-adjuntos-btn-descargar:hover:not(:disabled) {
-  background-color: #0284c7;
-  color: #ffffff;
-  border-color: #0284c7;
-}
-
-.seccion-adjuntos-btn-descargar:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Soporte responsive para pantallas pequeñas (360px) */
-@media (max-width: 480px) {
-  .seccion-adjuntos-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .seccion-adjuntos-btn-subir {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .seccion-adjuntos-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .seccion-adjuntos-btn-descargar {
-    width: 100%;
-    margin-top: 6px;
-    text-align: center;
-  }
+  border-color: var(--color-primario, #00bba6);
+  color: var(--color-primario, #00bba6);
+  background-color: var(--color-primario-suave, #e6f9f6);
 }

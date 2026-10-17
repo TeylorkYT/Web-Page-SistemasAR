@@ -2,7 +2,10 @@
  * ==============================================================================
  * SISTEMASAR - ESTILOS DEL BOTÓN REUTILIZABLE (Boton.css)
  * ==============================================================================
- * Estilos rectangulares con esquinas redondeadas basados en los mockups.
+ * Estilos modernos inspirados en la estética REPARO:
+ * - Botón primario en turquesa brillante con hover dinámico y sombra sutil
+ * - Botón secundario estilizado con borde pulido
+ * - Botón oscuro y de peligro
  * ==============================================================================
  */
 
@@ -12,61 +15,80 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 18px;
+  padding: 10px 20px;
   font-family: var(--fuente-principal);
   font-size: var(--tamano-texto-sm);
   font-weight: 600;
-  border-radius: var(--radio-boton);
+  border-radius: var(--radio-boton, 10px);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.22s ease-in-out;
   text-decoration: none;
-  line-height: 1.2;
+  line-height: 1.25;
   user-select: none;
   white-space: nowrap;
 }
 
-/* 1. Variante Primaria (Botón azul corporativo según mockups) */
+/* 1. Variante Primaria (Turquesa REPARO) */
 .boton-primario {
   background-color: var(--color-primario);
   color: #ffffff;
   border-color: var(--color-primario);
-  box-shadow: 0 2px 4px rgba(10, 54, 157, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 187, 166, 0.28);
 }
 
 .boton-primario:hover:not(:disabled) {
   background-color: var(--color-primario-hover);
   border-color: var(--color-primario-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 187, 166, 0.38);
 }
 
 .boton-primario:active:not(:disabled) {
   transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 187, 166, 0.25);
 }
 
-/* 2. Variante Secundaria (Botón blanco con borde gris, ej. 'Cancelar') */
+/* 2. Variante Secundaria (Superficie limpia con borde) */
 .boton-secundario {
   background-color: var(--color-superficie);
-  color: var(--color-texto-secundario);
+  color: var(--color-texto-principal);
   border-color: var(--color-borde);
+  box-shadow: 0 1px 3px rgba(7, 30, 51, 0.04);
 }
 
 .boton-secundario:hover:not(:disabled) {
-  background-color: #f1f5f9;
-  color: var(--color-texto-principal);
+  background-color: #f8fafc;
   border-color: #cbd5e1;
+  color: var(--color-primario);
+  transform: translateY(-1px);
 }
 
-/* 3. Variante Peligro (Botón rojo para acciones destructivas) */
+/* 3. Variante Oscura / Navy (Inspirada en las tarjetas oscuras de REPARO) */
+.boton-oscuro {
+  background-color: var(--color-sidebar-fondo);
+  color: #ffffff;
+  border-color: var(--color-sidebar-fondo);
+  box-shadow: 0 4px 12px rgba(7, 30, 51, 0.25);
+}
+
+.boton-oscuro:hover:not(:disabled) {
+  background-color: #0c2d4d;
+  transform: translateY(-1px);
+}
+
+/* 4. Variante Peligro (Rojo alerta) */
 .boton-peligro {
   background-color: var(--color-peligro);
   color: #ffffff;
   border-color: var(--color-peligro);
+  box-shadow: 0 3px 10px rgba(239, 68, 68, 0.25);
 }
 
 .boton-peligro:hover:not(:disabled) {
   background-color: #dc2626;
   border-color: #dc2626;
+  transform: translateY(-1px);
 }
 
 /* Modificador de ancho completo */

@@ -5,11 +5,11 @@
  */
 
 .avance-tecnico-contenedor {
-  padding: 24px;
+  padding: 10px 0;
   max-width: 900px;
   margin: 0 auto;
-  font-family: var(--fuente-principal, system-ui, sans-serif);
-  color: var(--color-texto-principal, #0f172a);
+  font-family: var(--fuente-principal);
+  color: var(--color-texto-principal, #072137);
 }
 
 .avance-tecnico-header {
@@ -22,23 +22,24 @@
 }
 
 .avance-tecnico-titulo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #0f2e5e;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--color-texto-principal, #072137);
   margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .avance-tecnico-subtitulo {
-  font-size: 0.92rem;
-  color: var(--color-texto-secundario, #64748b);
+  font-size: 0.95rem;
+  color: var(--color-texto-secundario, #556980);
   margin-top: 4px;
 }
 
 /* Tarjeta Resumen del Ticket */
 .ticket-resumen-banner {
-  background-color: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 12px;
+  background-color: #e6f9f6;
+  border: 1px solid #9ee7dc;
+  border-radius: var(--radio-tarjeta, 14px);
   padding: 16px 20px;
   margin-bottom: 24px;
   display: flex;
@@ -56,17 +57,17 @@
 
 .resumen-ticket-titulo {
   font-weight: 700;
-  color: #1e3a8a;
+  color: var(--color-texto-principal, #072137);
   font-size: 1rem;
 }
 
 /* Formulario Principal */
 .avance-formulario-card {
-  background-color: #ffffff;
-  border: 1px solid var(--color-borde, #e2e8f0);
-  border-radius: 12px;
+  background-color: var(--color-superficie, #ffffff);
+  border: 1px solid var(--color-borde, #e2ebf1);
+  border-radius: var(--radio-tarjeta, 14px);
   padding: 28px;
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--sombra-tarjeta, 0 4px 20px rgba(7, 30, 51, 0.05));
 }
 
 .grupo-campo {
@@ -77,13 +78,13 @@
   display: block;
   font-size: 0.9rem;
   font-weight: 700;
-  color: #334155;
-  margin-bottom: 8px;
+  color: var(--color-texto-principal, #072137);
+  margin-bottom: 6px;
 }
 
 .grupo-campo .campo-descripcion {
   font-size: 0.82rem;
-  color: #64748b;
+  color: var(--color-texto-secundario, #556980);
   margin-bottom: 8px;
 }
 
@@ -92,65 +93,54 @@
 .avance-input {
   width: 100%;
   padding: 10px 14px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  border: 1px solid var(--color-borde, #e2ebf1);
+  border-radius: var(--radio-boton, 10px);
   font-size: 0.92rem;
-  color: #1e293b;
-  font-family: inherit;
+  color: var(--color-texto-principal, #072137);
+  font-family: var(--fuente-principal);
   outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
   box-sizing: border-box;
+  transition: all 0.2s ease;
 }
 
 .avance-select:focus,
 .avance-textarea:focus,
 .avance-input:focus {
-  border-color: #0a369d;
-  box-shadow: 0 0 0 3px rgba(10, 54, 157, 0.1);
+  border-color: var(--color-primario, #00bba6);
+  box-shadow: 0 0 0 3px rgba(0, 187, 166, 0.15);
 }
 
 .avance-textarea {
   resize: vertical;
-  min-height: 120px;
-  line-height: 1.5;
+  min-height: 110px;
 }
 
 .campo-error-mensaje {
-  color: #dc2626;
+  color: var(--color-peligro, #ef4444);
   font-size: 0.82rem;
   font-weight: 600;
   margin-top: 6px;
+}
+
+.alerta-formulario {
+  padding: 12px 18px;
+  border-radius: var(--radio-boton, 10px);
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.alerta-formulario.exito {
+  background-color: #e6f9f6;
+  border: 1px solid #9ee7dc;
+  color: #007a6c;
 }
 
 .acciones-formulario {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 28px;
-  padding-top: 20px;
-  border-top: 1px solid #f1f5f9;
-}
-
-/* Alerta de Éxito / Error */
-.alerta-formulario {
-  padding: 14px 18px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.alerta-formulario.exito {
-  background-color: #dcfce7;
-  color: #166534;
-  border: 1px solid #86efac;
-}
-
-.alerta-formulario.error {
-  background-color: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #fca5a5;
+  margin-top: 24px;
+  border-top: 1px solid #edf2f7;
+  padding-top: 18px;
 }

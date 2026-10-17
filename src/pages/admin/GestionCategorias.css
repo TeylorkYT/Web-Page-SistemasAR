@@ -111,28 +111,29 @@
 
 /* Botones de acción superior (+ Nueva categoría / + Nuevo servicio) */
 .boton-nuevo,
+.boton-nuevo,
 .boton-accion-azul {
-  background-color: #1e3a8a;
+  background: linear-gradient(135deg, var(--color-primario, #00bba6) 0%, var(--color-primario-oscuro, #008f7e) 100%);
   color: #ffffff;
   border: none;
-  border-radius: 8px;
-  padding: 10px 18px;
+  border-radius: 20px;
+  padding: 10px 20px;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  box-shadow: 0 2px 4px rgba(30, 58, 138, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 187, 166, 0.25);
   transition: all 0.2s ease-in-out;
   white-space: nowrap;
 }
 
 .boton-nuevo:hover,
 .boton-accion-azul:hover {
-  background-color: #172554;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(30, 58, 138, 0.25);
+  opacity: 0.95;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 187, 166, 0.35);
 }
 
 .boton-nuevo:active,
@@ -150,27 +151,28 @@
 /* Tarjeta individual de Categoría */
 .tarjeta-categoria {
   background-color: #ffffff;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
+  border: 1px solid var(--color-borde, #e2e8f0);
+  border-radius: 12px;
   padding: 14px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 8px rgba(7, 30, 51, 0.04);
 }
 
 .tarjeta-categoria:hover {
-  border-color: #cbd5e1;
+  border-color: var(--color-primario, #00bba6);
   background-color: #f8fafc;
+  transform: translateY(-1px);
 }
 
 /* Estado activo / seleccionado según Mockup (Borde azul resaltado) */
 .tarjeta-categoria.seleccionada {
-  border: 2px solid #1e3a8a;
+  border: 2px solid var(--color-primario, #00bba6);
   background-color: #ffffff;
-  box-shadow: 0 3px 8px rgba(30, 58, 138, 0.12);
+  box-shadow: 0 4px 14px rgba(0, 187, 166, 0.15);
 }
 
 .tarjeta-categoria-nombre {
@@ -181,7 +183,7 @@
 }
 
 .tarjeta-categoria.seleccionada .tarjeta-categoria-nombre {
-  color: #1e3a8a;
+  color: var(--color-primario-oscuro, #008f7e);
   font-weight: 700;
 }
 

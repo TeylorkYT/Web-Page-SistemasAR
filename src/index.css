@@ -25,8 +25,8 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Contenedor raíz de React */
-#root {
+/* Contenedor raíz de Vue */
+#app, #root {
   min-height: 100vh;
   width: 100%;
   display: flex;
@@ -38,28 +38,46 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-texto-principal);
   font-weight: 700;
   line-height: 1.25;
+  letter-spacing: -0.02em;
 }
 
 p {
   color: var(--color-texto-secundario);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 /* Enlaces */
 a {
   color: var(--color-primario);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: color 0.2s ease;
 }
 
 a:hover {
+  color: var(--color-primario-hover);
   text-decoration: underline;
 }
 
-/* Scrollbar personalizado sutil */
+/* Form inputs globales */
+input, select, textarea {
+  font-family: var(--fuente-principal);
+  color: var(--color-texto-principal);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-boton);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--color-primario);
+  box-shadow: 0 0 0 3px rgba(0, 187, 166, 0.15);
+}
+
+/* Scrollbar personalizado */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
@@ -72,6 +90,5 @@ a:hover {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--color-primario);
 }
-
