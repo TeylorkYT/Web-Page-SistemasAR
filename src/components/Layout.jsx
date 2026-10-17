@@ -55,9 +55,19 @@ function detectarRol(pathname) {
   return 'administrador'; // fallback
 }
 
+function normalizarRol(r) {
+  if (!r) return 'administrador';
+  const lim = String(r).trim().toLowerCase();
+  if (lim === 'admin' || lim === 'administrador') return 'administrador';
+  if (lim === 'tecnico' || lim === 'técnico') return 'tecnico';
+  if (lim === 'cliente') return 'cliente';
+  return 'administrador';
+}
+
 // Detecta qué ítem del menú está activo según la ruta actual
 function detectarItemActivo(pathname, rol) {
-  const rutas = RUTAS_POR_ROL[rol] || {};
+  const rolNorm = normalizarRol(rol);
+  const rutas = RUTAS_POR_ROL[rolNorm] || RUTAS_POR_ROL.administrador;
   // Ordenar por longitud descendente para que rutas más específicas ganen
   const entrada = Object.entries(rutas)
     .sort(([, a], [, b]) => b.length - a.length)
@@ -223,6 +233,23 @@ const CONFIG_POR_ROL = {
   }
 };
 
+// Aliases para soportar variaciones de casing o nombres cortos
+CONFIG_POR_ROL.admin = CONFIG_POR_ROL.administrador;
+CONFIG_POR_ROL.Administrador = CONFIG_POR_ROL.administrador;
+CONFIG_POR_ROL.Admin = CONFIG_POR_ROL.administrador;
+CONFIG_POR_ROL.Tecnico = CONFIG_POR_ROL.tecnico;
+CONFIG_POR_ROL['técnico'] = CONFIG_POR_ROL.tecnico;
+CONFIG_POR_ROL['Técnico'] = CONFIG_POR_ROL.tecnico;
+CONFIG_POR_ROL.Cliente = CONFIG_POR_ROL.cliente;
+
+RUTAS_POR_ROL.admin = RUTAS_POR_ROL.administrador;
+RUTAS_POR_ROL.Administrador = RUTAS_POR_ROL.administrador;
+RUTAS_POR_ROL.Admin = RUTAS_POR_ROL.administrador;
+RUTAS_POR_ROL.Tecnico = RUTAS_POR_ROL.tecnico;
+RUTAS_POR_ROL['técnico'] = RUTAS_POR_ROL.tecnico;
+RUTAS_POR_ROL['Técnico'] = RUTAS_POR_ROL.tecnico;
+RUTAS_POR_ROL.Cliente = RUTAS_POR_ROL.cliente;
+
 /**
  * Componente Layout
  * 
@@ -254,7 +281,8 @@ export default function Layout({
   const cerrarSesion = auth?.cerrarSesion;
 
   // Rol detectado por la URL o sesión; si se pasa prop explícita se respeta
-  const rol = rolProp || sesion?.rol || detectarRol(location.pathname);
+  const rolCrudo = rolProp || detectarRol(location.pathname) || sesion?.rol;
+  const rol = normalizarRol(rolCrudo);
   const itemActivo = itemActivoProp || detectarItemActivo(location.pathname, rol);
   const nombreActivo = sesion?.nombre || nombreUsuario;
 
@@ -305,7 +333,8 @@ export default function Layout({
 
   // KIT-2: Manejar el clic en una opción del menú lateral: navega a la ruta correspondiente
   const seleccionarOpcion = (id) => {
-    const rutas = RUTAS_POR_ROL[rol] || {};
+    const rolNorm = normalizarRol(rol);
+    const rutas = RUTAS_POR_ROL[rolNorm] || RUTAS_POR_ROL.administrador;
     if (rutas[id]) {
       navigate(rutas[id]);
     }

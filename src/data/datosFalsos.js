@@ -639,6 +639,33 @@ export const calificaciones = [
     puntuacion: 4,
     comentario: "Buen trabajo en la configuracion de las copias de seguridad de contabilidad.",
     fecha_calificacion: "2026-08-19 17:15:00"
+  },
+  {
+    id_calificacion: 4,
+    id_ticket: 7,
+    id_cliente: 7,
+    id_tecnico: 4,
+    puntuacion: 5,
+    comentario: "Mario configuro la estacion de diseno de forma impecable. Todo funcionando a la perfeccion.",
+    fecha_calificacion: "2026-08-18 16:45:00"
+  },
+  {
+    id_calificacion: 5,
+    id_ticket: 5,
+    id_cliente: 5,
+    id_tecnico: 2,
+    puntuacion: 4,
+    comentario: "Diana nos ayudo a optimizar el servidor local. Muy buena actitud y conocimiento.",
+    fecha_calificacion: "2026-08-16 11:20:00"
+  },
+  {
+    id_calificacion: 6,
+    id_ticket: 4,
+    id_cliente: 6,
+    id_tecnico: 4,
+    puntuacion: 4,
+    comentario: "Mario atendio la solicitud rapidamente y dio explicaciones claras del proceso.",
+    fecha_calificacion: "2026-08-14 14:00:00"
   }
 ];
 

@@ -16,7 +16,12 @@ export function obtenerBaseDeDatos() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      return JSON.parse(raw);
+      const db = JSON.parse(raw);
+      if (!db.calificaciones || db.calificaciones.length < 6) {
+        db.calificaciones = JSON.parse(JSON.stringify(datosIniciales.calificaciones || []));
+        guardarBaseDeDatos(db);
+      }
+      return db;
     }
   } catch (err) {
     console.warn("Error leyendo localStorage, reiniciando mock DB:", err);
@@ -850,8 +855,20 @@ export async function despacharPeticionMock(config) {
       };
     });
 
-    if (params.id_tecnico && params.id_tecnico !== "todos") {
+    if (params.id_tecnico && params.id_tecnico !== "todos" && !isNaN(Number(params.id_tecnico))) {
       lista = lista.filter((c) => c.id_tecnico === Number(params.id_tecnico));
+    }
+    if (params.tecnico && params.tecnico !== "todos") {
+      const valor = String(params.tecnico).trim().toLowerCase();
+      lista = lista.filter((c) => {
+        const coincideId = String(c.id_tecnico) === valor;
+        const coincideNombre = c.tecnico_nombre && c.tecnico_nombre.toLowerCase().includes(valor);
+        return coincideId || coincideNombre;
+      });
+    }
+    if (params.tecnico_nombre && params.tecnico_nombre !== "todos") {
+      const valor = String(params.tecnico_nombre).trim().toLowerCase();
+      lista = lista.filter((c) => c.tecnico_nombre && c.tecnico_nombre.toLowerCase().includes(valor));
     }
     if (params.puntuacion && params.puntuacion !== "todos") {
       lista = lista.filter((c) => c.puntuacion === Number(params.puntuacion));

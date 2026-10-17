@@ -124,7 +124,7 @@ export default function GestionUsuarios() {
   ];
 
   return (
-    <Layout>
+    <Layout rol="administrador" itemActivo="usuarios">
       <h1>Gestión de usuarios</h1>
 
       <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>

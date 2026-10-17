@@ -150,11 +150,27 @@ export default function CalificacionesRecibidas() {
     }
   };
 
+  // Filtrado reactivo de seguridad del lado cliente
+  const calificacionesFiltradas = calificaciones.filter((item) => {
+    if (filtroTecnico && filtroTecnico !== "todos") {
+      const valor = filtroTecnico.trim().toLowerCase();
+      const coincideNombre = item.tecnico && item.tecnico.toLowerCase().includes(valor);
+      const coincideId = String(item.id_tecnico) === valor;
+      if (!coincideNombre && !coincideId) return false;
+    }
+    if (filtroPuntaje && filtroPuntaje !== "todos") {
+      if (item.puntuacion !== Number(filtroPuntaje)) return false;
+    }
+    if (fechaInicio && item.fecha && item.fecha < fechaInicio) return false;
+    if (fechaFin && item.fecha && item.fecha > fechaFin) return false;
+    return true;
+  });
+
   // Paginación
   const indiceUltimo = paginaActual * elementosPorPagina;
   const indicePrimero = indiceUltimo - elementosPorPagina;
-  const calificacionesPaginadas = calificaciones.slice(indicePrimero, indiceUltimo);
-  const totalPaginas = Math.ceil(calificaciones.length / elementosPorPagina) || 1;
+  const calificacionesPaginadas = calificacionesFiltradas.slice(indicePrimero, indiceUltimo);
+  const totalPaginas = Math.ceil(calificacionesFiltradas.length / elementosPorPagina) || 1;
 
   return (
     <Layout
@@ -197,7 +213,10 @@ export default function CalificacionesRecibidas() {
               <select
                 className="filtro-select-nativo"
                 value={filtroTecnico}
-                onChange={(e) => setFiltroTecnico(e.target.value)}
+                onChange={(e) => {
+                  setFiltroTecnico(e.target.value);
+                  setPaginaActual(1);
+                }}
                 aria-label="Filtrar por técnico"
               >
                 <option value="todos">[Todos los técnicos]</option>
@@ -219,6 +238,7 @@ export default function CalificacionesRecibidas() {
                   setFiltroRango(e.target.value);
                   setFechaInicio("");
                   setFechaFin("");
+                  setPaginaActual(1);
                 }}
                 aria-label="Filtrar por rango de tiempo"
               >
@@ -233,14 +253,20 @@ export default function CalificacionesRecibidas() {
               <input
                 type="date"
                 value={fechaInicio}
-                onChange={(e) => setFechaInicio(e.target.value)}
+                onChange={(e) => {
+                  setFechaInicio(e.target.value);
+                  setPaginaActual(1);
+                }}
                 style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.85rem" }}
               />
               <span>Hasta:</span>
               <input
                 type="date"
                 value={fechaFin}
-                onChange={(e) => setFechaFin(e.target.value)}
+                onChange={(e) => {
+                  setFechaFin(e.target.value);
+                  setPaginaActual(1);
+                }}
                 style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.85rem" }}
               />
             </div>
@@ -251,7 +277,10 @@ export default function CalificacionesRecibidas() {
               <select
                 className="filtro-select-nativo"
                 value={filtroPuntaje}
-                onChange={(e) => setFiltroPuntaje(e.target.value)}
+                onChange={(e) => {
+                  setFiltroPuntaje(e.target.value);
+                  setPaginaActual(1);
+                }}
                 aria-label="Filtrar por puntaje"
               >
                 <option value="todos">[Todos los puntajes]</option>
@@ -312,7 +341,7 @@ export default function CalificacionesRecibidas() {
          * 3. HISTORIAL DE CALIFICACIONES (Tabla)
          * -------------------------------------------------------------------- */}
         <section className="seccion-historial-calificaciones" aria-label="Historial de calificaciones">
-          <h2 className="historial-titulo">Historial de calificaciones ({calificaciones.length})</h2>
+          <h2 className="historial-titulo">Historial de calificaciones ({calificacionesFiltradas.length})</h2>
 
           <div className="tabla-calificaciones-contenedor">
             <table className="tabla-calificaciones">
@@ -333,7 +362,7 @@ export default function CalificacionesRecibidas() {
                       Cargando historial de calificaciones...
                     </td>
                   </tr>
-                ) : calificaciones.length === 0 ? (
+                ) : calificacionesFiltradas.length === 0 ? (
                   <tr>
                     <td colSpan="6" style={{ textAlign: "center", padding: "28px", color: "#64748b" }}>
                       No se encontraron calificaciones con los filtros seleccionados.
