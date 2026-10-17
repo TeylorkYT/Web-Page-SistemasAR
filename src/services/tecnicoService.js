@@ -46,6 +46,13 @@ export async function obtenerTicketsTecnico() {
       id_usuario: t.id_cliente,
       nombre: (t.cliente_nombre || "").split(" ")[0] || "Cliente",
       apellido: (t.cliente_nombre || "").split(" ").slice(1).join(" ") || "",
+      correo_electronico: t.cliente_correo || "cliente@prueba.com",
+    },
+    equipo: typeof t.equipo === "object" && t.equipo !== null ? t.equipo : {
+      tipo: "Dispositivo",
+      marca: String(t.equipo || "Hardware").split(" ")[0],
+      modelo: String(t.equipo || "").split(" ").slice(1).join(" ") || "General",
+      serial: "SN-001"
     },
     nombresCategorias: (t.categorias || []).map((c) => c.nombre_categoria || c),
   }));
@@ -83,7 +90,13 @@ export async function obtenerDetalleTicket(idTicket) {
       id_usuario: t.id_cliente,
       nombre: (t.cliente_nombre || "").split(" ")[0] || "Cliente",
       apellido: (t.cliente_nombre || "").split(" ").slice(1).join(" ") || "",
-      correo_electronico: "",
+      correo_electronico: t.cliente_correo || "cliente@prueba.com",
+    },
+    equipo: typeof t.equipo === "object" && t.equipo !== null ? t.equipo : {
+      tipo: "Dispositivo",
+      marca: String(t.equipo || "Hardware").split(" ")[0],
+      modelo: String(t.equipo || "").split(" ").slice(1).join(" ") || "General",
+      serial: "SN-001"
     },
     nombresCategorias: (t.categorias || []).map((c) => c.nombre_categoria || c),
     historial: histResp.data.map((h) => ({
