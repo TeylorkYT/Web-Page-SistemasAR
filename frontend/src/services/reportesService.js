@@ -1,7 +1,5 @@
 import { cliente } from "../api/client";
 
-const DIA = 86400000;
-
 export async function listarTecnicos() {
     try {
         const { data } = await cliente.get("/tecnicos");
@@ -32,6 +30,39 @@ export async function obtenerNotificaciones() {
 export async function marcarNotificacionLeida(idNotificacion) {
     const { data } = await cliente.patch(`/notificaciones/${idNotificacion}/leida`);
     return data;
+}
+
+export async function exportarReporte(tipoInforme, formato = "excel", { desde, hasta } = {}) {
+    const params = { formato };
+    if (desde) params.desde = desde;
+    if (hasta) params.hasta = hasta;
+
+    try {
+        const respuesta = await cliente.get(`/reportes/${tipoInforme}/exportar`, {
+            params,
+            responseType: "blob",
+        });
+
+        const esExcel = formato === "excel" || formato === "xlsx";
+        const tipoMime = esExcel
+            ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            : "application/pdf";
+        const extension = esExcel ? "xlsx" : "pdf";
+
+        const blob = new Blob([respuesta.data], { type: tipoMime });
+        const blobUrl = window.URL.createObjectURL(blob);
+
+        const enlace = document.createElement("a");
+        enlace.href = blobUrl;
+        enlace.setAttribute("download", `reporte_${tipoInforme}_${new Date().toISOString().slice(0, 10)}.${extension}`);
+        document.body.appendChild(enlace);
+        enlace.click();
+        enlace.remove();
+
+        window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+        throw new Error(error.response?.data?.detail || "Error al exportar el reporte");
+    }
 }
 
 export async function generarReporte({ idTecnico, desde, hasta }) {
@@ -65,8 +96,8 @@ export async function generarReporte({ idTecnico, desde, hasta }) {
 
     const detalle = cerrados.map((t) => {
         const catsNombres = (t.categorias || []).map((c) => (typeof c === "string" ? c : c.nombre_categoria)).join(", ") || "General";
-        const dias = t.fecha_resolucion
-            ? Math.max(0, Math.round((new Date(t.fecha_resolucion) - new Date(t.fecha_creacion)) / DIA))
+        const horas = t.fecha_resolucion
+            ? Math.max(0, Math.round(((new Date(t.fecha_resolucion) - new Date(t.fecha_creacion)) / 3600000) * 10) / 10)
             : 0;
 
         return {
@@ -75,16 +106,16 @@ export async function generarReporte({ idTecnico, desde, hasta }) {
             categorias: catsNombres,
             cliente: t.cliente_nombre || "-",
             tecnico: t.tecnico_nombre || "-",
-            dias: dias,
+            horas: horas,
         };
     });
 
-    const sumaDias = detalle.reduce((s, d) => s + (d.dias || 0), 0);
+    const sumaHoras = detalle.reduce((s, d) => s + (d.horas || 0), 0);
 
     return {
         resueltos: detalle.length,
-        tiempoPromedio: detalle.length ? (sumaDias / detalle.length).toFixed(1) : "0.0",
+        tiempoPromedio: detalle.length ? (sumaHoras / detalle.length).toFixed(1) : "0.0",
         porCategoria,
         detalle,
     };
-}
+}
