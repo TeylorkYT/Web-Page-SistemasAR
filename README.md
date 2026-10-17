@@ -1,208 +1,93 @@
-# Sistemas AR — Sistema de Gestión de Tickets de Soporte Técnico
+# Sistemas AR — Frontend (SPA React + Vite)
 
-Plataforma integral para la gestión, seguimiento y resolución de tickets de soporte técnico de hardware y software, desarrollada bajo arquitectura cliente-servidor con REST API.
+Frontend web para el Sistema de Gestión de Tickets de Soporte Técnico **Sistemas AR**, desarrollado con React 19, Vite y Vanilla CSS responsivo.
 
----
-
-## 📌 Descripción
-
-**Sistemas AR** permite a los **clientes** reportar incidencias de sus equipos tecnológicos y consultar su avance en tiempo real; a los **técnicos** recibir asignaciones, registrar notas internas, interactuar mediante comentarios y formalizar informes técnicos de solución; y a los **administradores** gestionar el personal, catalogar servicios, supervisar métricas mediante dashboards analíticos y auditar la satisfacción del usuario a través de calificaciones y alertas.
-
-El proyecto implementa el flujo de trabajo completo acordado en el **Documento Definitivo v2.0** con 14 tablas relacionales bajo el esquema `sistemas_ar` y una API bajo el prefijo `/api/v1`.
+> [!NOTE]
+> **Respaldo del Proyecto Full-Stack Completo:**
+> La versión integral del repositorio que incluye el backend en FastAPI (Python), el esquema y scripts de base de datos MySQL 8.0, despliegues y documentación general, se encuentra preservada en la rama:
+> **[`backup/proyecto-completo`](https://github.com/TeylorkYT/Web-Page-SistemasAR/tree/backup/proyecto-completo)**.
 
 ---
 
-## 🛠️ Stack Tecnológico
+## 🚀 Requisitos Previos
 
-| Capa | Tecnología | Características clave |
-| :--- | :--- | :--- |
-| **Base de Datos** | **MySQL 8.0** | 14 tablas relacionales, integridad referencial en cascada, índices y tipos ENUM nativos. |
-| **Backend** | **Python 3.10+ · FastAPI** | Arquitectura modular (Routers, Services, Schemas Pydantic v2, Models SQLAlchemy). Hashing seguro con `bcrypt`, autenticación JWT Bearer (`PyJWT`), pruebas unitarias con `pytest`. |
-| **Frontend** | **React 18 · Vite** | Single Page Application (SPA), React Router v6 con rutas protegidas por rol, gestión de estado y sesión con `AuthContext`, cliente HTTP centralizado con Axios, diseño responsivo y moderno con Vanilla CSS. |
+- **Node.js** 20.x o superior (recomendado 22.x LTS)
+- **npm** 10.x o superior
 
 ---
 
-## 📂 Estructura del Repositorio
+## 📦 Instalación y Ejecución Local
+
+1. **Instalar dependencias:**
+   ```bash
+   npm install
+   ```
+
+2. **Configurar variables de entorno (opcional):**
+   Crea un archivo `.env` en la raíz si deseas configurar la URL del backend u otros parámetros:
+   ```env
+   VITE_API_URL=http://localhost:8000/api/v1
+   ```
+
+3. **Iniciar el servidor de desarrollo:**
+   ```bash
+   npm run dev
+   ```
+   La aplicación se ejecutará por defecto en `http://localhost:5173`.
+
+4. **Validar sintaxis y buenas prácticas con Oxlint:**
+   ```bash
+   npm run lint
+   ```
+
+5. **Generar compilación optimizada para producción:**
+   ```bash
+   npm run build
+   ```
+
+6. **Previsualizar la compilación de producción:**
+   ```bash
+   npm run preview
+   ```
+
+---
+
+## 📂 Estructura del Proyecto
 
 ```text
 Web-Page-SistemasAR/
-├── backend/
-│   ├── app/
-│   │   ├── core/           # Configuración, seguridad (JWT, bcrypt) y dependencias de roles
-│   │   ├── db/             # Conexión SQLAlchemy y Base declarativa
-│   │   ├── models/         # Modelos ORM de las 14 tablas de la base de datos
-│   │   ├── routers/        # Controladores REST API bajo /api/v1 (auth, tickets, reportes, etc.)
-│   │   ├── schemas/        # Esquemas DTO y validaciones con Pydantic v2
-│   │   ├── services/       # Lógica de negocio transaccional y agregaciones
-│   │   └── main.py         # Punto de entrada de la aplicación FastAPI y registro de routers
-│   ├── tests/              # Suite completa de pruebas con pytest y SQLite en memoria
-│   ├── .env.example        # Plantilla de variables de entorno seguras
-│   ├── requirements.txt    # Dependencias fijadas del backend
-│   └── pytest.ini          # Configuración del entorno de pruebas
-├── frontend/
-│   ├── src/
-│   │   ├── api/            # Configuración de Axios con interceptor de tokens JWT
-│   │   ├── components/     # Componentes reutilizables (Layout, Tabla, Modal, RutaProtegida)
-│   │   ├── context/        # Proveedores de estado global (AuthContext)
-│   │   ├── pages/          # Vistas divididas por rol (admin, tecnico, cliente, auth)
-│   │   ├── routes/         # Definición de rutas y navegación protegida
-│   │   ├── services/       # Conectores cliente hacia los endpoints de la API
-│   │   ├── App.jsx         # Componente raíz con Router
-│   │   └── main.jsx        # Montaje de React DOM
-│   ├── package.json        # Dependencias y scripts de Vite
-│   └── vite.config.js      # Configuración del bundler
-├── database/
-│   ├── mibasededatos.sql   # DDL estructural completo de la base de datos (14 tablas)
-│   └── datos_prueba.sql    # Datos semilla y usuarios de prueba iniciales
-├── deploy/
-│   ├── nginx.conf          # Configuración de producción Nginx (SSL, rate limiting, SPA)
-│   ├── sistemasar-backend.service # Unidad Systemd para Uvicorn (2 workers)
-│   ├── backup_mysql.sh     # Script de respaldos diarios comprimidos y rotación
-│   └── test_carga_locust.py # Suite de pruebas de carga Locust (100 usuarios)
-├── docs/
-│   ├── dailies/            # Bitácoras de seguimiento ágil del proyecto
-│   ├── manuales/           # Manuales oficiales del sistema
-│   │   ├── manual-tecnico.md   # Arquitectura, módulos, endpoints y diccionario BD
-│   │   ├── manual-despliegue.md# Guía paso a paso de despliegue en VPS Ubuntu 22.04
-│   │   └── manual-usuario.md   # Manual de usuario final por rol (Cliente, Técnico, Admin)
-│   └── PENDIENTES.md       # Matriz de requisitos RF-01 a RF-18 y tareas de cierre
-└── README.md
+├── .github/
+│   └── workflows/
+│       └── ci.yml             # Integración continua (Lint & Build)
+├── public/                    # Activos estáticos públicos (favicons, svgs)
+├── src/
+│   ├── api/                   # Configuración de Axios e interceptores JWT
+│   ├── assets/                # Imágenes y recursos estáticos empaquetados
+│   ├── components/            # Componentes reutilizables (Layout, Botón, Modal, etc.)
+│   ├── context/               # Contextos globales de React (AuthContext)
+│   ├── data/                  # Datos semilla y mocks para pruebas
+│   ├── pages/                 # Páginas y vistas por rol (admin, cliente, tecnico, auth)
+│   │   ├── admin/             # Paneles y gestión del administrador
+│   │   ├── auth/              # Inicio de sesión, registro y recuperación de contraseña
+│   │   ├── cliente/           # Portal del cliente (tickets, equipos, perfil)
+│   │   └── tecnico/           # Panel del técnico (atención y avance de tickets)
+│   ├── routes/                # Rutas protegidas y enrutamiento por roles (React Router)
+│   ├── services/              # Capa de consumo de APIs y servicios
+│   ├── styles/                # Variables CSS y estilos base compartidos
+│   ├── App.jsx                # Componente raíz con árbol de rutas
+│   ├── index.css              # Reset y estilos globales
+│   └── main.jsx               # Punto de entrada de la aplicación React
+├── .gitignore                 # Exclusiones de Git
+├── .oxlintrc.json             # Configuración del linter Oxlint
+├── index.html                 # Plantilla HTML base
+├── package.json               # Dependencias y scripts
+└── vite.config.js             # Configuración del empaquetador Vite
 ```
 
 ---
 
-## 🚀 Guía de Instalación y Ejecución
+## 👥 Roles y Flujos Soportados
 
-### 1. Clonar el repositorio
-
-```bash
-git clone https://github.com/TeylorkYT/Web-Page-SistemasAR.git
-cd Web-Page-SistemasAR
-```
-
-### 2. Configurar la Base de Datos
-
-En tu motor MySQL 8.0 local o remoto:
-
-```bash
-# Crear base de datos e importar estructura y datos de prueba
-mysql -u root -p -e "CREATE DATABASE sistemas_ar CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-mysql -u root -p sistemas_ar < database/mibasededatos.sql
-mysql -u root -p sistemas_ar < database/datos_prueba.sql
-```
-
-### 3. Configurar y Ejecutar el Backend
-
-```bash
-cd backend
-
-# Crear y activar entorno virtual
-python -m venv venv
-# En Windows:
-venv\Scripts\activate
-# En Linux/Mac:
-source venv/bin/activate
-
-# Instalar dependencias
-pip install -r requirements.txt
-
-# Configurar variables de entorno
-cp .env.example .env
-# Ajustar DATABASE_URL y JWT_SECRET en el archivo .env
-
-# Ejecutar el servidor FastAPI
-uvicorn app.main:app --reload
-```
-
-- Servidor API: `http://localhost:8000`
-- Documentación Swagger interactiva: `http://localhost:8000/docs`
-- Documentación ReDoc: `http://localhost:8000/redoc`
-
-#### Ejecutar Pruebas Automatizadas
-
-**Pruebas herméticas por defecto (SQLite en memoria):**
-```bash
-pytest
-```
-
-**Pruebas contra base de datos real (MySQL 8.0):**
-```bash
-# Linux / macOS / Bash
-TEST_DB_HOST=127.0.0.1 TEST_DB_USER=root TEST_DB_PASSWORD=tu_clave TEST_DB_NAME=sistemas_ar_test pytest
-
-# Windows (PowerShell)
-$env:TEST_DB_HOST="127.0.0.1"; $env:TEST_DB_USER="root"; $env:TEST_DB_PASSWORD="tu_clave"; $env:TEST_DB_NAME="sistemas_ar_test"; pytest
-```
-
-### 4. Configurar y Ejecutar el Frontend
-
-En una nueva terminal:
-
-```bash
-cd frontend
-
-# Instalar paquetes
-npm install
-
-# Iniciar servidor de desarrollo Vite
-npm run dev
-```
-
-- Aplicación Web: `http://localhost:5173`
-
-Para validar la compilación de producción:
-```bash
-npm run build
-```
-
----
-
-## 👥 Cuentas de Prueba
-
-Para pruebas locales y demostraciones, el sistema cuenta con cuentas preconfiguradas en `database/datos_prueba.sql`.
-
-> **Contraseña de prueba universal:** `Prueba123*`
-
-| Rol | Correo electrónico | Acceso |
-| :--- | :--- | :--- |
-| **Administrador** | `admin@prueba.com` | Dashboard analítico, gestión de usuarios, categorías, asignación, reportes y calificaciones. |
-| **Técnico** | `tecnico@prueba.com` | Bandeja de tickets asignados, notas internas, comentarios y registro de soluciones. |
-| **Cliente** | `cliente@prueba.com` | Creación de tickets, registro de equipos propios, seguimiento y calificación de servicio. |
-| **Inactivo** | `inactivo@prueba.com` | Usuario inactivo para validación de bloqueo de autenticación (HTTP 401). |
-
----
-
-## 📋 Estado del Proyecto y Requisitos
-
-Para consultar el inventario detallado de los 18 requisitos funcionales (RF-01 a RF-18), las tareas diferidas a Prioridad 3 (P3) y las especificaciones de despliegue en servidor VPS, consulta el documento técnico de pendientes:
-
-👉 **[Ver Documento de Pendientes y Cierre (docs/PENDIENTES.md)](docs/PENDIENTES.md)**
-
-### 📚 Manuales Oficiales del Sistema
-- 🛠️ **[Manual Técnico de Arquitectura y Desarrollo](docs/manuales/manual-tecnico.md)**: Arquitectura cliente-servidor, catálogo de endpoints `/api/v1/*`, diccionario de datos de las 14 tablas relacionales y matriz RBAC.
-- 🚀 **[Manual de Instalación y Despliegue en VPS](docs/manuales/manual-despliegue.md)**: Configuración en Ubuntu 22.04 LTS, MySQL 8.0, Systemd, Nginx con SSL Let's Encrypt, crontab de backups y pruebas de carga.
-- 👤 **[Manual de Usuario Final por Rol](docs/manuales/manual-usuario.md)**: Guía práctica ilustrada para Clientes, Técnicos y Administradores (flujo de tickets, adjuntos, recuperación de contraseña y reportes).
-
----
-
-## 🔄 Integración Continua (CI / CD)
-
-El repositorio implementa un pipeline automatizado en **GitHub Actions** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) activado en cada Pull Request y push hacia las ramas `develop` y `main`:
-
-* **`backend-sqlite`:** Ejecuta la suite completa de pruebas herméticas con Python 3.12 y SQLite en memoria sin requerir dependencias externas.
-* **`backend-mysql`:** Inicializa un contenedor de servicio con **MySQL 8.0**, importa el esquema relacional oficial desde [`database/mibasededatos.sql`](database/mibasededatos.sql) y ejecuta las pruebas de integración contra la base de datos MySQL real.
-* **`frontend`:** Valida sintaxis y buenas prácticas con `oxlint` (`npm run lint`) y compila los bundles de producción con Vite (`npm run build`).
-
----
-
-## 🌿 Convenciones de Trabajo
-
-- **Ramas:** Todo desarrollo se realiza en ramas de funcionalidad `feature/*` que se integran a `develop` mediante Pull Requests pequeños y verificados. La rama `main` contiene exclusivamente versiones estables.
-- **Seguridad:** Ninguna credencial real, archivo `.env` ni token privado se versiona en el repositorio.
-- **Control de dependencias:** `backend/requirements.txt` es gestionado centralizadamente por Cristian y `frontend/package.json` por Jaider.
-
----
-
-## 📄 Licencia
-
-Proyecto desarrollado con fines formativos y académicos dentro del programa de formación ADSO.
+- **Administrador:** Dashboard analítico, gestión de personal técnico y usuarios, catálogo de categorías y auditoría de reportes.
+- **Técnico:** Dashboard operativo, gestión de asignaciones, seguimiento y cambio de estados, registro de soluciones y comentarios.
+- **Cliente:** Reporte de tickets con modalidad (presencial/remoto) y equipo asociado, historial de servicios, gestión de perfil y equipos, y calificación de atenciones recibidas.
