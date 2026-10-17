@@ -27,6 +27,16 @@ UPLOAD_DIR = os.getenv(
 )
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+# Configuración SMTP y Enlaces (RF-15, RF-03)
+SMTP_HOST = os.getenv("SMTP_HOST", "")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SMTP_USER = os.getenv("SMTP_USER", "")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+SMTP_FROM = os.getenv("SMTP_FROM", os.getenv("SMTP_USER", "soporte@sistemasar.net"))
+SMTP_TLS = os.getenv("SMTP_TLS", "true").lower() in ("true", "1", "yes")
+
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173").rstrip("/")
+
 
 def validar_configuracion_produccion() -> None:
     if ENV == "production":

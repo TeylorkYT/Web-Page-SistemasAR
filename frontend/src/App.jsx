@@ -9,6 +9,7 @@ import Estado from "./pages/Estado";
 // Auth
 import Login from "./pages/auth/Login";
 import RecuperarContrasena from "./pages/auth/RecuperarContrasena";
+import RestablecerContrasena from "./pages/auth/RestablecerContrasena";
 import Registro from "./pages/auth/Registro";
 
 // Cliente
@@ -43,6 +44,7 @@ export default function App() {
           <Route path="/dev-indice" element={<Indice />} />
           <Route path="/login" element={<Login />} />
           <Route path="/recuperar" element={<RecuperarContrasena />} />
+          <Route path="/restablecer" element={<RestablecerContrasena />} />
           <Route path="/registro" element={<Registro />} />
 
           {/* Rutas protegidas: Cliente */}

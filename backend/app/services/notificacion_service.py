@@ -3,6 +3,9 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.notificacion import Notificacion
+from app.models.ticket import Ticket
+from app.models.usuario import Usuario
+from app.services import email_service
 
 
 def notificar(
@@ -21,6 +24,22 @@ def notificar(
             leida=False,
         )
     )
+
+    try:
+        usuario = db.get(Usuario, id_usuario_destino)
+        ticket = db.get(Ticket, id_ticket)
+        if usuario and usuario.estado == "Activo" and usuario.correo_electronico:
+            titulo_tkt = ticket.titulo if ticket else f"Ticket #{id_ticket}"
+            email_service.enviar_correo_evento_ticket(
+                destinatario=usuario.correo_electronico,
+                nombre=usuario.nombre,
+                id_ticket=id_ticket,
+                titulo_ticket=titulo_tkt,
+                evento=tipo,
+                detalles=mensaje,
+            )
+    except Exception:
+        pass
 
 
 def listar_notificaciones(db: Session, id_usuario: int) -> list[Notificacion]:
