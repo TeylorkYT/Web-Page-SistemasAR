@@ -34,3 +34,11 @@ class PerfilOut(BaseModel):
     telefono: str | None = None
     direccion: str | None = None
     area_departamento: str | None = None
+
+
+class PerfilActualizarIn(BaseModel):
+    nombre: str | None = None
+    apellido: str | None = None
+    telefono: str | None = None
+    direccion: str | None = None
+    area_departamento: str | None = None

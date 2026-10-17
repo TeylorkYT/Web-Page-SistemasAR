@@ -24,9 +24,9 @@ Son 20 vistas en total. Cada persona revisa el bloque que le toca, y ninguno rev
 | Vidal | Vistas del técnico | Cristian |
 | Cristian | Vistas transversales | Jaider |
 | Magleony | Vistas del administrador 1 a 4: Dashboard general, Gestión de usuarios, Asignación de técnico a ticket, Gestión de categorías | Teylork |
-| Jaider | Autenticación y vistas del administrador 5 a 7: Gestión de inventario, Reportes, Calificaciones recibidas | Magleony y Teylork |
+| Jaider | Autenticación y vistas del administrador: Reportes, Calificaciones recibidas | Magleony y Teylork |
 
-Nota: el listado exacto de vistas de cada bloque se confirma con las rutas que dejó Cristian en el frontend, y cada tester escribe en su plantilla el nombre y la ruta de cada vista que le tocó. Si una vista de la lista no existe en el repositorio (por ejemplo Gestión de inventario, que el Documento Definitivo v2.0 ya no incluye como módulo), se anota como hallazgo para decidir si se quita de los mockups o se deja.
+Nota: el listado exacto de vistas de cada bloque se confirma con las rutas activas en el frontend (18 vistas activas en total), tras excluir del alcance el módulo de inventario según el Documento Definitivo v2.0.
 
 ## 4. Preparación antes de probar
 
