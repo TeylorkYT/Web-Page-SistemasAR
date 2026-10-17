@@ -21,6 +21,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Layout from "../../components/Layout";
+import { useAuth } from "../../context/AuthContext";
 import {
   obtenerTicketsPendientes,
   obtenerTecnicosParaAsignar,
@@ -30,6 +31,7 @@ import "./AsignarTecnico.css";
 
 export default function AsignarTecnico() {
   const { id: paramId } = useParams();
+  const { sesion } = useAuth();
 
   // Estados de datos
   const [tickets, setTickets] = useState([]);
@@ -165,7 +167,7 @@ export default function AsignarTecnico() {
     <Layout
       rol="administrador"
       itemActivo="asignacion"
-      nombreUsuario="Carlos Administrador"
+      nombreUsuario={sesion?.nombre || "Administrador"}
     >
       <div className="asignar-pagina">
         <header className="asignar-header-principal">

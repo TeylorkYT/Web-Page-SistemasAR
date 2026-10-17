@@ -369,18 +369,9 @@ export default function Login() {
             color: "var(--color-texto-secundario, #64748b)",
           }}
         >
-          <div>
-            ¿Cliente nuevo?{" "}
-            <Link
-              to="/registro"
-              style={{
-                color: "var(--color-primario, #0a369d)",
-                fontWeight: "600",
-                textDecoration: "none",
-              }}
-            >
-              Regístrate
-            </Link>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#475569" }}>
+            <span>🏢</span>
+            <span>¿Nuevo cliente? <strong>Solicita tu cuenta al administrador</strong></span>
           </div>
 
           <button

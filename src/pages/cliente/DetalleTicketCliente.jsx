@@ -110,8 +110,8 @@ export default function DetalleTicketCliente() {
 
   const colorEstado = COLOR_ESTADO[ticket.estado] || {};
   const colorPrioridad = COLOR_PRIORIDAD[ticket.prioridad] || '#64748b';
-  const puedeCalificar = ticket.estado === 'Resuelto';
   const yaCalificado = Boolean(ticket.calificacion);
+  const puedeCalificar = (ticket.estado === 'Resuelto' || ticket.estado === 'Cerrado') && !yaCalificado;
 
   return (
     <Layout rol="cliente" itemActivo="mis-tickets" nombreUsuario={sesion?.nombre}>
@@ -251,26 +251,57 @@ export default function DetalleTicketCliente() {
 
           {/* Comentarios con el técnico */}
           <div className="detalle-ticket-tarjeta">
-            <h2 className="detalle-ticket-seccion">Mensajes y Comentarios</h2>
+            <h2 className="detalle-ticket-seccion">💬 Chat con el Técnico Asignado</h2>
+            <p style={{ margin: "0 0 14px", fontSize: "13px", color: "#64748b" }}>
+              Comunícate de forma directa con el área técnica encargada de tu caso.
+            </p>
             {(!ticket.comentarios || ticket.comentarios.length === 0) ? (
-              <p style={{ color: '#64748b', fontSize: '14px', textAlign: 'center', margin: '14px 0' }}>
-                No hay comentarios aún en este ticket.
+              <p style={{ color: '#64748b', fontSize: '14px', textAlign: 'center', margin: '20px 0', padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
+                No hay mensajes aún en este ticket. Si tienes dudas o información adicional, puedes escribir abajo.
               </p>
             ) : (
               <div className="detalle-ticket-comentarios-lista">
-                {ticket.comentarios.map((c) => (
-                  <div key={c.id_comentario} className="detalle-ticket-comentario-item">
-                    <div className="detalle-ticket-comentario-header">
-                      <span className="detalle-ticket-comentario-autor">
-                        {c.autor || c.usuario_nombre} ({c.rolAutor || c.rol})
-                      </span>
-                      <span className="detalle-ticket-comentario-fecha">
-                        {formatearFecha(c.fecha_creacion)}
-                      </span>
+                {ticket.comentarios.map((c) => {
+                  const esTecnico = (c.rolAutor || c.rol) === 'Tecnico' || (c.rolAutor || c.rol) === 'tecnico';
+                  return (
+                    <div
+                      key={c.id_comentario}
+                      className="detalle-ticket-comentario-item"
+                      style={{
+                        backgroundColor: esTecnico ? '#eff6ff' : '#ffffff',
+                        border: esTecnico ? '1px solid #bfdbfe' : '1px solid #e2e8f0',
+                        borderRadius: '10px',
+                        padding: '12px 16px'
+                      }}
+                    >
+                      <div className="detalle-ticket-comentario-header" style={{ marginBottom: '6px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span
+                            style={{
+                              fontSize: '11px',
+                              fontWeight: 700,
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              backgroundColor: esTecnico ? '#dbeafe' : '#dcfce7',
+                              color: esTecnico ? '#1e40af' : '#166534'
+                            }}
+                          >
+                            {esTecnico ? '🛠️ Soporte Técnico' : '👤 Tú'}
+                          </span>
+                          <span className="detalle-ticket-comentario-autor" style={{ fontWeight: 700, color: '#1e293b' }}>
+                            {c.autor || c.usuario_nombre}
+                          </span>
+                        </div>
+                        <span className="detalle-ticket-comentario-fecha" style={{ fontSize: '12px', color: '#94a3b8' }}>
+                          {formatearFecha(c.fecha_creacion)}
+                        </span>
+                      </div>
+                      <p className="detalle-ticket-comentario-texto" style={{ color: '#334155', lineHeight: 1.5 }}>
+                        {c.contenido}
+                      </p>
                     </div>
-                    <p className="detalle-ticket-comentario-texto">{c.contenido}</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 

@@ -104,6 +104,16 @@ export async function actualizarCategoria(idCategoria, datos) {
   }
 }
 
+export async function eliminarCategoria(idCategoria) {
+  try {
+    const { data } = await cliente.delete(`/categorias/${idCategoria}`);
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al eliminar la categoría");
+  }
+}
+
 // ==============================================================================
 // 4. ASIGNACIÓN DE TÉCNICOS (VISTA 16)
 // ==============================================================================

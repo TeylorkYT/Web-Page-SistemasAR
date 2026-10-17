@@ -27,10 +27,22 @@ export const TECNICO_ACTUAL = {
   rol: "Tecnico"
 };
 
-/**
- * Obtiene los datos del técnico activo
- */
 export async function obtenerTecnicoActual() {
+  try {
+    const raw = localStorage.getItem("sesion");
+    if (raw) {
+      const s = JSON.parse(raw);
+      if (s && s.rol?.toLowerCase() === "tecnico") {
+        return {
+          id_usuario: s.id_usuario || 2,
+          nombre: s.nombre?.split(" ")[0] || "Técnico",
+          apellido: s.nombre?.split(" ").slice(1).join(" ") || "",
+          correo_electronico: s.correo_electronico || "tecnico@prueba.com",
+          rol: "Tecnico"
+        };
+      }
+    }
+  } catch {}
   return { ...TECNICO_ACTUAL };
 }
 
@@ -118,9 +130,9 @@ export async function cambiarEstadoTicket(idTicket, nuevoEstado, detalles = "") 
       await cliente.post(`/tickets/${idStr}/reporte`, {
         solucion_aplicada: detalles || "Solución técnica aplicada",
       });
-    } else if (nuevoEstado === "Cerrado") {
+    } else if (nuevoEstado) {
       await cliente.patch(`/tickets/${idStr}/estado`, {
-        estado_nuevo: "Cerrado",
+        estado_nuevo: nuevoEstado,
       });
     }
     const { data } = await cliente.get(`/tickets/${idStr}`);
@@ -144,9 +156,9 @@ export async function registrarAvance(idTicket, { detalles, tipoAccion: _tipoAcc
       await cliente.post(`/tickets/${idStr}/reporte`, {
         solucion_aplicada: solucion_aplicada || detalles || "Solución técnica aplicada",
       });
-    } else if (nuevoEstado === "Cerrado") {
+    } else if (nuevoEstado) {
       await cliente.patch(`/tickets/${idStr}/estado`, {
-        estado_nuevo: "Cerrado",
+        estado_nuevo: nuevoEstado,
       });
     }
     return { exito: true };
@@ -156,8 +168,23 @@ export async function registrarAvance(idTicket, { detalles, tipoAccion: _tipoAcc
   }
 }
 
+export async function comentarTicket(idTicket, { contenido, es_nota_interna = false }) {
+  const idStr = String(idTicket).replace(/^(TKT-|#)/i, "");
+  try {
+    const { data } = await cliente.post(`/tickets/${idStr}/comentarios`, {
+      contenido: contenido.trim(),
+      es_nota_interna: Boolean(es_nota_interna),
+    });
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al enviar el mensaje");
+  }
+}
+
 export {
   subirAdjunto,
   listarAdjuntos,
   descargarAdjunto,
+  comentar,
 } from "./ticketsService";

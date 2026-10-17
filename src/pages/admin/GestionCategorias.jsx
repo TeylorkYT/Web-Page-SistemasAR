@@ -21,7 +21,8 @@ import Layout from "../../components/Layout";
 import {
   obtenerCategorias,
   crearCategoria,
-  actualizarCategoria
+  actualizarCategoria,
+  eliminarCategoria
 } from "../../services/adminService";
 import "./GestionCategorias.css";
 
@@ -29,6 +30,17 @@ function IconoLapiz() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+    </svg>
+  );
+}
+
+function IconoBasura() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3 6 5 6 21 6"></polyline>
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+      <line x1="10" y1="11" x2="10" y2="17"></line>
+      <line x1="14" y1="11" x2="14" y2="17"></line>
     </svg>
   );
 }
@@ -54,6 +66,10 @@ export default function GestionCategorias() {
   const [formCategoria, setFormCategoria] = useState({ nombre_categoria: "", descripcion: "" });
   const [errorFormulario, setErrorFormulario] = useState("");
   const [guardando, setGuardando] = useState(false);
+
+  // Estados para eliminación de categoría
+  const [categoriaAEliminar, setCategoriaAEliminar] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
 
   const mostrarAlerta = (tipo, mensaje) => {
     setAlerta({ tipo, mensaje });
@@ -103,6 +119,33 @@ export default function GestionCategorias() {
     });
     setErrorFormulario("");
     setModalAbierto(true);
+  };
+
+  const solicitarEliminarCategoria = (e, cat) => {
+    if (e) e.stopPropagation();
+    setCategoriaAEliminar(cat);
+  };
+
+  const confirmarEliminarCategoria = async () => {
+    if (!categoriaAEliminar) return;
+    setEliminando(true);
+    try {
+      await eliminarCategoria(categoriaAEliminar.id_categoria);
+      setCategorias((prev) => prev.filter((c) => c.id_categoria !== categoriaAEliminar.id_categoria));
+      if (categoriaSeleccionadaId === categoriaAEliminar.id_categoria) {
+        const restantes = categorias.filter((c) => c.id_categoria !== categoriaAEliminar.id_categoria);
+        setCategoriaSeleccionadaId(restantes.length > 0 ? restantes[0].id_categoria : null);
+      }
+      mostrarAlerta("exito", `Categoría "${categoriaAEliminar.nombre_categoria}" eliminada correctamente.`);
+      if (modalAbierto && categoriaEnEdicion?.id_categoria === categoriaAEliminar.id_categoria) {
+        setModalAbierto(false);
+      }
+      setCategoriaAEliminar(null);
+    } catch (err) {
+      mostrarAlerta("error", err.message || "Error al eliminar la categoría");
+    } finally {
+      setEliminando(false);
+    }
   };
 
   const guardarCategoria = async (e) => {
@@ -231,6 +274,15 @@ export default function GestionCategorias() {
                         >
                           <IconoLapiz />
                         </button>
+                        <button
+                          type="button"
+                          className="boton-accion-icono boton-eliminar"
+                          onClick={(e) => solicitarEliminarCategoria(e, cat)}
+                          title="Eliminar categoría"
+                          aria-label={`Eliminar categoría ${cat.nombre_categoria}`}
+                        >
+                          <IconoBasura />
+                        </button>
                       </div>
                     </div>
                   );
@@ -246,15 +298,25 @@ export default function GestionCategorias() {
               <div className="columna-header">
                 <h2 className="columna-titulo">Detalle de la categoría</h2>
                 {categoriaActiva && (
-                  <button
-                    type="button"
-                    className="boton-accion-icono boton-editar"
-                    onClick={(e) => abrirModalEditarCategoria(e, categoriaActiva)}
-                    title="Editar esta categoría"
-                    style={{ border: "1px solid #cbd5e1", padding: "6px 12px", borderRadius: "6px", display: "flex", gap: "6px", alignItems: "center", fontSize: "0.85rem", background: "#fff", cursor: "pointer" }}
-                  >
-                    <IconoLapiz /> Editar
-                  </button>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button
+                      type="button"
+                      className="boton-accion-icono boton-editar"
+                      onClick={(e) => abrirModalEditarCategoria(e, categoriaActiva)}
+                      title="Editar esta categoría"
+                      style={{ border: "1px solid #cbd5e1", padding: "6px 12px", borderRadius: "6px", display: "flex", gap: "6px", alignItems: "center", fontSize: "0.85rem", background: "#fff", cursor: "pointer" }}
+                    >
+                      <IconoLapiz /> Editar
+                    </button>
+                    <button
+                      type="button"
+                      className="boton-eliminar-panel"
+                      onClick={(e) => solicitarEliminarCategoria(e, categoriaActiva)}
+                      title="Eliminar esta categoría"
+                    >
+                      <IconoBasura /> Eliminar
+                    </button>
+                  </div>
                 )}
               </div>
 
@@ -360,24 +422,97 @@ export default function GestionCategorias() {
                   </div>
                 </div>
 
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="boton-secundario"
-                    onClick={() => setModalAbierto(false)}
-                    disabled={guardando}
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    className="boton-primario"
-                    disabled={guardando}
-                  >
-                    {guardando ? "Guardando..." : categoriaEnEdicion ? "Guardar cambios" : "Crear categoría"}
-                  </button>
+                <div className="modal-footer" style={{ justifyContent: categoriaEnEdicion ? "space-between" : "flex-end" }}>
+                  {categoriaEnEdicion ? (
+                    <button
+                      type="button"
+                      className="boton-eliminar-panel"
+                      onClick={() => solicitarEliminarCategoria(null, categoriaEnEdicion)}
+                      disabled={guardando}
+                    >
+                      <IconoBasura /> Eliminar
+                    </button>
+                  ) : null}
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <button
+                      type="button"
+                      className="boton-secundario"
+                      onClick={() => setModalAbierto(false)}
+                      disabled={guardando}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="boton-primario"
+                      disabled={guardando}
+                    >
+                      {guardando ? "Guardando..." : categoriaEnEdicion ? "Guardar cambios" : "Crear categoría"}
+                    </button>
+                  </div>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de confirmación para eliminar categoría */}
+        {categoriaAEliminar && (
+          <div className="modal-overlay" role="dialog" aria-modal="true">
+            <div className="modal-contenido" style={{ maxWidth: "440px" }}>
+              <div className="modal-header">
+                <h3 className="modal-titulo" style={{ color: "#dc2626", display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span>⚠️</span> Confirmar eliminación
+                </h3>
+                <button
+                  type="button"
+                  className="modal-boton-cerrar"
+                  onClick={() => setCategoriaAEliminar(null)}
+                  aria-label="Cerrar modal"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="modal-body">
+                <p style={{ margin: 0, color: "#334155", fontSize: "0.95rem" }}>
+                  ¿Estás seguro de que deseas eliminar permanentemente la categoría:
+                </p>
+
+                <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px" }}>
+                  <div style={{ fontWeight: 700, color: "#0f172a", fontSize: "1.05rem" }}>
+                    {categoriaAEliminar.nombre_categoria}
+                  </div>
+                  {categoriaAEliminar.descripcion && (
+                    <div style={{ fontSize: "0.85rem", color: "#64748b", marginTop: "4px" }}>
+                      {categoriaAEliminar.descripcion}
+                    </div>
+                  )}
+                </div>
+
+                <p style={{ margin: 0, fontSize: "0.85rem", color: "#64748b" }}>
+                  Esta acción desvinculará esta categoría del catálogo técnico oficial.
+                </p>
+              </div>
+
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="boton-secundario"
+                  onClick={() => setCategoriaAEliminar(null)}
+                  disabled={eliminando}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  className="modal-boton-eliminar-confirmar"
+                  onClick={confirmarEliminarCategoria}
+                  disabled={eliminando}
+                >
+                  {eliminando ? "Eliminando..." : "Sí, eliminar"}
+                </button>
+              </div>
             </div>
           </div>
         )}

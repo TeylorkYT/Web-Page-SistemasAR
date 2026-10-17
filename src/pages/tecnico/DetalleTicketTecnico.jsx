@@ -16,10 +16,12 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "../../components/Layout";
 import Boton from "../../components/Boton";
+import { useAuth } from "../../context/AuthContext";
 import {
   obtenerDetalleTicket,
   cambiarEstadoTicket,
-  obtenerTecnicoActual
+  obtenerTecnicoActual,
+  comentarTicket
 } from "../../services/tecnicoService";
 import SeccionAdjuntos from "../../components/SeccionAdjuntos";
 import "./DetalleTicketTecnico.css";
@@ -27,6 +29,7 @@ import "./DetalleTicketTecnico.css";
 export default function DetalleTicketTecnico() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { sesion } = useAuth();
 
   // Estados
   const [tecnico, setTecnico] = useState(null);
@@ -38,6 +41,12 @@ export default function DetalleTicketTecnico() {
   const [estadoSeleccionado, setEstadoSeleccionado] = useState("");
   const [actualizandoEstado, setActualizandoEstado] = useState(false);
   const [mensajeExito, setMensajeExito] = useState("");
+
+  // Estados para el Chat con el Cliente
+  const [nuevoMensaje, setNuevoMensaje] = useState("");
+  const [esNotaInterna, setEsNotaInterna] = useState(false);
+  const [enviandoMensaje, setEnviandoMensaje] = useState(false);
+  const [errorMensaje, setErrorMensaje] = useState("");
 
   useEffect(() => {
     let cancelado = false;
@@ -102,15 +111,61 @@ export default function DetalleTicketTecnico() {
     }
   };
 
-  const manejarCambioMenu = (itemId) => {
-    if (itemId === "dashboard" || itemId === "tickets-asignados") {
-      navigate("/tecnico");
+  // Enviar mensaje en el chat del ticket
+  const manejarEnviarMensaje = async (e) => {
+    e.preventDefault();
+    if (!nuevoMensaje.trim() || enviandoMensaje) return;
+
+    setErrorMensaje("");
+    setEnviandoMensaje(true);
+
+    try {
+      const resp = await comentarTicket(ticket.id_ticket, {
+        contenido: nuevoMensaje.trim(),
+        es_nota_interna: esNotaInterna
+      });
+
+      const nuevoItem = {
+        id_comentario: resp?.id_comentario || Date.now(),
+        id_ticket: ticket.id_ticket,
+        contenido: nuevoMensaje.trim(),
+        autor: nombreParaMostrar,
+        rolAutor: "Tecnico",
+        es_nota_interna: esNotaInterna,
+        fecha_creacion: new Date().toISOString().replace("T", " ").substring(0, 19)
+      };
+
+      setTicket((prev) => ({
+        ...prev,
+        comentarios: [...(prev.comentarios || []), nuevoItem]
+      }));
+
+      setNuevoMensaje("");
+      setEsNotaInterna(false);
+    } catch (err) {
+      setErrorMensaje(err.message || "Error al enviar el mensaje.");
+    } finally {
+      setEnviandoMensaje(false);
     }
   };
 
+  const manejarCambioMenu = (itemId) => {
+    if (itemId === "dashboard") {
+      navigate("/tecnico");
+    } else if (itemId === "tickets-asignados") {
+      navigate("/tecnico/tickets");
+    }
+  };
+
+  const nombreParaMostrar = sesion?.nombre
+    ? `${sesion.nombre} ${sesion.apellido || ""}`.trim()
+    : tecnico
+    ? `${tecnico.nombre} ${tecnico.apellido}`
+    : "Técnico";
+
   if (cargando) {
     return (
-      <Layout rol="tecnico" itemActivo="tickets-asignados" nombreUsuario="Diana Paz">
+      <Layout rol="tecnico" itemActivo="tickets-asignados" nombreUsuario={nombreParaMostrar}>
         <div style={{ padding: "40px", textAlign: "center", color: "#64748b" }}>
           <h2>Cargando ticket #{id}...</h2>
         </div>
@@ -120,11 +175,11 @@ export default function DetalleTicketTecnico() {
 
   if (error || !ticket) {
     return (
-      <Layout rol="tecnico" itemActivo="tickets-asignados" nombreUsuario="Diana Paz">
+      <Layout rol="tecnico" itemActivo="tickets-asignados" nombreUsuario={nombreParaMostrar}>
         <div style={{ padding: "40px", textAlign: "center" }}>
           <h2 style={{ color: "#dc2626" }}>Ticket no encontrado</h2>
           <p>{error || "El ticket solicitado no existe o no tienes permisos."}</p>
-          <Boton variante="secundario" onClick={() => navigate("/tecnico")} texto="Volver al Dashboard" />
+          <Boton variante="secundario" onClick={() => navigate("/tecnico/tickets")} texto="Volver a Tickets Asignados" />
         </div>
       </Layout>
     );
@@ -134,7 +189,7 @@ export default function DetalleTicketTecnico() {
     <Layout
       rol="tecnico"
       itemActivo="tickets-asignados"
-      nombreUsuario={tecnico ? `${tecnico.nombre} ${tecnico.apellido}` : "Diana Paz"}
+      nombreUsuario={nombreParaMostrar}
       onCambiarItem={manejarCambioMenu}
     >
       <div className="detalle-ticket-contenedor">
@@ -147,7 +202,7 @@ export default function DetalleTicketTecnico() {
           <div className="detalle-ticket-acciones-header">
             <Boton
               variante="secundario"
-              onClick={() => navigate("/tecnico")}
+              onClick={() => navigate("/tecnico/tickets")}
               texto="⬅ Mis Tickets"
             />
             <Boton
@@ -282,23 +337,158 @@ export default function DetalleTicketTecnico() {
               estadoTicket={ticket.estado}
             />
 
-            {/* Comentarios de Bitácora */}
-            {ticket.comentarios && ticket.comentarios.length > 0 && (
-              <div className="detalle-card">
-                <h2 className="detalle-card-titulo">💬 Comentarios Registrados</h2>
-                {ticket.comentarios.map((c) => (
-                  <div key={c.id_comentario} className="comentario-item">
-                    <div className="comentario-autor-fila">
-                      <span className="comentario-autor">
-                        {c.autor} ({c.rolAutor})
-                      </span>
-                      <span style={{ color: "#94a3b8" }}>{c.fecha_creacion}</span>
-                    </div>
-                    <div className="comentario-texto">{c.contenido}</div>
-                  </div>
-                ))}
+            {/* 💬 Chat y Comunicación con el Cliente */}
+            <div className="detalle-card" style={{ marginTop: "20px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", borderBottom: "1px solid #f1f5f9", paddingBottom: "12px" }}>
+                <div>
+                  <h2 className="detalle-card-titulo" style={{ margin: 0, padding: 0, border: "none" }}>
+                    💬 Chat del Ticket con el Cliente
+                  </h2>
+                  <p style={{ margin: "4px 0 0", fontSize: "0.85rem", color: "#64748b" }}>
+                    Conversación directa con {ticket.cliente.nombre} {ticket.cliente.apellido}.
+                  </p>
+                </div>
+                <span style={{ fontSize: "0.8rem", padding: "4px 10px", borderRadius: "12px", backgroundColor: "#f0fdf4", color: "#166534", fontWeight: 600 }}>
+                  Canal activo
+                </span>
               </div>
-            )}
+
+              {/* Lista de mensajes */}
+              <div className="chat-mensajes-contenedor" style={{ display: "flex", flexDirection: "column", gap: "12px", maxHeight: "380px", overflowY: "auto", marginBottom: "16px", paddingRight: "4px" }}>
+                {!ticket.comentarios || ticket.comentarios.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "28px 12px", color: "#94a3b8", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px dashed #cbd5e1" }}>
+                    <span style={{ fontSize: "2rem", display: "block", marginBottom: "8px" }}>💬</span>
+                    <p style={{ margin: 0, fontSize: "0.9rem", fontWeight: 600, color: "#475569" }}>
+                      No hay mensajes en este chat aún
+                    </p>
+                    <p style={{ margin: "4px 0 0", fontSize: "0.82rem" }}>
+                      Escribe un mensaje abajo para comunicarte con el cliente o responder a sus dudas.
+                    </p>
+                  </div>
+                ) : (
+                  ticket.comentarios.map((c, idx) => {
+                    const esTecnico = (c.rolAutor || c.rol) === "Tecnico";
+                    return (
+                      <div
+                        key={c.id_comentario || idx}
+                        style={{
+                          padding: "12px 16px",
+                          borderRadius: "10px",
+                          border: c.es_nota_interna
+                            ? "1px solid #fde047"
+                            : esTecnico
+                            ? "1px solid #bfdbfe"
+                            : "1px solid #e2e8f0",
+                          backgroundColor: c.es_nota_interna
+                            ? "#fefce8"
+                            : esTecnico
+                            ? "#eff6ff"
+                            : "#ffffff",
+                          boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
+                        }}
+                      >
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <span
+                              style={{
+                                fontSize: "0.75rem",
+                                fontWeight: 700,
+                                padding: "2px 8px",
+                                borderRadius: "6px",
+                                backgroundColor: esTecnico ? "#dbeafe" : "#dcfce7",
+                                color: esTecnico ? "#1e40af" : "#166534"
+                              }}
+                            >
+                              {esTecnico ? "🛠️ Técnico" : "👤 Cliente"}
+                            </span>
+                            <span style={{ fontWeight: 700, fontSize: "0.88rem", color: "#1e293b" }}>
+                              {c.autor || c.usuario_nombre || "Usuario"}
+                            </span>
+                            {c.es_nota_interna && (
+                              <span style={{ fontSize: "0.75rem", padding: "2px 6px", borderRadius: "4px", backgroundColor: "#fef08a", color: "#854d0e", fontWeight: 600 }}>
+                                🔒 Nota interna
+                              </span>
+                            )}
+                          </div>
+                          <span style={{ fontSize: "0.78rem", color: "#94a3b8" }}>
+                            {c.fecha_creacion}
+                          </span>
+                        </div>
+                        <p style={{ margin: 0, fontSize: "0.9rem", color: "#334155", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
+                          {c.contenido}
+                        </p>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Formulario de envío */}
+              {ticket.estado !== "Cerrado" ? (
+                <form onSubmit={manejarEnviarMensaje} style={{ borderTop: "1px solid #f1f5f9", paddingTop: "14px" }}>
+                  <textarea
+                    rows={3}
+                    placeholder={`Escribe un mensaje para ${ticket.cliente.nombre}...`}
+                    value={nuevoMensaje}
+                    onChange={(e) => setNuevoMensaje(e.target.value)}
+                    disabled={enviandoMensaje}
+                    style={{
+                      width: "100%",
+                      padding: "10px 14px",
+                      borderRadius: "8px",
+                      border: "1px solid #cbd5e1",
+                      fontSize: "0.9rem",
+                      fontFamily: "inherit",
+                      resize: "vertical",
+                      boxSizing: "border-box",
+                      outline: "none"
+                    }}
+                  />
+
+                  {errorMensaje && (
+                    <p style={{ color: "#dc2626", fontSize: "0.85rem", margin: "6px 0 0" }}>
+                      {errorMensaje}
+                    </p>
+                  )}
+
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "10px", flexWrap: "wrap", gap: "10px" }}>
+                    <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.85rem", color: "#64748b", cursor: "pointer" }}>
+                      <input
+                        type="checkbox"
+                        checked={esNotaInterna}
+                        onChange={(e) => setEsNotaInterna(e.target.checked)}
+                      />
+                      <span>Nota interna (invisible para el cliente)</span>
+                    </label>
+
+                    <button
+                      type="submit"
+                      disabled={enviandoMensaje || !nuevoMensaje.trim()}
+                      style={{
+                        padding: "8px 18px",
+                        backgroundColor: esNotaInterna ? "#854d0e" : "var(--color-primario, #0a369d)",
+                        color: "#ffffff",
+                        border: "none",
+                        borderRadius: "8px",
+                        fontWeight: 600,
+                        fontSize: "0.88rem",
+                        cursor: enviandoMensaje || !nuevoMensaje.trim() ? "not-allowed" : "pointer",
+                        opacity: enviandoMensaje || !nuevoMensaje.trim() ? 0.6 : 1,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px"
+                      }}
+                    >
+                      {enviandoMensaje ? "Enviando..." : esNotaInterna ? "🔒 Guardar nota interna" : "💬 Enviar mensaje"}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div style={{ padding: "10px 14px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", color: "#64748b", fontSize: "0.85rem", textAlign: "center" }}>
+                  🔒 Este ticket se encuentra cerrado. No se admiten nuevos mensajes.
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Columna Derecha: Cliente, Equipo y Metadatos */}

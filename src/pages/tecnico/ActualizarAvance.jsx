@@ -16,6 +16,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "../../components/Layout";
 import Boton from "../../components/Boton";
+import { useAuth } from "../../context/AuthContext";
 import {
   obtenerDetalleTicket,
   registrarAvance,
@@ -26,6 +27,7 @@ import "./ActualizarAvance.css";
 export default function ActualizarAvance() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { sesion } = useAuth();
 
   // Estados
   const [tecnico, setTecnico] = useState(null);
@@ -107,17 +109,25 @@ export default function ActualizarAvance() {
   };
 
   const manejarCambioMenu = (itemId) => {
-    if (itemId === "dashboard" || itemId === "tickets-asignados") {
+    if (itemId === "dashboard") {
       navigate("/tecnico");
+    } else if (itemId === "tickets-asignados") {
+      navigate("/tecnico/tickets");
     }
   };
+
+  const nombreParaMostrar = sesion?.nombre
+    ? `${sesion.nombre} ${sesion.apellido || ""}`.trim()
+    : tecnico
+    ? `${tecnico.nombre} ${tecnico.apellido}`
+    : "Técnico";
 
   if (cargandoTicket) {
     return (
       <Layout
         rol="tecnico"
         itemActivo="tickets-asignados"
-        nombreUsuario={tecnico ? `${tecnico.nombre} ${tecnico.apellido}` : "Diana Paz"}
+        nombreUsuario={nombreParaMostrar}
         onCambiarItem={manejarCambioMenu}
       >
         <div style={{ textAlign: "center", padding: "50px 20px", color: "#64748b" }}>
@@ -131,7 +141,7 @@ export default function ActualizarAvance() {
     <Layout
       rol="tecnico"
       itemActivo="tickets-asignados"
-      nombreUsuario={tecnico ? `${tecnico.nombre} ${tecnico.apellido}` : "Diana Paz"}
+      nombreUsuario={nombreParaMostrar}
       onCambiarItem={manejarCambioMenu}
     >
       <div className="avance-tecnico-contenedor">

@@ -24,3 +24,13 @@ export async function actualizarUsuario(idUsuario, datos) {
     throw new Error(typeof detalle === "string" ? detalle : "Error al actualizar el usuario");
   }
 }
+
+export async function eliminarUsuario(idUsuario) {
+  try {
+    const { data } = await cliente.delete(`/usuarios/${idUsuario}`);
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al eliminar el usuario");
+  }
+}

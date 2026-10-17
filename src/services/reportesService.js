@@ -32,6 +32,21 @@ export async function marcarNotificacionLeida(idNotificacion) {
     return data;
 }
 
+export async function marcarTodasNotificacionesLeidas() {
+    const { data } = await cliente.patch("/notificaciones/todas-leidas");
+    return data;
+}
+
+export async function eliminarNotificacion(idNotificacion) {
+    const { data } = await cliente.delete(`/notificaciones/${idNotificacion}`);
+    return data;
+}
+
+export async function eliminarTodasNotificaciones() {
+    const { data } = await cliente.delete("/notificaciones");
+    return data;
+}
+
 export async function exportarReporte(tipoInforme, formato = "excel", { desde, hasta } = {}) {
     const params = { formato };
     if (desde) params.desde = desde;

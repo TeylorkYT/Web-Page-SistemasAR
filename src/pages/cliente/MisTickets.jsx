@@ -141,13 +141,31 @@ export default function MisTickets() {
                     </td>
                     <td style={{ fontSize: '13px', color: '#64748b' }}>{formatearFecha(t.fecha_creacion)}</td>
                     <td>
-                      <button
-                        id={`ver-ticket-${t.id_ticket}`}
-                        className="mis-tickets-btn-ver"
-                        onClick={() => navigate(`/cliente/tickets/${t.id_ticket}`)}
-                      >
-                        Ver
-                      </button>
+                      <div style={{ display: 'flex', gap: '6px' }}>
+                        <button
+                          id={`ver-ticket-${t.id_ticket}`}
+                          className="mis-tickets-btn-ver"
+                          onClick={() => navigate(`/cliente/tickets/${t.id_ticket}`)}
+                        >
+                          Ver
+                        </button>
+                        {(t.estado === 'Resuelto' || t.estado === 'Cerrado') && !t.calificacion && (
+                          <button
+                            id={`calificar-ticket-${t.id_ticket}`}
+                            className="mis-tickets-btn-ver"
+                            style={{
+                              backgroundColor: '#fefce8',
+                              color: '#854d0e',
+                              borderColor: '#fde047',
+                              fontWeight: 600
+                            }}
+                            onClick={() => navigate(`/cliente/tickets/${t.id_ticket}/calificar`)}
+                            title="Calificar servicio recibido"
+                          >
+                            ★ Calificar
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );

@@ -699,6 +699,18 @@ export async function despacharPeticionMock(config) {
     }
   }
 
+  if (matchCategoriaId && metodo === "delete") {
+    const catId = Number(matchCategoriaId[1]);
+    const idx = db.categorias.findIndex((item) => item.id_categoria === catId);
+    if (idx !== -1) {
+      const eliminada = db.categorias.splice(idx, 1)[0];
+      db.ticketCategorias = db.ticketCategorias.filter((tc) => tc.id_categoria !== catId);
+      guardarBaseDeDatos(db);
+      return { data: { mensaje: "Categoría eliminada correctamente", categoria: eliminada }, status: 200 };
+    }
+    return { data: { detail: "Categoría no encontrada" }, status: 404 };
+  }
+
   // --------------------------------------------------------------------------
   // 5. TÉCNICOS
   // --------------------------------------------------------------------------
@@ -742,6 +754,23 @@ export async function despacharPeticionMock(config) {
         estado: body.estado || "Activo"
       };
       db.usuarios.push(nuevoUsuario);
+
+      if (nuevoUsuario.rol === "Cliente" && !db.clientes.some((c) => c.id_usuario === nuevoId)) {
+        db.clientes.push({
+          id_usuario: nuevoId,
+          telefono: "3000000000",
+          direccion: "Dirección principal",
+          area_departamento: "General"
+        });
+      }
+      if (nuevoUsuario.rol === "Tecnico" && !db.tecnicos.some((t) => t.id_usuario === nuevoId)) {
+        db.tecnicos.push({
+          id_usuario: nuevoId,
+          especialidad: "Soporte General",
+          disponibilidad: "Disponible"
+        });
+      }
+
       guardarBaseDeDatos(db);
       return { data: nuevoUsuario, status: 201 };
     }
@@ -753,9 +782,31 @@ export async function despacharPeticionMock(config) {
     const u = db.usuarios.find((user) => user.id_usuario === uId);
     if (u) {
       Object.assign(u, body);
+      if (body.rol === "Tecnico" && !db.tecnicos.some((t) => t.id_usuario === uId)) {
+        db.tecnicos.push({
+          id_usuario: uId,
+          especialidad: "Soporte General",
+          disponibilidad: "Disponible"
+        });
+      }
       guardarBaseDeDatos(db);
       return { data: u, status: 200 };
     }
+  }
+
+  if (matchUsuarioId && metodo === "delete") {
+    const uId = Number(matchUsuarioId[1]);
+    const idx = db.usuarios.findIndex((user) => user.id_usuario === uId);
+    if (idx !== -1) {
+      const eliminado = db.usuarios.splice(idx, 1)[0];
+      // Desvincular de roles específicos
+      db.clientes = db.clientes.filter((c) => c.id_usuario !== uId);
+      db.tecnicos = db.tecnicos.filter((t) => t.id_usuario !== uId);
+      db.administradores = db.administradores.filter((a) => a.id_usuario !== uId);
+      guardarBaseDeDatos(db);
+      return { data: { mensaje: "Usuario eliminado correctamente", usuario: eliminado }, status: 200 };
+    }
+    return { data: { detail: "Usuario no encontrado" }, status: 404 };
   }
 
   // --------------------------------------------------------------------------
@@ -888,6 +939,20 @@ export async function despacharPeticionMock(config) {
     return { data: db.notificaciones, status: 200 };
   }
 
+  if (pathname === "/notificaciones" && metodo === "delete") {
+    db.notificaciones = [];
+    guardarBaseDeDatos(db);
+    return { data: { mensaje: "Todas las notificaciones han sido eliminadas" }, status: 200 };
+  }
+
+  if (pathname === "/notificaciones/todas-leidas" && metodo === "patch") {
+    db.notificaciones.forEach((n) => {
+      n.leida = true;
+    });
+    guardarBaseDeDatos(db);
+    return { data: { mensaje: "Todas las notificaciones marcadas como leídas" }, status: 200 };
+  }
+
   const matchNotifLeida = pathname.match(/^\/notificaciones\/(\d+)\/leida$/);
   if (matchNotifLeida && metodo === "patch") {
     const notifId = Number(matchNotifLeida[1]);
@@ -895,6 +960,18 @@ export async function despacharPeticionMock(config) {
     if (notif) notif.leida = true;
     guardarBaseDeDatos(db);
     return { data: { mensaje: "Notificación leída" }, status: 200 };
+  }
+
+  const matchNotifDelete = pathname.match(/^\/notificaciones\/(\d+)$/);
+  if (matchNotifDelete && metodo === "delete") {
+    const notifId = Number(matchNotifDelete[1]);
+    const idx = db.notificaciones.findIndex((n) => n.id_notificacion === notifId);
+    if (idx !== -1) {
+      const eliminada = db.notificaciones.splice(idx, 1)[0];
+      guardarBaseDeDatos(db);
+      return { data: { mensaje: "Notificación eliminada correctamente", notificacion: eliminada }, status: 200 };
+    }
+    return { data: { detail: "Notificación no encontrada" }, status: 404 };
   }
 
   // Fallback genérico para cualquier otro endpoint

@@ -15,11 +15,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Layout from "../../components/Layout";
+import { useAuth } from "../../context/AuthContext";
 import { obtenerMetricasDashboard } from "../../services/adminService";
 import "./DashboardAdmin.css";
 
 export default function DashboardAdmin() {
   const navigate = useNavigate();
+  const { sesion } = useAuth();
 
   // Estados de datos
   const [metricas, setMetricas] = useState({
@@ -62,8 +64,9 @@ export default function DashboardAdmin() {
   const manejarCambioItemMenu = (id) => {
     const rutas = {
       dashboard: "/admin",
+      asignacion: "/admin/asignacion",
+      tickets: "/admin/tickets",
       usuarios: "/admin/usuarios",
-      asignacion: "/admin/tickets/1/asignar",
       categorias: "/admin/categorias",
       reportes: "/admin/reportes",
       calificaciones: "/admin/calificaciones"
@@ -80,7 +83,7 @@ export default function DashboardAdmin() {
     <Layout
       rol="administrador"
       itemActivo="dashboard"
-      nombreUsuario="Marlon Monsalve"
+      nombreUsuario={sesion?.nombre || "Administrador"}
       onCambiarItem={manejarCambioItemMenu}
     >
       <div className="dashboard-admin-pagina">

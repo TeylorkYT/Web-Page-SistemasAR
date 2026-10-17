@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 const vistas = [
   { numero: 1, nombre: "Login", ruta: "/login" },
   { numero: 2, nombre: "Recuperación de contraseña", ruta: "/recuperar" },
-  { numero: 3, nombre: "Registro de nuevo cliente", ruta: "/registro" },
   { numero: 4, nombre: "Dashboard del cliente", ruta: "/cliente" },
   { numero: 5, nombre: "Crear ticket", ruta: "/cliente/tickets/nuevo" },
   { numero: 6, nombre: "Mis tickets", ruta: "/cliente/tickets" },
@@ -14,9 +13,10 @@ const vistas = [
   { numero: 11, nombre: "Detalle de ticket asignado", ruta: "/tecnico/tickets/1" },
   { numero: 12, nombre: "Actualizar avance", ruta: "/tecnico/tickets/1/avance" },
   { numero: 14, nombre: "Dashboard del administrador", ruta: "/admin" },
-  { numero: 15, nombre: "Gestión de usuarios", ruta: "/admin/usuarios" },
-  { numero: 16, nombre: "Asignación de técnico", ruta: "/admin/tickets/1/asignar" },
-  { numero: 17, nombre: "Gestión de categorías", ruta: "/admin/categorias" },
+  { numero: 15, nombre: "Asignación de técnico a tickets", ruta: "/admin/asignacion" },
+  { numero: 16, nombre: "Historial de todos los tickets", ruta: "/admin/tickets" },
+  { numero: 17, nombre: "Gestión de usuarios", ruta: "/admin/usuarios" },
+  { numero: 18, nombre: "Gestión de categorías", ruta: "/admin/categorias" },
   { numero: 19, nombre: "Reportes", ruta: "/admin/reportes" },
   { numero: 20, nombre: "Calificaciones recibidas", ruta: "/admin/calificaciones" },
 ];

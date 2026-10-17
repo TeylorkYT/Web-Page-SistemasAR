@@ -26,3 +26,13 @@ export async function actualizarCategoria(id, datos) {
     throw new Error(typeof detalle === "string" ? detalle : "Error al actualizar la categoría");
   }
 }
+
+export async function eliminarCategoria(id) {
+  try {
+    const { data } = await cliente.delete(`/categorias/${id}`);
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al eliminar la categoría");
+  }
+}
