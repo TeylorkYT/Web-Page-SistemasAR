@@ -21,6 +21,7 @@ import {
   cambiarEstadoTicket,
   obtenerTecnicoActual
 } from "../../services/tecnicoService";
+import SeccionAdjuntos from "../../components/SeccionAdjuntos";
 import "./DetalleTicketTecnico.css";
 
 export default function DetalleTicketTecnico() {
@@ -274,6 +275,12 @@ export default function DetalleTicketTecnico() {
                 )}
               </div>
             </div>
+
+            {/* Evidencias y Adjuntos */}
+            <SeccionAdjuntos
+              idTicket={ticket.id_ticket}
+              estadoTicket={ticket.estado}
+            />
 
             {/* Comentarios de Bitácora */}
             {ticket.comentarios && ticket.comentarios.length > 0 && (

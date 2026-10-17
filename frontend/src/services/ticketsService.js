@@ -155,3 +155,72 @@ export async function listarCategorias() {
   const { data } = await cliente.get("/categorias");
   return data;
 }
+
+/**
+ * Sube un archivo adjunto como evidencia a un ticket
+ * @param {number|string} idTicket
+ * @param {File} archivo
+ */
+export async function subirAdjunto(idTicket, archivo) {
+  const idStr = String(idTicket).replace(/^(TKT-|#)/i, "");
+  const formData = new FormData();
+  formData.append("archivo", archivo);
+
+  try {
+    const { data } = await cliente.post(`/tickets/${idStr}/adjuntos`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al subir el archivo adjunto");
+  }
+}
+
+/**
+ * Obtiene la lista de adjuntos de un ticket
+ * @param {number|string} idTicket
+ */
+export async function listarAdjuntos(idTicket) {
+  const idStr = String(idTicket).replace(/^(TKT-|#)/i, "");
+  try {
+    const { data } = await cliente.get(`/tickets/${idStr}/adjuntos`);
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al obtener adjuntos");
+  }
+}
+
+/**
+ * Descarga de manera segura un archivo adjunto con token de autenticación
+ * @param {number|string} idTicket
+ * @param {number|string} idAdjunto
+ * @param {string} [nombreArchivo]
+ */
+export async function descargarAdjunto(idTicket, idAdjunto, nombreArchivo = "adjunto") {
+  const idStr = String(idTicket).replace(/^(TKT-|#)/i, "");
+  try {
+    const respuesta = await cliente.get(`/tickets/${idStr}/adjuntos/${idAdjunto}/descargar`, {
+      responseType: "blob",
+    });
+
+    const tipoMime = respuesta.headers["content-type"] || "application/octet-stream";
+    const blob = new Blob([respuesta.data], { type: tipoMime });
+    const blobUrl = window.URL.createObjectURL(blob);
+
+    const enlace = document.createElement("a");
+    enlace.href = blobUrl;
+    enlace.setAttribute("download", nombreArchivo);
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+
+    window.URL.revokeObjectURL(blobUrl);
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al descargar el archivo");
+  }
+}
