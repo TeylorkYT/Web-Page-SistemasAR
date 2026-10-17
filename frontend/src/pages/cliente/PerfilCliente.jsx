@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import Layout from "../../components/Layout";
 import Boton from "../../components/Boton";
+import { useAuth } from "../../context/AuthContext";
 import { obtenerPerfilCliente, obtenerEquiposCliente } from "../../services/clienteService";
 
 export default function PerfilCliente() {
+  const { sesion } = useAuth();
   const [perfil, setPerfil] = useState(null);
   const [equipos, setEquipos] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -12,8 +14,8 @@ export default function PerfilCliente() {
     const cargarDatos = async () => {
       try {
         const [datosPerfil, datosEquipos] = await Promise.all([
-          obtenerPerfilCliente(1), // Simulamos ser Laura
-          obtenerEquiposCliente(1)
+          obtenerPerfilCliente(),
+          obtenerEquiposCliente()
         ]);
         setPerfil(datosPerfil);
         setEquipos(datosEquipos);
@@ -26,16 +28,18 @@ export default function PerfilCliente() {
     cargarDatos();
   }, []);
 
+  const nombreMostrar = perfil?.nombre ? `${perfil.nombre} ${perfil.apellido}` : sesion?.nombre;
+
   if (cargando) {
     return (
-      <Layout>
+      <Layout rol="cliente" itemActivo="perfil-equipos" nombreUsuario={nombreMostrar}>
         <div style={{ padding: "20px", textAlign: "center" }}>Cargando perfil...</div>
       </Layout>
     );
   }
 
   return (
-    <Layout>
+    <Layout rol="cliente" itemActivo="perfil-equipos" nombreUsuario={nombreMostrar}>
       <div style={{ padding: "20px", fontFamily: "var(--fuente-principal, sans-serif)", maxWidth: "1000px", margin: "0 auto" }}>
         <h1 style={{ marginBottom: "24px", color: "var(--color-texto-principal, #0f172a)" }}>
           Mi Perfil

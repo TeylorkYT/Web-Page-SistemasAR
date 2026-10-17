@@ -15,6 +15,7 @@ from app.core.security import (
     verificar_reset_token,
 )
 from app.db.database import get_db
+from app.models.cliente import Cliente
 from app.models.usuario import Usuario
 from app.schemas.auth import LoginIn, PerfilOut, RefreshIn, TokenOut
 from app.schemas.usuario import RecuperarIn, RegistroClienteIn, RestablecerIn, UsuarioOut
@@ -140,11 +141,25 @@ def refrescar(datos: RefreshIn, db: Session = Depends(get_db)):
 
 
 @router.get("/me", response_model=PerfilOut)
-def perfil(usuario: Usuario = Depends(usuario_actual)):
+def perfil(usuario: Usuario = Depends(usuario_actual), db: Session = Depends(get_db)):
+    telefono = None
+    direccion = None
+    area_departamento = None
+    if usuario.rol == "Cliente":
+        cli = db.query(Cliente).filter(Cliente.id_usuario == usuario.id_usuario).first()
+        if cli:
+            telefono = cli.telefono
+            direccion = cli.direccion
+            area_departamento = cli.area_departamento
+
     return PerfilOut(
         id_usuario=usuario.id_usuario,
         nombre=usuario.nombre,
         apellido=usuario.apellido,
         correo_electronico=usuario.correo_electronico,
         rol=usuario.rol.lower(),
+        fecha_registro=usuario.fecha_registro,
+        telefono=telefono,
+        direccion=direccion,
+        area_departamento=area_departamento,
     )
