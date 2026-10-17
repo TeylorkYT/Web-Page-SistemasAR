@@ -108,8 +108,6 @@ export default function ActualizarAvance() {
   const manejarCambioMenu = (itemId) => {
     if (itemId === "dashboard" || itemId === "tickets-asignados") {
       navigate("/tecnico");
-    } else if (itemId === "inventario-repuestos") {
-      navigate("/tecnico/inventario");
     }
   };
 
@@ -181,7 +179,6 @@ export default function ActualizarAvance() {
                 <option value="Diagnostico">Diagnóstico y Pruebas</option>
                 <option value="Reparacion">Reparación / Corrección Técnica</option>
                 <option value="Mantenimiento">Mantenimiento Preventivo / Limpieza</option>
-                <option value="Solicitud_Repuesto">Solicitud / Uso de Repuesto de Inventario</option>
                 <option value="Comentario">Nota Informativa / Seguimiento</option>
               </select>
             </div>

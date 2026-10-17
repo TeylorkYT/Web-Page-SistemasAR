@@ -6,8 +6,8 @@
  * 
  * Descripción:
  * Layout maestro que soporta los 3 roles del sistema según los Mockups:
- * 1. Administrador (Panel de Administrador: usuarios, inventario, reportes, etc.)
- * 2. Técnico (PANEL TÉCNICO: dashboard, tickets asignados, inventario, buscador)
+ * 1. Administrador (Panel de Administrador: usuarios, categorías, reportes, etc.)
+ * 2. Técnico (PANEL TÉCNICO: dashboard, tickets asignados, buscador)
  * 3. Cliente (Portal del Cliente: dashboard, crear ticket, mis tickets, equipos)
  * ==============================================================================
  */

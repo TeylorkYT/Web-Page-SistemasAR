@@ -8,7 +8,6 @@
  * - Vista 10: Dashboard del técnico (tickets asignados, métricas de trabajo)
  * - Vista 11: Detalle del ticket asignado (información completa y cambio de estado)
  * - Vista 12: Actualizar avance (registro en el historial y bitácora del ticket)
- * - Vista 13: Consulta de inventario / repuestos disponibles (solo lectura)
  *
  * Cumple con las reglas del Daily 2:
  * 1. Funciones async que simulan llamadas al backend.

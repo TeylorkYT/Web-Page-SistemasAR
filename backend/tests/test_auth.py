@@ -101,3 +101,27 @@ def test_refresh_token_valido_e_invalido(client):
     )
     assert resp_invalido.status_code == 401
     assert resp_invalido.json() == {"detail": "Refresh token inválido o vencido"}
+
+
+def test_actualizar_perfil_me(client):
+    login_resp = client.post(
+        "/api/v1/auth/login",
+        json={"correo_electronico": "cliente@prueba.com", "contrasena": "Prueba123*"},
+    )
+    assert login_resp.status_code == 200
+    token = login_resp.json()["access_token"]
+
+    resp_update = client.put(
+        "/api/v1/auth/me",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "telefono": "3009998877",
+            "direccion": "Calle 100 # 50-20",
+            "area_departamento": "Finanzas",
+        },
+    )
+    assert resp_update.status_code == 200
+    datos = resp_update.json()
+    assert datos["telefono"] == "3009998877"
+    assert datos["direccion"] == "Calle 100 # 50-20"
+    assert datos["area_departamento"] == "Finanzas"
