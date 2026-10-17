@@ -20,7 +20,7 @@ class Ticket(Base):
         server_default="Presencial",
     )
     fecha_creacion: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now()
+        DateTime, default=datetime.now, server_default=func.now()
     )
     fecha_resolucion: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     fecha_cierre: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
