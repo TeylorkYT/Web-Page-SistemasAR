@@ -265,7 +265,7 @@ export default function Layout({
 
   useEffect(() => {
     let cancelado = false;
-    if (sesion?.access_token || localStorage.getItem("sesion")) {
+    if (localStorage.getItem("token")) {
       obtenerNotificaciones()
         .then((data) => {
           if (!cancelado) setNotificaciones(data || []);
@@ -275,7 +275,7 @@ export default function Layout({
     return () => {
       cancelado = true;
     };
-  }, [location.pathname, sesion]);
+  }, [location.pathname]);
 
   const noLeidas = notificaciones.filter((n) => !n.leida).length;
 

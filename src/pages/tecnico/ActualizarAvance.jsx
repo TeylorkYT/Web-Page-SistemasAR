@@ -30,7 +30,6 @@ export default function ActualizarAvance() {
   // Estados
   const [tecnico, setTecnico] = useState(null);
   const [ticket, setTicket] = useState(null);
-  const [cargandoTicket, setCargandoTicket] = useState(true);
 
   // Campos de formulario
   const [tipoAccion, setTipoAccion] = useState("Reparacion");
@@ -111,21 +110,6 @@ export default function ActualizarAvance() {
       navigate("/tecnico");
     }
   };
-
-  if (cargandoTicket) {
-    return (
-      <Layout
-        rol="tecnico"
-        itemActivo="tickets-asignados"
-        nombreUsuario={tecnico ? `${tecnico.nombre} ${tecnico.apellido}` : "Diana Paz"}
-        onCambiarItem={manejarCambioMenu}
-      >
-        <div style={{ textAlign: "center", padding: "50px 20px", color: "#64748b" }}>
-          Cargando información del ticket...
-        </div>
-      </Layout>
-    );
-  }
 
   return (
     <Layout

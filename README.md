@@ -52,22 +52,6 @@ Frontend web para el Sistema de Gestión de Tickets de Soporte Técnico **Sistem
 
 ---
 
-## 🔑 Credenciales de Acceso Rápido (Modo Demostración)
-
-La pantalla de inicio de sesión (`/login`) incluye tarjetas interactivas de **1-clic** para ingresar de inmediato con cualquiera de los tres roles oficiales:
-
-| Rol | Usuario de Prueba | Contraseña | Capacidades Principales |
-| :--- | :--- | :--- | :--- |
-| 👑 **Administrador** | `admin@prueba.com` | `Prueba123*` | Gestión de usuarios, categorías/servicios, monitoreo de técnicos y reportes. |
-| 🛠️ **Técnico** | `tecnico@prueba.com` | `Prueba123*` | Tickets asignados, registro de notas internas, solución y actualización de avance. |
-| 👤 **Cliente** | `cliente@prueba.com` | `Prueba123*` | Creación de tickets con modalidad y equipo, portal de mis tickets y calificaciones. |
-
-> [!TIP]
-> **Modo Autónomo con Datos Simulados v2.0:**
-> El frontend cuenta con un motor autónomo (`mockDataStore.js`) con soporte de persistencia en `localStorage`. Todas las vistas, listados, filtros, creación de tickets, comentarios y perfiles funcionan fluidamente con datos realistas basados en el diseño relacional oficial, sin necesidad de dependencias externas.
-
----
-
 ## 📂 Estructura del Proyecto
 
 ```text

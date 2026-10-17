@@ -1,6 +1,5 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { obtenerRutaPorRol } from "./rutaPorRol";
 
 /**
  * Redirección inteligente de raíz (/) y rutas no encontradas (*) según la sesión activa.
@@ -14,6 +13,10 @@ export default function RedireccionRaiz() {
     return <Navigate to="/login" replace />;
   }
 
-  const destino = obtenerRutaPorRol(sesion.rol);
-  return <Navigate to={destino} replace />;
+  const rol = (sesion.rol || "").toLowerCase();
+  if (rol === "cliente") return <Navigate to="/cliente" replace />;
+  if (rol === "tecnico") return <Navigate to="/tecnico" replace />;
+  if (rol === "administrador") return <Navigate to="/admin" replace />;
+
+  return <Navigate to="/login" replace />;
 }
