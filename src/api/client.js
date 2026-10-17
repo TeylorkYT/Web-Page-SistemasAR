@@ -1,7 +1,11 @@
 import axios from "axios";
 import { API_URL } from "../services/api";
+import { despacharPeticionMock } from "./mockDataStore";
 
-export const cliente = axios.create({ baseURL: `${API_URL}/api/v1` });
+export const cliente = axios.create({
+  baseURL: `${API_URL}/api/v1`,
+  timeout: 2000,
+});
 
 cliente.interceptors.request.use((config) => {
   try {
@@ -22,6 +26,24 @@ cliente.interceptors.response.use(
   (respuesta) => respuesta,
   async (error) => {
     const original = error.config;
+
+    // Si el backend no está disponible (servidor no encendido, Network Error, ECONNREFUSED)
+    // despachamos transparentemente la petición mediante el motor de datos simulados
+    if (
+      !error.response ||
+      error.code === "ERR_NETWORK" ||
+      error.message?.includes("Network Error") ||
+      error.code === "ECONNABORTED" ||
+      [502, 503, 504].includes(error.response?.status)
+    ) {
+      try {
+        const respuestaMock = await despacharPeticionMock(original);
+        return respuestaMock;
+      } catch (mockError) {
+        return Promise.reject(mockError);
+      }
+    }
+
     let sesion = null;
     try {
       const raw = localStorage.getItem("sesion");
@@ -29,6 +51,7 @@ cliente.interceptors.response.use(
     } catch {
       localStorage.removeItem("sesion");
     }
+
     const esRutaDeAuth = original?.url
       ? original.url.includes("/auth/login") ||
         original.url.includes("/auth/refresh") ||
@@ -57,7 +80,7 @@ cliente.interceptors.response.use(
         window.location.href = "/login";
       }
     }
+
     return Promise.reject(error);
   }
 );
-
