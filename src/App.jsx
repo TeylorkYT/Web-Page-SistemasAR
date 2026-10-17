@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import RutaProtegida from "./routes/RutaProtegida";
 import RedireccionRaiz from "./routes/RedireccionRaiz";
@@ -10,7 +10,6 @@ import Estado from "./pages/Estado";
 import Login from "./pages/auth/Login";
 import RecuperarContrasena from "./pages/auth/RecuperarContrasena";
 import RestablecerContrasena from "./pages/auth/RestablecerContrasena";
-import Registro from "./pages/auth/Registro";
 
 // Cliente
 import DashboardCliente from "./pages/cliente/DashboardCliente";
@@ -22,6 +21,7 @@ import PerfilCliente from "./pages/cliente/PerfilCliente";
 
 // Técnico
 import DashboardTecnico from "./pages/tecnico/DashboardTecnico";
+import TicketsAsignados from "./pages/tecnico/TicketsAsignados";
 import DetalleTicketTecnico from "./pages/tecnico/DetalleTicketTecnico";
 import ActualizarAvance from "./pages/tecnico/ActualizarAvance";
 
@@ -29,6 +29,7 @@ import ActualizarAvance from "./pages/tecnico/ActualizarAvance";
 import DashboardAdmin from "./pages/admin/DashboardAdmin";
 import GestionUsuarios from "./pages/admin/GestionUsuarios";
 import AsignarTecnico from "./pages/admin/AsignarTecnico";
+import HistorialTickets from "./pages/admin/HistorialTickets";
 import GestionCategorias from "./pages/admin/GestionCategorias";
 import Reportes from "./pages/admin/Reportes";
 import CalificacionesRecibidas from "./pages/admin/CalificacionesRecibidas";
@@ -45,7 +46,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/recuperar" element={<RecuperarContrasena />} />
           <Route path="/restablecer" element={<RestablecerContrasena />} />
-          <Route path="/registro" element={<Registro />} />
+          <Route path="/registro" element={<Navigate to="/login" replace />} />
 
           {/* Rutas protegidas: Cliente */}
           <Route element={<RutaProtegida rol="cliente" />}>
@@ -60,6 +61,7 @@ export default function App() {
           {/* Rutas protegidas: Técnico */}
           <Route element={<RutaProtegida rol="tecnico" />}>
             <Route path="/tecnico" element={<DashboardTecnico />} />
+            <Route path="/tecnico/tickets" element={<TicketsAsignados />} />
             <Route path="/tecnico/tickets/:id" element={<DetalleTicketTecnico />} />
             <Route path="/tecnico/tickets/:id/avance" element={<ActualizarAvance />} />
           </Route>
@@ -67,8 +69,11 @@ export default function App() {
           {/* Rutas protegidas: Administrador */}
           <Route element={<RutaProtegida rol="administrador" />}>
             <Route path="/admin" element={<DashboardAdmin />} />
-            <Route path="/admin/usuarios" element={<GestionUsuarios />} />
+            <Route path="/admin/asignacion" element={<AsignarTecnico />} />
+            <Route path="/admin/tickets/asignar" element={<AsignarTecnico />} />
             <Route path="/admin/tickets/:id/asignar" element={<AsignarTecnico />} />
+            <Route path="/admin/tickets" element={<HistorialTickets />} />
+            <Route path="/admin/usuarios" element={<GestionUsuarios />} />
             <Route path="/admin/categorias" element={<GestionCategorias />} />
             <Route path="/admin/reportes" element={<Reportes />} />
             <Route path="/admin/calificaciones" element={<CalificacionesRecibidas />} />
