@@ -29,7 +29,11 @@ cliente.interceptors.response.use(
     } catch {
       localStorage.removeItem("sesion");
     }
-    const esRutaDeAuth = original?.url ? original.url.includes("/auth/") : false;
+    const esRutaDeAuth = original?.url
+      ? original.url.includes("/auth/login") ||
+        original.url.includes("/auth/refresh") ||
+        original.url.includes("/auth/register")
+      : false;
 
     if (
       error.response?.status === 401 &&
