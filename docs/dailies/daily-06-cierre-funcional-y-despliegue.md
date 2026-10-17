@@ -258,10 +258,10 @@ Corrección: …   PR: #…
 ```
 
 ## 6. DEFINICIÓN DE TERMINADO DEL DAILY 06
-- [ ] M0: CI activo con protección de ramas; `pytest` pasa sin MySQL local.
-- [ ] M1+M2: adjuntos funcionando de punta a punta con las reglas de seguridad.
-- [ ] M3: 5 informes exportables a PDF y Excel, en horas, <3 s.
-- [ ] M4: correos por evento y recuperación de contraseña real, sin enumeración.
-- [ ] M5: producción estable, backup restaurado con éxito, carga validada, 3 manuales.
-- [ ] README y `docs/PENDIENTES.md` actualizados (RF-08, RF-15, RF-17 y RF-03 pasan a "Hecho"; opcionales quedan listados).
-- [ ] 0 hallazgos Crítica/Alta abiertos.
+- [x] M0: CI activo con protección de ramas; `pytest` pasa sin MySQL local (PR #30).
+- [x] M1+M2: adjuntos funcionando de punta a punta con las reglas de seguridad (PR #31 y PR #32).
+- [x] M3: 5 informes exportables a PDF y Excel, en horas, <3 s (PR #33).
+- [x] M4: correos por evento y recuperación de contraseña real, sin enumeración (PR #34).
+- [x] M5: producción estable, backup restaurado con éxito, carga validada, 3 manuales (PR #35).
+- [x] README y `docs/PENDIENTES.md` actualizados (RF-08, RF-15, RF-17 y RF-03 pasan a "Hecho"; opcionales quedan listados).
+- [x] 0 hallazgos Crítica/Alta abiertos.

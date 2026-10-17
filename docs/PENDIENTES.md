@@ -15,57 +15,49 @@ Evaluación exhaustiva de los 18 requisitos funcionales del Documento Definitivo
 | :--- | :--- | :---: | :--- |
 | **RF-01** | **Autenticación e inicio de sesión** | **Hecho** | Login con JWT (`POST /api/v1/auth/login`), emisión de access token y refresh token, rotación de tokens (`/refresh`) y consulta de identidad (`/me`). |
 | **RF-02** | **Cierre de sesión y control de acceso** | **Hecho** | Protección en frontend con `AuthContext` y rutas protegidas por rol (`RutaProtegida.jsx`). En backend, middleware de roles con `requiere_roles(...)`. |
-| **RF-03** | **Registro de clientes y recuperación** | **Parcial** | Registro completo de clientes (`POST /api/v1/auth/register`) con validación de contraseña (8 a 72 chars) y duplicidad de correo (409). Recuperación segura (`POST /api/v1/auth/recuperar`) responde mensaje estándar; el envío real por correo SMTP queda pendiente para P3. |
+| **RF-03** | **Registro de clientes y recuperación** | **Hecho** | Registro completo de clientes (`POST /api/v1/auth/register`) con validación de contraseña (8 a 72 chars) y duplicidad de correo (409). Recuperación de contraseña real con correo SMTP (`POST /api/v1/auth/recuperar`), token JWT firmado de un solo uso con huella criptográfica de contraseña (`POST /api/v1/auth/restablecer`), prevención de enumeración y cooldown en frontend. |
 | **RF-04** | **Gestión de usuarios por Administrador** | **Hecho** | CRUD completo (`GET`, `POST`, `PUT /api/v1/usuarios`), filtrado por rol y estado, actualización de contraseñas con hash bcrypt y validación que impide al admin inactivarse a sí mismo (400). Vista 15 conectada. |
 | **RF-05** | **Gestión de categorías de servicio** | **Hecho** | Endpoints `GET`, `POST`, `PUT /api/v1/categorias`. Validación de unicidad de nombre (409). Vista 17 conectada. |
 | **RF-06** | **Asignación de categorías a tickets** | **Hecho** | Tabla relacional `Ticket_Categoria` que soporta múltiples categorías por ticket en la creación y visualización. Nota: no existe inactivación de categorías debido al diseño del DDL. |
 | **RF-07** | **Registro y gestión de equipos** | **Hecho** | Endpoints `GET`, `POST`, `PUT /api/v1/equipos`. Filtrado por cliente dueño, unicidad de serial (409) y soporte para administración. Vista 9 conectada. |
-| **RF-08** | **Adjuntos de evidencia en tickets** | **Pendiente** | Subida y almacenamiento de archivos `.jpg`, `.png` y `.pdf` de hasta 5 MB (máx 3 por ticket) diferido para Prioridad 3 (P3). |
+| **RF-08** | **Adjuntos de evidencia en tickets** | **Hecho** | Subida y almacenamiento seguro de archivos `.jpg`, `.png` y `.pdf` de hasta 5 MB (máx. 3 por ticket) en `POST /api/v1/tickets/{id}/adjuntos`, listado y descarga con validación estricta de pertenencia (anti-IDOR). Componente `SeccionAdjuntos.jsx` integrado en vistas de Cliente y Técnico. |
 | **RF-09** | **Creación de tickets de soporte** | **Hecho** | Endpoint `POST /api/v1/tickets`. Requiere al menos una categoría válida y valida que el equipo pertenezca al cliente. Estado inicial `Abierto`, prioridad por defecto `Media`, evento inicial en historial. |
 | **RF-10** | **Listado y filtrado de tickets por rol** | **Hecho** | `GET /api/v1/tickets` con filtrado estricto: cliente solo ve los suyos, técnico solo los asignados, administrador ve todos con filtros por estado, prioridad y técnico. |
 | **RF-11** | **Detalle integral, historial y comentarios** | **Hecho** | `GET /api/v1/tickets/{id}`, historial ordenado cronológicamente y comentarios con regla de privacidad: los clientes nunca ven notas internas ni pueden crearlas. |
 | **RF-12** | **Asignación de técnico y prioridad** | **Hecho** | `PATCH /api/v1/tickets/{id}/asignar` por Administrador. Valida técnico activo y disponible (rechaza `Fuera_de_Servicio` con 400). Transición a `En_Proceso`. |
 | **RF-13** | **Informe técnico de solución** | **Hecho** | `POST /api/v1/tickets/{id}/reporte` ejecutado por el técnico asignado. Valida solución no vacía, crea registro en `Reporte` y pasa ticket a `Resuelto`. |
 | **RF-14** | **Calificación y cierre de tickets** | **Hecho** | `POST /api/v1/tickets/{id}/calificacion` por el cliente (puntuación 1 a 5) o cierre directo sin calificar con `PATCH /api/v1/tickets/{id}/estado`. Transición a `Cerrado`. |
-| **RF-15** | **Notificaciones por correo electrónico (SMTP)** | **Pendiente** | Envío de correos automáticos ante eventos críticos mediante servidor SMTP diferido para Prioridad 3 (P3). |
+| **RF-15** | **Notificaciones por correo electrónico (SMTP)** | **Hecho** | Envío de correos automáticos ante eventos del ticket (apertura, asignación, comentarios, solución) y recuperación de contraseñas mediante servidor SMTP configurable con `BackgroundTasks` y 3 plantillas HTML responsivas. Tolerante a fallos si el SMTP no está configurado. |
 | **RF-16** | **Notificaciones internas en plataforma** | **Hecho** | Modelo `Notificacion`, servicio `notificar` y endpoints `GET /api/v1/notificaciones`, `PATCH .../leida`. Disparos automáticos en creación, asignación, comentarios, resolución, cierre y alertas de baja calificación ($\le$ 2 estrellas). Campana interactiva en `Layout.jsx`. |
-| **RF-17** | **Reportes estadísticos y métricas** | **Parcial** | Servicio `reporte_service.py` con los 5 informes agregados en JSON (`por_agente`, `por_prioridad`, `tiempos_resolucion`, `estado_general`, `incidencias_area_categoria`) y dashboard del administrador conectado. Exportación a PDF y Excel pendiente para P3. |
+| **RF-17** | **Reportes estadísticos y métricas** | **Hecho** | Servicio `reporte_service.py` con los 5 informes agregados en JSON y servicio `exportacion_service.py` para exportar a PDF (`reportlab`) y Excel (`openpyxl`) con sanitización contra inyección de fórmulas. Botones integrados en vista `Reportes.jsx`. |
 | **RF-18** | **Supervisión de calificaciones y feedback** | **Hecho** | `GET /api/v1/calificaciones` con filtros por técnico, puntuación y rango de fechas. Vista 20 (`CalificacionesRecibidas.jsx`) conectada a la API real. |
 
 ---
 
-## 2. Lista de Pendientes por Prioridad
+## 2. Estado de Cierre y Módulos Completados (Daily 06)
 
-### 2.1 Prioridad 3 (P3 - Mejoras funcionales pendientes)
-1. **Adjuntos de evidencia en tickets (RF-08):**
-   - Endpoint `POST /api/v1/tickets/{id}/adjuntos`.
-   - Soporte para multipart/form-data con validación de MIME types (`image/jpeg`, `image/png`, `application/pdf`) y límite de 5 MB.
-   - Restricción de máximo 3 adjuntos por ticket. Almacenamiento seguro en disco o bucket con nombres sanitizados (UUID).
-2. **Servicio de correo electrónico SMTP (RF-15):**
-   - Configuración de credenciales SMTP (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`) en `.env`.
-   - Servicio asíncrono en background para envío de plantillas HTML: confirmación de registro, link de recuperación de contraseña con token temporal, y notificación de ticket resuelto.
-3. **Exportación de reportes a PDF y Excel (RF-17):**
-   - Integración de `openpyxl` para exportación de hojas de cálculo con el detalle de tickets y tiempos.
-   - Integración de `reportlab` o `weasyprint` para generación de informes ejecutivos en PDF.
-4. **Alerta de tickets estancados (> 8 horas):**
-   - Tarea programada (scheduler/cron) que evalúe tickets en estado `Abierto` por más de 8 horas hábiles sin asignación y emita alerta crítica al administrador.
-5. **Edición dinámica de disponibilidad técnica (HU-SOP-01):**
-   - Endpoint para que el técnico pueda alternar su disponibilidad entre `Disponible` y `En_Almuerzo` desde su interfaz sin intervención del administrador.
-6. **Tablero Kanban interactivo:**
-   - Tablero arrastrable con drag-and-drop para mover tickets entre estados respetando las reglas de la máquina de estados.
+Todos los módulos de cierre funcional y despliegue del **Daily 06** fueron completados con éxito:
 
-### 2.2 Tareas fuera del alcance formativo (Infraestructura y Producción)
-1. **Despliegue en VPS (Producción):**
-   - Configuración de servidor Ubuntu Server 22.04 LTS.
-   - Configuración de servidor web Nginx como reverse proxy para FastAPI (puerto 8000) y archivos estáticos de React.
-   - Certificados SSL/TLS gratuitos mediante Certbot (Let's Encrypt).
-   - Daemonización y persistencia con `systemd` para Uvicorn y autoarranque tras reinicios.
-2. **Pruebas de estrés y concurrencia:**
-   - Creación de escenarios de carga con **Locust** o **k6** para validar tiempos de respuesta bajo 100 usuarios concurrentes.
-3. **Documentación final:**
-   - Manual Técnico de Arquitectura.
-   - Manual de Instalación y Despliegue en Servidor.
-   - Manual de Usuario final por rol (Administrador, Técnico, Cliente).
+- **M0 · CI Hermético y Protección de Ramas:** Tests ejecutados con SQLite en memoria y MySQL en CI independiente.
+- **M1 · Adjuntos de Evidencia (Backend - RF-08):** Subida, almacenamiento sanitizado, validación MIME y descarga anti-IDOR.
+- **M2 · Adjuntos de Evidencia (Frontend - RF-08):** Componente `SeccionAdjuntos.jsx` con drag and drop, validación de tamaño y tipo de archivo.
+- **M3 · Exportación de Reportes a PDF y Excel (RF-17):** 5 informes exportables a `.xlsx` y `.pdf` en tiempo récord (<3 s) con neutralización de fórmulas.
+- **M4 · Correo SMTP y Recuperación de Contraseña (RF-15 y RF-03):** Envío asíncrono en background, plantillas HTML y token de reset criptográfico.
+- **M5 · Despliegue en VPS, Carga y Manuales:**
+  - Configuración de Nginx (`deploy/nginx.conf`) con reverse proxy, rate limiting, SSL y SPA fallback.
+  - Servicio Systemd (`deploy/sistemasar-backend.service`) con 2 workers Uvicorn.
+  - Script de respaldos automatizados (`deploy/backup_mysql.sh`) con retención de 7 días y verificación de restauración.
+  - Script de pruebas de carga Locust (`deploy/test_carga_locust.py`) para 100 usuarios concurrentes.
+  - Manuales en `docs/manuales/`: `manual-tecnico.md`, `manual-despliegue.md` y `manual-usuario.md`.
+
+### 2.1 Tareas Opcionales para Fases Futuras
+| ID | Tarea | Descripción |
+|---|---|---|
+| **O-01** | Alerta de ticket estancado | Notificación al administrador si un ticket permanece >8h en `En_Proceso`. |
+| **O-02** | Disponibilidad dinámica del técnico | Endpoint para que el propio técnico alterne su estado (`Disponible`, `En_Almuerzo`, `Ocupado`). |
+| **O-03** | Advertencia de saturación de técnico | Alerta al administrador al asignar si el técnico ya posee 5 tickets en proceso. |
+| **O-04** | Tablero Kanban interactivo | Visualización en columnas drag-and-drop sincronizada con la API REST. |
+| **O-05** | Edición de perfil de cliente y equipos | Vista mejorada para actualizar datos personales del cliente. |
 
 ---
 

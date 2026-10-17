@@ -54,8 +54,17 @@ Web-Page-SistemasAR/
 ├── database/
 │   ├── mibasededatos.sql   # DDL estructural completo de la base de datos (14 tablas)
 │   └── datos_prueba.sql    # Datos semilla y usuarios de prueba iniciales
+├── deploy/
+│   ├── nginx.conf          # Configuración de producción Nginx (SSL, rate limiting, SPA)
+│   ├── sistemasar-backend.service # Unidad Systemd para Uvicorn (2 workers)
+│   ├── backup_mysql.sh     # Script de respaldos diarios comprimidos y rotación
+│   └── test_carga_locust.py # Suite de pruebas de carga Locust (100 usuarios)
 ├── docs/
 │   ├── dailies/            # Bitácoras de seguimiento ágil del proyecto
+│   ├── manuales/           # Manuales oficiales del sistema
+│   │   ├── manual-tecnico.md   # Arquitectura, módulos, endpoints y diccionario BD
+│   │   ├── manual-despliegue.md# Guía paso a paso de despliegue en VPS Ubuntu 22.04
+│   │   └── manual-usuario.md   # Manual de usuario final por rol (Cliente, Técnico, Admin)
 │   └── PENDIENTES.md       # Matriz de requisitos RF-01 a RF-18 y tareas de cierre
 └── README.md
 ```
@@ -168,6 +177,11 @@ Para pruebas locales y demostraciones, el sistema cuenta con cuentas preconfigur
 Para consultar el inventario detallado de los 18 requisitos funcionales (RF-01 a RF-18), las tareas diferidas a Prioridad 3 (P3) y las especificaciones de despliegue en servidor VPS, consulta el documento técnico de pendientes:
 
 👉 **[Ver Documento de Pendientes y Cierre (docs/PENDIENTES.md)](docs/PENDIENTES.md)**
+
+### 📚 Manuales Oficiales del Sistema
+- 🛠️ **[Manual Técnico de Arquitectura y Desarrollo](docs/manuales/manual-tecnico.md)**: Arquitectura cliente-servidor, catálogo de endpoints `/api/v1/*`, diccionario de datos de las 14 tablas relacionales y matriz RBAC.
+- 🚀 **[Manual de Instalación y Despliegue en VPS](docs/manuales/manual-despliegue.md)**: Configuración en Ubuntu 22.04 LTS, MySQL 8.0, Systemd, Nginx con SSL Let's Encrypt, crontab de backups y pruebas de carga.
+- 👤 **[Manual de Usuario Final por Rol](docs/manuales/manual-usuario.md)**: Guía práctica ilustrada para Clientes, Técnicos y Administradores (flujo de tickets, adjuntos, recuperación de contraseña y reportes).
 
 ---
 
