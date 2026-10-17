@@ -519,6 +519,100 @@ export async function despacharPeticionMock(config) {
     return { data: nuevaCal, status: 201 };
   }
 
+  // Reporte de solución técnica (Técnico resuelve ticket)
+  const matchReporte = pathname.match(/^\/tickets\/(\d+)\/reporte$/);
+  if (matchReporte && metodo === "post") {
+    const ticketId = Number(matchReporte[1]);
+    const t = db.tickets.find((tick) => tick.id_ticket === ticketId);
+    const usuarioActual = obtenerUsuarioActual();
+
+    const nuevoReporte = {
+      id_reporte: db.reportes.length + 1,
+      id_ticket: ticketId,
+      id_tecnico: usuarioActual?.id_usuario || t?.id_tecnico || 2,
+      solucion_aplicada: body.solucion_aplicada || "Solución técnica aplicada exitosamente.",
+      fecha_reporte: new Date().toISOString().replace("T", " ").substring(0, 19),
+      estado: "Aprobado"
+    };
+
+    // Actualizar o añadir reporte
+    const idxRep = db.reportes.findIndex((r) => r.id_ticket === ticketId);
+    if (idxRep >= 0) {
+      db.reportes[idxRep] = nuevoReporte;
+    } else {
+      db.reportes.push(nuevoReporte);
+    }
+
+    if (t) {
+      t.estado = "Resuelto";
+      t.fecha_resolucion = nuevoReporte.fecha_reporte;
+
+      db.historial.push({
+        id_historial: db.historial.length + 1,
+        id_ticket: ticketId,
+        tipo_accion: "Resolucion",
+        estado_anterior: "En_Proceso",
+        estado_nuevo: "Resuelto",
+        fecha_accion: nuevoReporte.fecha_reporte,
+        id_usuario: nuevoReporte.id_tecnico,
+        detalles: nuevoReporte.solucion_aplicada
+      });
+    }
+
+    guardarBaseDeDatos(db);
+    return { data: nuevoReporte, status: 201 };
+  }
+
+  // Archivos adjuntos de tickets
+  const matchAdjuntos = pathname.match(/^\/tickets\/(\d+)\/adjuntos$/);
+  if (matchAdjuntos) {
+    const ticketId = Number(matchAdjuntos[1]);
+    if (metodo === "get") {
+      const items = db.adjuntos.filter((a) => a.id_ticket === ticketId);
+      return { data: items, status: 200 };
+    }
+    if (metodo === "post") {
+      const usuarioActual = obtenerUsuarioActual();
+      let nombreArch = "evidencia_adjunta.png";
+      let tipoMime = "image/png";
+      let tamano = 102400;
+
+      if (body instanceof FormData) {
+        const file = body.get("archivo");
+        if (file) {
+          nombreArch = file.name || nombreArch;
+          tipoMime = file.type || tipoMime;
+          tamano = file.size || tamano;
+        }
+      }
+
+      const nuevoAdj = {
+        id_adjunto: db.adjuntos.length + 1,
+        id_ticket: ticketId,
+        id_usuario: usuarioActual?.id_usuario || 5,
+        nombre_archivo: nombreArch,
+        ruta_url: `/uploads/evidencias/${nombreArch}`,
+        tipo_mime: tipoMime,
+        tamano_bytes: tamano,
+        fecha_subida: new Date().toISOString().replace("T", " ").substring(0, 19)
+      };
+
+      db.adjuntos.push(nuevoAdj);
+      guardarBaseDeDatos(db);
+      return { data: nuevoAdj, status: 201 };
+    }
+  }
+
+  // Descargar archivo adjunto
+  const matchDescargarAdj = pathname.match(/^\/tickets\/(\d+)\/adjuntos\/(\d+)\/descargar$/);
+  if (matchDescargarAdj && metodo === "get") {
+    const adjId = Number(matchDescargarAdj[2]);
+    const adj = db.adjuntos.find((a) => a.id_adjunto === adjId);
+    const contenido = `Evidencia simulada de Sistemas AR\nArchivo: ${adj ? adj.nombre_archivo : "adjunto.txt"}\nFecha: ${new Date().toISOString()}`;
+    const blob = new Blob([contenido], { type: "text/plain" });
+    return { data: blob, status: 200 };
+  }
+
   // --------------------------------------------------------------------------
   // 3. EQUIPOS
   // --------------------------------------------------------------------------
@@ -689,9 +783,55 @@ export async function despacharPeticionMock(config) {
     };
   }
 
+  // Exportación de reportes (Excel / PDF)
+  const matchExportar = pathname.match(/^\/reportes\/([^/]+)\/exportar$/);
+  if (matchExportar && metodo === "get") {
+    const tipoInforme = matchExportar[1];
+    const formato = (params.formato || "excel").toLowerCase();
+    const esExcel = formato === "excel" || formato === "xlsx";
+
+    // Generar contenido CSV / Texto estructurado para la descarga
+    const lineas = [
+      `REPORTE DE SISTEMAS AR - ${tipoInforme.toUpperCase()}`,
+      `Generado el: ${new Date().toLocaleString()}`,
+      "",
+      "ID Ticket,Titulo,Cliente,Tecnico,Estado,Prioridad,Fecha Creacion,Fecha Resolucion"
+    ];
+
+    db.tickets.forEach((t) => {
+      const cli = db.usuarios.find((u) => u.id_usuario === t.id_cliente);
+      const tec = db.usuarios.find((u) => u.id_usuario === t.id_tecnico);
+      lineas.push(
+        `#${t.id_ticket},"${t.titulo.replace(/"/g, '""')}","${cli ? cli.nombre + " " + cli.apellido : "Cliente"}","${tec ? tec.nombre + " " + tec.apellido : "Sin asignar"}",${t.estado},${t.prioridad},"${t.fecha_creacion}","${t.fecha_resolucion || "-"}"`
+      );
+    });
+
+    const contenido = lineas.join("\n");
+    const tipoMime = esExcel
+      ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      : "application/pdf";
+    const blob = new Blob([contenido], { type: tipoMime });
+
+    return { data: blob, status: 200 };
+  }
+
+  // Reportes por tipo (por_agente, incidencias_area_categoria, etc.)
+  const matchTipoReporte = pathname.match(/^\/reportes\/([^/]+)$/);
+  if (matchTipoReporte && metodo === "get") {
+    return {
+      data: {
+        tipo: matchTipoReporte[1],
+        total_tickets: db.tickets.length,
+        resueltos: db.tickets.filter((t) => t.estado === "Resuelto" || t.estado === "Cerrado").length,
+        pendientes: db.tickets.filter((t) => t.estado === "Abierto" || t.estado === "En_Proceso").length
+      },
+      status: 200
+    };
+  }
+
   // Calificaciones
   if (pathname === "/calificaciones" && metodo === "get") {
-    const lista = db.calificaciones.map((cal) => {
+    let lista = db.calificaciones.map((cal) => {
       const cli = db.usuarios.find((u) => u.id_usuario === cal.id_cliente);
       const tec = db.usuarios.find((u) => u.id_usuario === cal.id_tecnico);
       const tick = db.tickets.find((t) => t.id_ticket === cal.id_ticket);
@@ -702,11 +842,27 @@ export async function despacharPeticionMock(config) {
         puntuacion: cal.puntuacion,
         comentario: cal.comentario,
         fecha_calificacion: cal.fecha_calificacion,
+        id_tecnico: cal.id_tecnico,
+        id_cliente: cal.id_cliente,
         cliente_nombre: cli ? `${cli.nombre} ${cli.apellido}` : `Cliente #${cal.id_cliente}`,
         tecnico_nombre: tec ? `${tec.nombre} ${tec.apellido}` : `Técnico #${cal.id_tecnico}`,
         titulo_ticket: tick ? tick.titulo : `Ticket #${cal.id_ticket}`
       };
     });
+
+    if (params.id_tecnico && params.id_tecnico !== "todos") {
+      lista = lista.filter((c) => c.id_tecnico === Number(params.id_tecnico));
+    }
+    if (params.puntuacion && params.puntuacion !== "todos") {
+      lista = lista.filter((c) => c.puntuacion === Number(params.puntuacion));
+    }
+    if (params.desde) {
+      lista = lista.filter((c) => c.fecha_calificacion >= params.desde);
+    }
+    if (params.hasta) {
+      lista = lista.filter((c) => c.fecha_calificacion <= params.hasta);
+    }
+
     return { data: lista, status: 200 };
   }
 
