@@ -33,8 +33,21 @@ def test_c4_01_recuperar_respuesta_identica_anti_enumeracion(client):
 
 
 def test_c4_02_y_c4_03_flujo_completo_restablecer_e_invalidacion(client, monkeypatch):
-    # 1. Obtenemos un usuario real
-    # Simulamos el envío de correo capturando el token generado
+    # 1. Registramos un usuario dedicado para no alterar los usuarios base del seed
+    correo_test = "cliente_reset_exclusivo@prueba.com"
+    client.post(
+        "/api/v1/auth/register",
+        json={
+            "nombre": "User",
+            "apellido": "Reset",
+            "correo_electronico": correo_test,
+            "contrasena": "Prueba123*",
+            "telefono": "3001112233",
+            "direccion": "Calle Test 123",
+            "area_departamento": "Soporte",
+        },
+    )
+
     token_capturado = {}
 
     def mock_enviar_recuperacion(destinatario, nombre, token_reset):
@@ -45,7 +58,7 @@ def test_c4_02_y_c4_03_flujo_completo_restablecer_e_invalidacion(client, monkeyp
 
     resp_req = client.post(
         "/api/v1/auth/recuperar",
-        json={"correo_electronico": "cliente@prueba.com"},
+        json={"correo_electronico": correo_test},
     )
     assert resp_req.status_code == 200
     assert "token" in token_capturado
@@ -71,14 +84,14 @@ def test_c4_02_y_c4_03_flujo_completo_restablecer_e_invalidacion(client, monkeyp
     # 4. Probar login con clave anterior -> Falla 401
     resp_antigua = client.post(
         "/api/v1/auth/login",
-        json={"correo_electronico": "cliente@prueba.com", "contrasena": "Prueba123*"},
+        json={"correo_electronico": correo_test, "contrasena": "Prueba123*"},
     )
     assert resp_antigua.status_code == 401
 
     # 5. Probar login con clave nueva -> Exitoso 200
     resp_nueva = client.post(
         "/api/v1/auth/login",
-        json={"correo_electronico": "cliente@prueba.com", "contrasena": nueva_clave},
+        json={"correo_electronico": correo_test, "contrasena": nueva_clave},
     )
     assert resp_nueva.status_code == 200
     assert "access_token" in resp_nueva.json()
