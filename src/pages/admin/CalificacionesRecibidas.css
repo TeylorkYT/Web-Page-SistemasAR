@@ -91,8 +91,8 @@
 }
 
 .filtro-caja-select:focus-within {
-  border-color: #1e3a8a;
-  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.12);
+  border-color: var(--color-primario, #00bba6);
+  box-shadow: 0 0 0 3px rgba(0, 187, 166, 0.15);
 }
 
 .filtro-icono {
@@ -120,10 +120,10 @@
 }
 
 .metricas-titulo {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #475569;
-  margin-bottom: 12px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-texto-principal, #071e33);
+  margin-bottom: 14px;
 }
 
 .metricas-cards-grid {
@@ -141,26 +141,26 @@
 
 .tarjeta-satisfaccion {
   background-color: #ffffff;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 16px 20px;
+  border: 1px solid var(--color-borde, #e2e8f0);
+  border-radius: 14px;
+  padding: 18px 22px;
   display: flex;
   align-items: center;
   gap: 16px;
-  box-shadow: 0 2px 5px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 4px 14px rgba(7, 30, 51, 0.04);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .tarjeta-satisfaccion:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 6px 18px rgba(7, 30, 51, 0.08);
 }
 
 /* Iconos de las tarjetas de satisfacción */
 .icono-caja-satisfaccion {
   width: 48px;
   height: 48px;
-  border-radius: 10px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -195,7 +195,7 @@
 .satisfaccion-label {
   font-size: 0.825rem;
   color: #64748b;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .satisfaccion-valor {
@@ -205,11 +205,11 @@
 }
 
 .satisfaccion-valor .valor-verde {
-  color: #16a34a;
+  color: var(--color-primario-oscuro, #008f7e);
 }
 
 .satisfaccion-valor .valor-morado {
-  color: #6366f1;
+  color: var(--color-sidebar-fondo, #071e33);
 }
 
 .satisfaccion-valor .valor-rojo {

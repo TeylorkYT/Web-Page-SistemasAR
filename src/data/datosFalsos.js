@@ -651,7 +651,7 @@ export const calificaciones = [
   },
   {
     id_calificacion: 5,
-    id_ticket: 5,
+    id_ticket: 3,
     id_cliente: 5,
     id_tecnico: 2,
     puntuacion: 4,

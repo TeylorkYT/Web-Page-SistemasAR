@@ -51,23 +51,33 @@ export async function obtenerTecnicoActual() {
  */
 export async function obtenerTicketsTecnico() {
   const { data } = await cliente.get("/tickets");
-  return data.map((t) => ({
-    ...t,
-    codigo: `TKT-${t.id_ticket}`,
-    cliente: {
-      id_usuario: t.id_cliente,
-      nombre: (t.cliente_nombre || "").split(" ")[0] || "Cliente",
-      apellido: (t.cliente_nombre || "").split(" ").slice(1).join(" ") || "",
-      correo_electronico: t.cliente_correo || "cliente@prueba.com",
-    },
-    equipo: typeof t.equipo === "object" && t.equipo !== null ? t.equipo : {
-      tipo: "Dispositivo",
-      marca: String(t.equipo || "Hardware").split(" ")[0],
-      modelo: String(t.equipo || "").split(" ").slice(1).join(" ") || "General",
-      serial: "SN-001"
-    },
-    nombresCategorias: (t.categorias || []).map((c) => c.nombre_categoria || c),
-  }));
+  return data.map((t) => {
+    let eq = null;
+    if (t.equipo_objeto) {
+      eq = t.equipo_objeto;
+    } else if (typeof t.equipo === "object" && t.equipo !== null) {
+      eq = t.equipo;
+    } else if (t.id_equipo && t.equipo && t.equipo !== "Sin equipo asociado") {
+      eq = {
+        tipo: "Dispositivo",
+        marca: String(t.equipo || "Hardware").split(" ")[0],
+        modelo: String(t.equipo || "").split(" ").slice(1).join(" ") || "General",
+        serial: "SN-001"
+      };
+    }
+    return {
+      ...t,
+      codigo: `TKT-${t.id_ticket}`,
+      cliente: {
+        id_usuario: t.id_cliente,
+        nombre: (t.cliente_nombre || "").split(" ")[0] || "Cliente",
+        apellido: (t.cliente_nombre || "").split(" ").slice(1).join(" ") || "",
+        correo_electronico: t.cliente_correo || "cliente@prueba.com",
+      },
+      equipo: eq,
+      nombresCategorias: (t.categorias || []).map((c) => c.nombre_categoria || c),
+    };
+  });
 }
 
 export async function obtenerMetricasDashboardTecnico() {
@@ -95,6 +105,21 @@ export async function obtenerDetalleTicket(idTicket) {
   ]);
 
   const t = ticketResp.data;
+  let equipoFinal = null;
+  if (t.equipo_objeto) {
+    equipoFinal = t.equipo_objeto;
+  } else if (typeof t.equipo === "object" && t.equipo !== null) {
+    equipoFinal = t.equipo;
+  } else if (t.id_equipo && t.equipo && t.equipo !== "Sin equipo asociado") {
+    equipoFinal = {
+      tipo: "Dispositivo",
+      marca: String(t.equipo).split(" ")[0],
+      modelo: String(t.equipo).split(" ").slice(1).join(" ") || "General",
+      serial: "SN-001",
+      estado_equipo: "Operativo"
+    };
+  }
+
   return {
     ...t,
     codigo: `TKT-${t.id_ticket}`,
@@ -104,12 +129,7 @@ export async function obtenerDetalleTicket(idTicket) {
       apellido: (t.cliente_nombre || "").split(" ").slice(1).join(" ") || "",
       correo_electronico: t.cliente_correo || "cliente@prueba.com",
     },
-    equipo: typeof t.equipo === "object" && t.equipo !== null ? t.equipo : {
-      tipo: "Dispositivo",
-      marca: String(t.equipo || "Hardware").split(" ")[0],
-      modelo: String(t.equipo || "").split(" ").slice(1).join(" ") || "General",
-      serial: "SN-001"
-    },
+    equipo: equipoFinal,
     nombresCategorias: (t.categorias || []).map((c) => c.nombre_categoria || c),
     historial: histResp.data.map((h) => ({
       ...h,
@@ -121,6 +141,46 @@ export async function obtenerDetalleTicket(idTicket) {
       rolAutor: c.rol,
     })),
   };
+}
+
+/**
+ * Registrar un nuevo equipo para un cliente (opcionalmente asociándolo a un ticket)
+ */
+export async function agregarEquipoCliente(datos) {
+  try {
+    const { data } = await cliente.post("/equipos", datos);
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al registrar el equipo para el cliente");
+  }
+}
+
+/**
+ * Vincular un equipo existente al ticket
+ */
+export async function vincularEquipoTicket(idTicket, idEquipo) {
+  const idStr = String(idTicket).replace(/^(TKT-|#)/i, "");
+  try {
+    const { data } = await cliente.patch(`/tickets/${idStr}`, { id_equipo: idEquipo });
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al vincular el equipo al ticket");
+  }
+}
+
+/**
+ * Obtener todos los equipos registrados para un cliente específico
+ */
+export async function obtenerEquiposCliente(idCliente) {
+  try {
+    const { data } = await cliente.get("/equipos", { params: { id_cliente: idCliente } });
+    return data;
+  } catch (error) {
+    const detalle = error.response?.data?.detail;
+    throw new Error(typeof detalle === "string" ? detalle : "Error al obtener equipos del cliente");
+  }
 }
 
 export async function cambiarEstadoTicket(idTicket, nuevoEstado, detalles = "") {
