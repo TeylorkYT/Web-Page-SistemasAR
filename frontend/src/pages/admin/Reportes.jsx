@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import Tabla from "../../components/Tabla";
-import { generarReporte, listarTecnicos } from "../../services/reportesService";
+import { exportarReporte, generarReporte, listarTecnicos } from "../../services/reportesService";
 
 const colores = ["#1565c0", "#2e7d32", "#6a1b9a", "#c62828", "#ef6c00", "#00838f"];
 const card = { border: "1px solid #ddd", borderRadius: "10px", padding: "16px", background: "white", flex: 1 };
@@ -13,7 +13,7 @@ const columnas = [
   { titulo: "Categoría", campo: "categorias" },
   { titulo: "Cliente", campo: "cliente" },
   { titulo: "Técnico", campo: "tecnico" },
-  { titulo: "Días", campo: "dias", render: (t) => (t.dias ?? "-") },
+  { titulo: "Horas", campo: "horas", render: (t) => (t.horas ?? "-") },
 ];
 
 export default function Reportes() {
@@ -23,6 +23,8 @@ export default function Reportes() {
   const [desde, setDesde] = useState("");
   const [hasta, setHasta] = useState("");
   const [resultado, setResultado] = useState(null);
+  const [exportando, setExportando] = useState(false);
+  const [errorExportar, setErrorExportar] = useState("");
 
   useEffect(() => {
     listarTecnicos().then(setTecnicos);
@@ -32,12 +34,31 @@ export default function Reportes() {
     setResultado(await generarReporte({ idTecnico, desde, hasta }));
   }
 
+  async function manejarExportar(formato) {
+    setErrorExportar("");
+    setExportando(true);
+    try {
+      const mapaReporte = {
+        tecnico: "por_agente",
+        categoria: "incidencias_area_categoria",
+        periodo: "tiempos_resolucion",
+      };
+      const tipoInforme = mapaReporte[tipo] || "por_agente";
+      await exportarReporte(tipoInforme, formato, { desde, hasta });
+    } catch (err) {
+      setErrorExportar(err.message || "Error al exportar el reporte.");
+    } finally {
+      setExportando(false);
+    }
+  }
+
   function limpiar() {
     setTipo("tecnico");
     setIdTecnico("todos");
     setDesde("");
     setHasta("");
     setResultado(null);
+    setErrorExportar("");
   }
 
   const tecnicoElegido = tecnicos.find((t) => String(t.id_usuario) === idTecnico);
@@ -109,7 +130,7 @@ export default function Reportes() {
               <h2 style={{ color: "#2e7d32" }}>{resultado.resueltos}</h2>
             </div>
             <div style={card}>
-              <p>Tiempo promedio (días)</p>
+              <p>Tiempo promedio (horas)</p>
               <h2 style={{ color: "#6a1b9a" }}>{resultado.tiempoPromedio}</h2>
             </div>
           </div>
@@ -142,12 +163,53 @@ export default function Reportes() {
           <h3>Detalle de tickets cerrados</h3>
           <Tabla columnas={columnas} filas={resultado.detalle} mensajeVacio="No hay tickets cerrados en ese rango" />
 
-          <div style={{ marginTop: "16px", display: "flex", gap: "12px", alignItems: "center" }}>
-            <button disabled>Exportar a PDF</button>
-            <button disabled>Exportar a Excel</button>
-            <small>Exportar queda pendiente: requiere backend.</small>
+          <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
+            {errorExportar && (
+              <div style={{ color: "#b91c1c", background: "#fef2f2", padding: "8px 12px", borderRadius: "6px", fontSize: "0.88rem" }}>
+                {errorExportar}
+              </div>
+            )}
+            <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+              <button
+                type="button"
+                id="btn-exportar-pdf"
+                onClick={() => manejarExportar("pdf")}
+                disabled={exportando}
+                style={{
+                  padding: "8px 18px",
+                  backgroundColor: "#dc2626",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  fontWeight: 600,
+                  cursor: exportando ? "not-allowed" : "pointer",
+                  opacity: exportando ? 0.7 : 1,
+                }}
+              >
+                {exportando ? "Exportando…" : "📄 Exportar a PDF"}
+              </button>
+              <button
+                type="button"
+                id="btn-exportar-excel"
+                onClick={() => manejarExportar("excel")}
+                disabled={exportando}
+                style={{
+                  padding: "8px 18px",
+                  backgroundColor: "#16a34a",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  fontWeight: 600,
+                  cursor: exportando ? "not-allowed" : "pointer",
+                  opacity: exportando ? 0.7 : 1,
+                }}
+              >
+                {exportando ? "Exportando…" : "📊 Exportar a Excel"}
+              </button>
+            </div>
           </div>
         </div>
+
       )}
     </Layout>
   );
