@@ -17,7 +17,7 @@ class Comentario(Base):
         Boolean, default=False, server_default="0"
     )
     fecha_creacion: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now()
+        DateTime, default=datetime.now, server_default=func.now()
     )
     id_usuario: Mapped[int] = mapped_column(
         Integer,
