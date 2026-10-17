@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import { obtenerTicket } from '../../services/ticketsService';
+import SeccionAdjuntos from '../../components/SeccionAdjuntos';
 import './DetalleTicketCliente.css';
 
 const COLOR_ESTADO = {
@@ -104,6 +105,11 @@ export default function DetalleTicketCliente() {
 
           <h2 className="detalle-ticket-seccion" style={{ marginTop: 20 }}>Descripción</h2>
           <p className="detalle-ticket-descripcion">{ticket.descripcion}</p>
+
+          <SeccionAdjuntos
+            idTicket={ticket.id_ticket}
+            estadoTicket={ticket.estado}
+          />
         </div>
 
         {/* Historial */}

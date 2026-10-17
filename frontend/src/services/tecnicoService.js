@@ -143,3 +143,9 @@ export async function registrarAvance(idTicket, { detalles, tipoAccion: _tipoAcc
     throw new Error(typeof detalle === "string" ? detalle : "Error al registrar el avance");
   }
 }
+
+export {
+  subirAdjunto,
+  listarAdjuntos,
+  descargarAdjunto,
+} from "./ticketsService";

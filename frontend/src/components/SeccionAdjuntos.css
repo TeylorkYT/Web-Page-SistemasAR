@@ -1,0 +1,237 @@
+.seccion-adjuntos-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.seccion-adjuntos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.seccion-adjuntos-titulo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.seccion-adjuntos-subtitulo {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 4px 0 0;
+}
+
+.seccion-adjuntos-btn-subir {
+  background-color: #0284c7;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.15s ease, transform 0.05s ease;
+}
+
+.seccion-adjuntos-btn-subir:hover:not(:disabled) {
+  background-color: #0369a1;
+}
+
+.seccion-adjuntos-btn-subir:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.seccion-adjuntos-alerta {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.seccion-adjuntos-error {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.seccion-adjuntos-exito {
+  background-color: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.seccion-adjuntos-cerrar-alerta {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  color: inherit;
+  line-height: 1;
+}
+
+.seccion-adjuntos-aviso-cerrado {
+  background-color: #f8fafc;
+  color: #64748b;
+  border: 1px dashed #cbd5e1;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  margin-bottom: 14px;
+}
+
+.seccion-adjuntos-cargando {
+  padding: 24px;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.seccion-adjuntos-vacio {
+  text-align: center;
+  padding: 24px;
+  background-color: #f8fafc;
+  border: 1px dashed #e2e8f0;
+  border-radius: 8px;
+}
+
+.seccion-adjuntos-vacio-texto {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 0 0 8px;
+}
+
+.seccion-adjuntos-btn-enlace {
+  background: none;
+  border: none;
+  color: #0284c7;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.seccion-adjuntos-btn-enlace:hover {
+  color: #0369a1;
+}
+
+.seccion-adjuntos-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.seccion-adjuntos-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.seccion-adjuntos-item:hover {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.seccion-adjuntos-item-icono {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.seccion-adjuntos-item-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.seccion-adjuntos-item-nombre {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.seccion-adjuntos-item-meta {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.seccion-adjuntos-btn-descargar {
+  background-color: #ffffff;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.seccion-adjuntos-btn-descargar:hover:not(:disabled) {
+  background-color: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+}
+
+.seccion-adjuntos-btn-descargar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Soporte responsive para pantallas pequeñas (360px) */
+@media (max-width: 480px) {
+  .seccion-adjuntos-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .seccion-adjuntos-btn-subir {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .seccion-adjuntos-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .seccion-adjuntos-btn-descargar {
+    width: 100%;
+    margin-top: 6px;
+    text-align: center;
+  }
+}
