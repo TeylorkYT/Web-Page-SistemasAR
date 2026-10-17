@@ -76,7 +76,7 @@ export default function Reportes() {
   });
 
   return (
-    <Layout>
+    <Layout rol="administrador" itemActivo="reportes">
       <h1>Generación de reportes</h1>
 
       <div style={card}>
