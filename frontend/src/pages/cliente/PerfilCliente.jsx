@@ -58,13 +58,24 @@ export default function PerfilCliente() {
   });
 
   const cargarDatos = async () => {
+    setCargando(true);
     try {
-      const [datosPerfil, datosEquipos] = await Promise.all([
+      const [resultadoPerfil, resultadoEquipos] = await Promise.allSettled([
         obtenerPerfilCliente(),
         obtenerEquiposCliente(),
       ]);
-      setPerfil(datosPerfil);
-      setEquipos(datosEquipos);
+
+      if (resultadoPerfil.status === "fulfilled") {
+        setPerfil(resultadoPerfil.value);
+      } else {
+        console.error("Error al cargar perfil:", resultadoPerfil.reason);
+      }
+
+      if (resultadoEquipos.status === "fulfilled") {
+        setEquipos(resultadoEquipos.value || []);
+      } else {
+        console.error("Error al cargar equipos:", resultadoEquipos.reason);
+      }
     } catch (error) {
       console.error("Error al cargar el perfil y equipos:", error);
     } finally {
