@@ -7,6 +7,7 @@ import {
   actualizarPerfilCliente,
   obtenerEquiposCliente,
   crearEquipoCliente,
+  actualizarEquipoCliente,
 } from "../../services/clienteService";
 import "./PerfilCliente.css";
 
@@ -41,6 +42,21 @@ export default function PerfilCliente() {
     area_departamento: "General",
   });
 
+  // Estados para modal de editar equipo
+  const [modalEditarEquipoAbierto, setModalEditarEquipoAbierto] = useState(false);
+  const [equipoAEditar, setEquipoAEditar] = useState(null);
+  const [guardandoEditarEquipo, setGuardandoEditarEquipo] = useState(false);
+  const [mensajeEditarEquipo, setMensajeEditarEquipo] = useState(null);
+  const [formEditarEquipo, setFormEditarEquipo] = useState({
+    tipo: "Computador",
+    marca: "",
+    modelo: "",
+    serial: "",
+    sistema_operativo: "",
+    area_departamento: "General",
+    estado_equipo: "Operativo",
+  });
+
   const cargarDatos = async () => {
     try {
       const [datosPerfil, datosEquipos] = await Promise.all([
@@ -50,7 +66,7 @@ export default function PerfilCliente() {
       setPerfil(datosPerfil);
       setEquipos(datosEquipos);
     } catch (error) {
-      console.error("Error al cargar el perfil:", error);
+      console.error("Error al cargar el perfil y equipos:", error);
     } finally {
       setCargando(false);
     }
@@ -60,6 +76,7 @@ export default function PerfilCliente() {
     cargarDatos();
   }, []);
 
+  // --- Modal Editar Perfil ---
   const abrirModalPerfil = () => {
     setMensajePerfil(null);
     setFormPerfil({
@@ -94,7 +111,6 @@ export default function PerfilCliente() {
       });
       setPerfil(perfilActualizado);
 
-      // Si cambió el nombre, sincronizamos la sesión local
       if (sesion) {
         guardarSesion({
           ...sesion,
@@ -124,6 +140,7 @@ export default function PerfilCliente() {
     }
   };
 
+  // --- Modal Añadir Equipo ---
   const abrirModalEquipo = () => {
     setMensajeEquipo(null);
     setFormEquipo({
@@ -158,7 +175,7 @@ export default function PerfilCliente() {
         sistema_operativo: formEquipo.sistema_operativo.trim() || null,
         area_departamento: formEquipo.area_departamento.trim() || "General",
       });
-      setEquipos((prev) => [...prev, nuevoEquipo]);
+      setEquipos((prev) => [nuevoEquipo, ...prev]);
       setMensajeEquipo({
         tipo: "exito",
         texto: "¡Equipo registrado exitosamente!",
@@ -181,6 +198,71 @@ export default function PerfilCliente() {
     }
   };
 
+  // --- Modal Editar Equipo ---
+  const abrirModalEditarEquipo = (equipo) => {
+    setEquipoAEditar(equipo);
+    setMensajeEditarEquipo(null);
+    setFormEditarEquipo({
+      tipo: equipo.tipo || "Computador",
+      marca: equipo.marca || "",
+      modelo: equipo.modelo || "",
+      serial: equipo.serial || "",
+      sistema_operativo: equipo.sistema_operativo || "",
+      area_departamento: equipo.area_departamento || "General",
+      estado_equipo: equipo.estado_equipo || "Operativo",
+    });
+    setModalEditarEquipoAbierto(true);
+  };
+
+  const manejarGuardarEditarEquipo = async (e) => {
+    e.preventDefault();
+    if (!formEditarEquipo.marca.trim() || !formEditarEquipo.modelo.trim() || !formEditarEquipo.serial.trim()) {
+      setMensajeEditarEquipo({
+        tipo: "error",
+        texto: "Marca, modelo y número de serial son obligatorios.",
+      });
+      return;
+    }
+
+    setGuardandoEditarEquipo(true);
+    setMensajeEditarEquipo(null);
+    try {
+      const equipoActualizado = await actualizarEquipoCliente(equipoAEditar.id_equipo, {
+        tipo: formEditarEquipo.tipo,
+        marca: formEditarEquipo.marca.trim(),
+        modelo: formEditarEquipo.modelo.trim(),
+        serial: formEditarEquipo.serial.trim(),
+        sistema_operativo: formEditarEquipo.sistema_operativo.trim() || null,
+        area_departamento: formEditarEquipo.area_departamento.trim() || "General",
+        estado_equipo: formEditarEquipo.estado_equipo,
+      });
+
+      setEquipos((prev) =>
+        prev.map((eq) => (eq.id_equipo === equipoActualizado.id_equipo ? equipoActualizado : eq))
+      );
+
+      setMensajeEditarEquipo({
+        tipo: "exito",
+        texto: "¡Equipo actualizado correctamente!",
+      });
+
+      setTimeout(() => {
+        setModalEditarEquipoAbierto(false);
+        setMensajeEditarEquipo(null);
+      }, 1200);
+    } catch (error) {
+      console.error("Error al actualizar equipo:", error);
+      const detalle =
+        error.response?.data?.detail || "No se pudo actualizar el equipo.";
+      setMensajeEditarEquipo({
+        tipo: "error",
+        texto: typeof detalle === "string" ? detalle : "Error al actualizar el equipo.",
+      });
+    } finally {
+      setGuardandoEditarEquipo(false);
+    }
+  };
+
   const nombreMostrar = perfil?.nombre
     ? `${perfil.nombre} ${perfil.apellido}`
     : sesion?.nombre;
@@ -189,7 +271,7 @@ export default function PerfilCliente() {
     return (
       <Layout rol="cliente" itemActivo="perfil-equipos" nombreUsuario={nombreMostrar}>
         <div style={{ padding: "40px", textAlign: "center", color: "#64748b" }}>
-          Cargando perfil...
+          Cargando perfil y equipos...
         </div>
       </Layout>
     );
@@ -199,8 +281,8 @@ export default function PerfilCliente() {
     <Layout rol="cliente" itemActivo="perfil-equipos" nombreUsuario={nombreMostrar}>
       <div className="perfil-contenedor">
         <header className="perfil-header">
-          <h1>Mi Perfil</h1>
-          <p>Consulta y administra tus datos personales y los equipos asociados a tu cuenta.</p>
+          <h1>Mi Perfil y Equipos Registrados</h1>
+          <p>Consulta y administra tus datos personales y el inventario de equipos asignados a tu cuenta.</p>
         </header>
 
         <div className="perfil-grid">
@@ -240,11 +322,16 @@ export default function PerfilCliente() {
           {/* Tarjeta de Mis Equipos Registrados */}
           <section className="perfil-card">
             <div className="perfil-equipos-header">
-              <h2>Mis Equipos Registrados</h2>
+              <div>
+                <h2>Mis Equipos Registrados</h2>
+                <span style={{ fontSize: "12px", color: "#64748b" }}>
+                  {equipos.length} {equipos.length === 1 ? "equipo asociado" : "equipos asociados"}
+                </span>
+              </div>
               <Boton
                 variante="primario"
                 onClick={abrirModalEquipo}
-                estilo={{ padding: "6px 12px", fontSize: "13px" }}
+                style={{ padding: "6px 14px", fontSize: "13px" }}
               >
                 + Añadir Equipo
               </Boton>
@@ -269,19 +356,30 @@ export default function PerfilCliente() {
                         <p className="equipo-info-detalle">
                           S/N: {equipo.serial}
                           {equipo.sistema_operativo ? ` • OS: ${equipo.sistema_operativo}` : ""}
-                          {equipo.area_departamento ? ` • ${equipo.area_departamento}` : ""}
+                          {equipo.area_departamento ? ` • Ubicación: ${equipo.area_departamento}` : ""}
                         </p>
                       </div>
-                      <span className={`badge-estado-equipo ${estadoClase}`}>
-                        {equipo.estado_equipo.replace("_", " ")}
-                      </span>
+
+                      <div className="equipo-item-acciones">
+                        <span className={`badge-estado-equipo ${estadoClase}`}>
+                          {equipo.estado_equipo.replace("_", " ")}
+                        </span>
+                        <button
+                          type="button"
+                          className="btn-editar-equipo"
+                          onClick={() => abrirModalEditarEquipo(equipo)}
+                          title="Editar información de este equipo"
+                        >
+                          Editar
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
               </div>
             ) : (
               <p style={{ color: "#64748b", fontSize: "14px", textAlign: "center", padding: "30px 0" }}>
-                No tienes equipos registrados actualmente.
+                No tienes equipos registrados actualmente. Usa el botón superior para agregar tu primer equipo.
               </p>
             )}
           </section>
@@ -603,6 +701,188 @@ export default function PerfilCliente() {
                   deshabilitado={guardandoEquipo}
                 >
                   {guardandoEquipo ? "Guardando..." : "Registrar Equipo"}
+                </Boton>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Editar Equipo */}
+      {modalEditarEquipoAbierto && (
+        <div className="perfil-modal-overlay" onClick={() => !guardandoEditarEquipo && setModalEditarEquipoAbierto(false)}>
+          <div className="perfil-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="perfil-modal-header">
+              <h3>Editar Equipo Registrado</h3>
+              <button
+                type="button"
+                onClick={() => setModalEditarEquipoAbierto(false)}
+                disabled={guardandoEditarEquipo}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: "20px",
+                  cursor: "pointer",
+                  color: "#64748b",
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={manejarGuardarEditarEquipo}>
+              <div className="perfil-modal-body">
+                {mensajeEditarEquipo && (
+                  <div
+                    className={`perfil-alerta ${
+                      mensajeEditarEquipo.tipo === "exito"
+                        ? "perfil-alerta-exito"
+                        : "perfil-alerta-error"
+                    }`}
+                  >
+                    {mensajeEditarEquipo.texto}
+                  </div>
+                )}
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <div className="perfil-form-group">
+                    <label htmlFor="editar-equipo-tipo">Tipo de Dispositivo *</label>
+                    <select
+                      id="editar-equipo-tipo"
+                      className="perfil-input"
+                      value={formEditarEquipo.tipo}
+                      onChange={(e) =>
+                        setFormEditarEquipo({ ...formEditarEquipo, tipo: e.target.value })
+                      }
+                      disabled={guardandoEditarEquipo}
+                    >
+                      <option value="Computador">Computador</option>
+                      <option value="Impresora">Impresora</option>
+                      <option value="Servidor">Servidor</option>
+                      <option value="Red">Equipo de Red</option>
+                      <option value="Otro">Otro Dispositivo</option>
+                    </select>
+                  </div>
+                  <div className="perfil-form-group">
+                    <label htmlFor="editar-equipo-estado">Estado del Equipo *</label>
+                    <select
+                      id="editar-equipo-estado"
+                      className="perfil-input"
+                      value={formEditarEquipo.estado_equipo}
+                      onChange={(e) =>
+                        setFormEditarEquipo({ ...formEditarEquipo, estado_equipo: e.target.value })
+                      }
+                      disabled={guardandoEditarEquipo}
+                    >
+                      <option value="Operativo">Operativo</option>
+                      <option value="En_Reparacion">En Reparación</option>
+                      <option value="Fuera_de_Servicio">Fuera de Servicio</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <div className="perfil-form-group">
+                    <label htmlFor="editar-equipo-marca">Marca *</label>
+                    <input
+                      id="editar-equipo-marca"
+                      type="text"
+                      className="perfil-input"
+                      value={formEditarEquipo.marca}
+                      onChange={(e) =>
+                        setFormEditarEquipo({ ...formEditarEquipo, marca: e.target.value })
+                      }
+                      required
+                      maxLength={50}
+                      disabled={guardandoEditarEquipo}
+                    />
+                  </div>
+                  <div className="perfil-form-group">
+                    <label htmlFor="editar-equipo-modelo">Modelo *</label>
+                    <input
+                      id="editar-equipo-modelo"
+                      type="text"
+                      className="perfil-input"
+                      value={formEditarEquipo.modelo}
+                      onChange={(e) =>
+                        setFormEditarEquipo({ ...formEditarEquipo, modelo: e.target.value })
+                      }
+                      required
+                      maxLength={50}
+                      disabled={guardandoEditarEquipo}
+                    />
+                  </div>
+                </div>
+
+                <div className="perfil-form-group">
+                  <label htmlFor="editar-equipo-serial">Número de Serial (S/N) *</label>
+                  <input
+                    id="editar-equipo-serial"
+                    type="text"
+                    className="perfil-input"
+                    value={formEditarEquipo.serial}
+                    onChange={(e) =>
+                      setFormEditarEquipo({ ...formEditarEquipo, serial: e.target.value })
+                    }
+                    required
+                    maxLength={50}
+                    disabled={guardandoEditarEquipo}
+                  />
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <div className="perfil-form-group">
+                    <label htmlFor="editar-equipo-so">Sistema Operativo</label>
+                    <input
+                      id="editar-equipo-so"
+                      type="text"
+                      className="perfil-input"
+                      value={formEditarEquipo.sistema_operativo}
+                      onChange={(e) =>
+                        setFormEditarEquipo({
+                          ...formEditarEquipo,
+                          sistema_operativo: e.target.value,
+                        })
+                      }
+                      maxLength={50}
+                      disabled={guardandoEditarEquipo}
+                    />
+                  </div>
+                  <div className="perfil-form-group">
+                    <label htmlFor="editar-equipo-area">Área o Ubicación</label>
+                    <input
+                      id="editar-equipo-area"
+                      type="text"
+                      className="perfil-input"
+                      value={formEditarEquipo.area_departamento}
+                      onChange={(e) =>
+                        setFormEditarEquipo({
+                          ...formEditarEquipo,
+                          area_departamento: e.target.value,
+                        })
+                      }
+                      maxLength={80}
+                      disabled={guardandoEditarEquipo}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="perfil-modal-footer">
+                <Boton
+                  variante="secundario"
+                  tipo="button"
+                  onClick={() => setModalEditarEquipoAbierto(false)}
+                  deshabilitado={guardandoEditarEquipo}
+                >
+                  Cancelar
+                </Boton>
+                <Boton
+                  variante="primario"
+                  tipo="submit"
+                  deshabilitado={guardandoEditarEquipo}
+                >
+                  {guardandoEditarEquipo ? "Guardando..." : "Guardar Cambios"}
                 </Boton>
               </div>
             </form>

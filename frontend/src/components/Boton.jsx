@@ -39,8 +39,12 @@ export default function Boton({
   deshabilitado = false,
   anchoCompleto = false,
   className = '',
+  style,
+  estilo,
   ...otrasProps
 }) {
+  const estiloFinal = style || estilo;
+
   // Construcción dinámica de clases CSS según la variante seleccionada
   const clasesBoton = [
     'boton-reutilizable',
@@ -66,6 +70,7 @@ export default function Boton({
       className={clasesBoton}
       onClick={manejarClick}
       disabled={deshabilitado}
+      style={estiloFinal}
       {...otrasProps}
     >
       {/* Si se proporciona un icono, se renderiza antes del texto */}

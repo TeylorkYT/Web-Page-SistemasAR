@@ -40,4 +40,9 @@ export async function crearEquipoCliente(datos) {
   const { data } = await cliente.post("/equipos", datos);
   return data;
 }
+
+export async function actualizarEquipoCliente(idEquipo, datos) {
+  const { data } = await cliente.put(`/equipos/${idEquipo}`, datos);
+  return data;
+}
 
