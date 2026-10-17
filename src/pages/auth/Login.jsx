@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import Campo from "../../components/Campo";
 import Boton from "../../components/Boton";
 import { iniciarSesion } from "../../services/authService";
-import { rutaPorRol } from "../../routes/rutaPorRol";
+import { obtenerRutaPorRol } from "../../routes/rutaPorRol";
 import { useAuth } from "../../context/AuthContext";
 import { reiniciarBaseDeDatos } from "../../api/mockDataStore";
 
@@ -51,8 +51,8 @@ export default function Login() {
 
   // Si ya hay sesión activa, redirigir al panel correspondiente
   useEffect(() => {
-    if (sesion?.rol && rutaPorRol[sesion.rol]) {
-      navigate(rutaPorRol[sesion.rol], { replace: true });
+    if (sesion?.rol) {
+      navigate(obtenerRutaPorRol(sesion.rol), { replace: true });
     }
   }, [sesion, navigate]);
 
@@ -62,7 +62,7 @@ export default function Login() {
     try {
       const respuesta = await iniciarSesion(correo.trim(), pass);
       guardarSesion(respuesta);
-      const destino = rutaPorRol[respuesta.rol] || "/cliente";
+      const destino = obtenerRutaPorRol(respuesta.rol);
       navigate(destino, { replace: true });
     } catch (err) {
       setError(err.message || "Correo o contraseña incorrectos");

@@ -2,9 +2,19 @@ import axios from "axios";
 import { API_URL } from "../services/api";
 import { despacharPeticionMock } from "./mockDataStore";
 
+// Por defecto en la rama develop (frontend puro), opera en modo autónomo sin requerir backend
+const MODO_STANDALONE = import.meta.env.VITE_STANDALONE !== "false";
+
 export const cliente = axios.create({
   baseURL: `${API_URL}/api/v1`,
-  timeout: 2000,
+  timeout: 3000,
+  adapter: async (config) => {
+    if (MODO_STANDALONE) {
+      return despacharPeticionMock(config);
+    }
+    const defaultAdapter = axios.getAdapter(axios.defaults.adapter);
+    return defaultAdapter(config);
+  },
 });
 
 cliente.interceptors.request.use((config) => {
@@ -27,8 +37,7 @@ cliente.interceptors.response.use(
   async (error) => {
     const original = error.config;
 
-    // Si el backend no está disponible (servidor no encendido, Network Error, ECONNREFUSED)
-    // despachamos transparentemente la petición mediante el motor de datos simulados
+    // Fallback de contingencia si no se estuviese usando el adapter
     if (
       !error.response ||
       error.code === "ERR_NETWORK" ||
@@ -37,8 +46,7 @@ cliente.interceptors.response.use(
       [502, 503, 504].includes(error.response?.status)
     ) {
       try {
-        const respuestaMock = await despacharPeticionMock(original);
-        return respuestaMock;
+        return await despacharPeticionMock(original);
       } catch (mockError) {
         return Promise.reject(mockError);
       }
