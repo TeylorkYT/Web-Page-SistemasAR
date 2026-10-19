@@ -4,8 +4,11 @@
       <div class="modal-tarjeta" :style="{ maxWidth: maxWidth || '560px' }">
         <div class="modal-cabecera">
           <h3 class="modal-titulo">{{ titulo }}</h3>
-          <button type="button" class="modal-boton-cerrar" @click="cerrarModal" aria-label="Cerrar modal">
-            ✕
+          <button type="button" class="modal-boton-cerrar" @click="cerrarModal" aria-label="Cerrar modal" style="display: flex; align-items: center; justify-content: center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
           </button>
         </div>
         <div class="modal-cuerpo">

@@ -33,7 +33,10 @@
 
       <div class="sidebar-footer">
         <span>SistemasAR • {{ rolCalculado }}</span>
-        <span title="Conexión activa">🟢 Online</span>
+        <span class="indicador-online" title="Conexión activa">
+          <span class="punto-online"></span>
+          <span>En línea</span>
+        </span>
       </div>
     </aside>
 
@@ -46,8 +49,13 @@
             class="header-boton-menu"
             @click="menuMovilAbierto = !menuMovilAbierto"
             aria-label="Menú"
+            style="display: flex; align-items: center; justify-content: center;"
           >
-            ☰
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
           </button>
           <div class="header-marca">
             <span class="header-marca-dark">Sistemas</span><span>AR</span>
@@ -118,8 +126,11 @@
             <!-- Dropdown de notificaciones -->
             <div v-if="panelNotifAbierto" class="panel-notificaciones-dropdown">
               <div class="panel-notif-header">
-                <div class="panel-notif-titulo">
-                  <span>🔔</span>
+                <div class="panel-notif-titulo" style="display: flex; align-items: center; gap: 6px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                  </svg>
                   <span>Notificaciones {{ noLeidas > 0 ? `(${noLeidas} nuevas)` : '' }}</span>
                 </div>
                 <div class="panel-notif-acciones-rapidas">
@@ -162,7 +173,13 @@
                   class="panel-notif-btn-ver-todas"
                   @click="abrirHistorialCompleto"
                 >
-                  📜 Ver historial completo ({{ notificaciones.length }})
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; vertical-align: middle;">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                  </svg>
+                  Ver historial completo ({{ notificaciones.length }})
                 </button>
                 <button
                   type="button"
@@ -186,7 +203,12 @@
             <div class="modal-historial-card" @click.stop>
               <div class="modal-historial-header">
                 <div class="modal-historial-titulo-bloque">
-                  <div class="modal-historial-icono">🔔</div>
+                  <div class="modal-historial-icono">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                  </div>
                   <div>
                     <h3 class="modal-historial-titulo">Historial de Notificaciones</h3>
                     <span style="font-size: 0.8rem; color: #64748b;">
@@ -196,11 +218,14 @@
                 </div>
                 <button
                   type="button"
-                  style="background: none; border: none; font-size: 1.4rem; color: #64748b; cursor: pointer; padding: 4px;"
+                  style="background: none; border: none; color: #64748b; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center;"
                   aria-label="Cerrar modal"
                   @click="modalHistorialAbierto = false"
                 >
-                  ✕
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
                 </button>
               </div>
 
@@ -244,7 +269,10 @@
               <!-- Lista completa de notificaciones -->
               <div class="modal-historial-lista">
                 <div v-if="notificacionesFiltradasModal.length === 0" style="padding: 40px 20px; text-align: center; color: #64748b;">
-                  <span style="font-size: 2rem; display: block; margin-bottom: 8px;">📭</span>
+                  <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 10px; display: block;">
+                    <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                    <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                  </svg>
                   <p style="margin: 0; font-weight: 600;">No hay notificaciones con los filtros seleccionados.</p>
                 </div>
 
@@ -276,7 +304,11 @@
                       class="modal-historial-btn-ir"
                       @click="abrirNotificacion(n)"
                     >
-                      🔍 Ver ticket #{{ n.id_ticket }} →
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      </svg>
+                      Ver ticket #{{ n.id_ticket }} →
                     </button>
                     <span v-else style="font-size: 0.8rem; color: #94a3b8;">Notificación general</span>
 
@@ -295,7 +327,10 @@
                         title="Eliminar notificación"
                         @click="eliminarIndividual(n.id_notificacion)"
                       >
-                        🗑️
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
                       </button>
                     </div>
                   </div>
@@ -308,18 +343,22 @@
                   <button
                     v-if="noLeidas > 0"
                     type="button"
-                    style="padding: 6px 14px; border-radius: 20px; border: 1px solid var(--color-primario, #00bba6); background: #ffffff; color: var(--color-primario, #00bba6); font-size: 0.82rem; font-weight: 700; cursor: pointer;"
+                    style="padding: 6px 14px; border-radius: 8px; border: 1px solid var(--color-primario, #00bba6); background: #ffffff; color: var(--color-primario, #00bba6); font-size: 0.82rem; font-weight: 600; cursor: pointer;"
                     @click="marcarTodasComoLeidas"
                   >
-                    ✓ Marcar todas como leídas
+                    Marcar todas como leídas
                   </button>
                   <button
                     v-if="notificaciones.length > 0"
                     type="button"
-                    style="padding: 6px 14px; border-radius: 20px; border: 1px solid #fecaca; background: #fff; color: #dc2626; font-size: 0.82rem; font-weight: 700; cursor: pointer;"
+                    style="padding: 6px 14px; border-radius: 8px; border: 1px solid #fecaca; background: #fff; color: #dc2626; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;"
                     @click="borrarTodoHistorial"
                   >
-                    🗑️ Limpiar historial
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    Limpiar historial
                   </button>
                 </div>
 
@@ -365,6 +404,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuth } from '../context/useAuth';
+import { iniciarSesion } from '../services/authService';
 import {
   obtenerNotificaciones,
   marcarNotificacionLeida,
@@ -397,7 +437,7 @@ const emit = defineEmits(['cambiarRol', 'cambiarItem']);
 
 const route = useRoute();
 const router = useRouter();
-const { sesion, cerrarSesion } = useAuth();
+const { sesion, guardarSesion, cerrarSesion } = useAuth();
 
 const notifContenedorRef = ref(null);
 const menuMovilAbierto = ref(false);
@@ -541,15 +581,62 @@ const seleccionarOpcion = (id) => {
   menuMovilAbierto.value = false;
 };
 
-const cambiarRolDemo = (nuevoRol) => {
-  emit('cambiarRol', nuevoRol);
+const USUARIOS_DEMO_DEFAULT = {
+  cliente: {
+    access_token: 'fake-jwt-token-cliente-5',
+    refresh_token: 'fake-refresh-token',
+    rol: 'Cliente',
+    nombre: 'Laura Ramírez',
+    id_usuario: 5,
+    correo_electronico: 'cliente@prueba.com',
+  },
+  tecnico: {
+    access_token: 'fake-jwt-token-tecnico-2',
+    refresh_token: 'fake-refresh-token',
+    rol: 'Tecnico',
+    nombre: 'Diana Paz',
+    id_usuario: 2,
+    correo_electronico: 'tecnico@prueba.com',
+  },
+  administrador: {
+    access_token: 'fake-jwt-token-admin-1',
+    refresh_token: 'fake-refresh-token',
+    rol: 'Administrador',
+    nombre: 'Carlos Administrador',
+    id_usuario: 1,
+    correo_electronico: 'admin@prueba.com',
+  },
+};
+
+const cambiarRolDemo = async (nuevoRol) => {
+  const norm = (nuevoRol || '').toLowerCase();
+  const correos = {
+    cliente: 'cliente@prueba.com',
+    tecnico: 'tecnico@prueba.com',
+    administrador: 'admin@prueba.com',
+  };
   const destinos = {
     cliente: '/cliente',
     tecnico: '/tecnico',
     administrador: '/admin',
   };
-  if (destinos[nuevoRol]) {
-    router.push(destinos[nuevoRol]);
+
+  try {
+    if (correos[norm]) {
+      const resp = await iniciarSesion(correos[norm], 'Prueba123*');
+      guardarSesion(resp);
+    } else if (USUARIOS_DEMO_DEFAULT[norm]) {
+      guardarSesion(USUARIOS_DEMO_DEFAULT[norm]);
+    }
+  } catch {
+    if (USUARIOS_DEMO_DEFAULT[norm]) {
+      guardarSesion(USUARIOS_DEMO_DEFAULT[norm]);
+    }
+  }
+
+  emit('cambiarRol', nuevoRol);
+  if (destinos[norm] && route.path !== destinos[norm]) {
+    router.push(destinos[norm]).catch(() => {});
   }
 };
 
@@ -601,10 +688,10 @@ const claseBadgeTipo = (tipo) => {
 
 const etiquetaBadgeTipo = (tipo) => {
   const t = (tipo || '').toLowerCase();
-  if (t.includes('asignacion')) return '🛠️ Asignación';
-  if (t.includes('resolucion')) return '✅ Resolución';
-  if (t.includes('comentario')) return '💬 Comentario';
-  return '🔔 Actualización';
+  if (t.includes('asignacion')) return 'Asignación';
+  if (t.includes('resolucion')) return 'Resolución';
+  if (t.includes('comentario')) return 'Comentario';
+  return 'Actualización';
 };
 
 const notificacionesFiltradasModal = computed(() => {

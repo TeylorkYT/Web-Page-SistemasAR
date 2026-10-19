@@ -113,18 +113,26 @@
                 type="button"
                 class="boton-accion-icono boton-editar"
                 title="Editar esta categoría"
-                style="border: 1px solid #cbd5e1; padding: 6px 14px; border-radius: 8px; display: flex; gap: 6px; align-items: center; font-size: 0.85rem; background: #fff; cursor: pointer; font-weight: 600;"
+                style="border: 1px solid #cbd5e1; padding: 6px 14px; border-radius: 8px; display: inline-flex; gap: 6px; align-items: center; font-size: 0.85rem; background: #fff; cursor: pointer; font-weight: 600;"
                 @click="abrirModalEditarCategoria($event, categoriaActiva)"
               >
-                ✏️ Editar
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                </svg>
+                <span>Editar</span>
               </button>
               <button
                 type="button"
                 class="boton-eliminar-panel"
                 title="Eliminar esta categoría"
+                style="display: inline-flex; align-items: center; gap: 6px;"
                 @click="solicitarEliminarCategoria($event, categoriaActiva)"
               >
-                🗑️ Eliminar
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                <span>Eliminar</span>
               </button>
             </div>
           </div>
@@ -224,9 +232,14 @@
                 type="button"
                 class="boton-eliminar-panel"
                 :disabled="guardando"
+                style="display: inline-flex; align-items: center; gap: 6px;"
                 @click="solicitarEliminarCategoria(null, categoriaEnEdicion)"
               >
-                🗑️ Eliminar
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                <span>Eliminar</span>
               </button>
               <div style="display: flex; gap: 10px;">
                 <button
@@ -255,7 +268,12 @@
         <div class="modal-contenido" style="max-width: 440px;">
           <div class="modal-header">
             <h3 class="modal-titulo" style="color: #dc2626; display: flex; align-items: center; gap: 8px;">
-              <span>⚠️</span> Confirmar eliminación
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              <span>Confirmar eliminación</span>
             </h3>
             <button
               type="button"

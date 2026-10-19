@@ -7,8 +7,13 @@
         id="btn-nuevo-ticket"
         class="mis-tickets-btn-nuevo"
         @click="router.push('/cliente/tickets/nuevo')"
+        style="display: inline-flex; align-items: center; gap: 6px;"
       >
-        + Nuevo ticket
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>Nuevo ticket</span>
       </button>
     </div>
 
@@ -72,14 +77,19 @@
               {{ formatearFecha(t.fecha_creacion) }}
             </td>
             <td>
-              <div style="display: flex; gap: 6px;">
+              <div style="display: flex; gap: 6px; align-items: center;">
                 <button
                   type="button"
                   :id="`ver-ticket-${t.id_ticket}`"
                   class="mis-tickets-btn-ver"
                   @click="router.push(`/cliente/tickets/${t.id_ticket}`)"
+                  style="display: inline-flex; align-items: center; gap: 4px;"
                 >
-                  Ver
+                  <span>Ver</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
                 </button>
                 <button
                   v-if="(t.estado === 'Resuelto' || t.estado === 'Cerrado') && !t.calificacion"
@@ -88,8 +98,12 @@
                   class="mis-tickets-btn-calificar"
                   @click="router.push(`/cliente/tickets/${t.id_ticket}/calificar`)"
                   title="Calificar servicio recibido"
+                  style="display: inline-flex; align-items: center; gap: 4px;"
                 >
-                  ★ Calificar
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="#eab308" stroke="#ca8a04" stroke-width="1.5">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                  <span>Calificar</span>
                 </button>
               </div>
             </td>

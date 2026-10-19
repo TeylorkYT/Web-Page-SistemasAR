@@ -20,6 +20,8 @@ export function useAuth() {
         refresh_token: datos.refresh_token,
         rol: datos.rol,
         nombre: datos.nombre,
+        id_usuario: datos.id_usuario,
+        correo_electronico: datos.correo_electronico,
       };
       localStorage.setItem('sesion', JSON.stringify(nueva));
       sesion.value = nueva;

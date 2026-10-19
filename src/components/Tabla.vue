@@ -12,14 +12,18 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(fila, index) in filas" :key="fila.id || index" class="tabla-tr">
+        <tr v-for="(fila, index) in filas" :key="fila.id || fila.id_usuario || index" class="tabla-tr">
           <td v-for="col in columnas" :key="col.campo" class="tabla-td" :style="{ textAlign: col.alineacion || 'left' }">
-            <template v-if="col.render">
-              <component :is="resolverRender(col.render, fila, index)" />
-            </template>
-            <template v-else>
-              {{ fila[col.campo] }}
-            </template>
+            <slot :name="'col-' + col.campo" :fila="fila" :index="index">
+              <slot :name="col.campo" :fila="fila" :index="index">
+                <template v-if="col.render">
+                  <component :is="resolverRender(col.render, fila, index)" />
+                </template>
+                <template v-else>
+                  {{ fila[col.campo] }}
+                </template>
+              </slot>
+            </slot>
           </td>
         </tr>
       </tbody>

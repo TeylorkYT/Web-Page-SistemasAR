@@ -120,15 +120,29 @@
               class="crear-ticket-btn-adjuntar"
               @click="abrirSelector"
               :disabled="enviando"
+              style="display: inline-flex; align-items: center; justify-content: center; gap: 8px;"
             >
-              📎 Seleccionar imágenes o PDFs (máx. 5 MB c/u)
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+              </svg>
+              <span>Seleccionar imágenes o PDFs (máx. 5 MB c/u)</span>
             </button>
           </div>
 
           <ul v-if="archivos.length > 0" class="crear-ticket-lista-adjuntos">
             <li v-for="(arch, idx) in archivos" :key="`${arch.name}-${idx}`" class="crear-ticket-item-adjunto">
-              <span class="crear-ticket-nombre-adjunto">
-                {{ arch.type.includes('pdf') ? '📄' : '🖼️' }} {{ arch.name }} ({{ formatearTamano(arch.size) }})
+              <span class="crear-ticket-nombre-adjunto" style="display: inline-flex; align-items: center; gap: 6px;">
+                <svg v-if="arch.type.includes('pdf')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="9" y1="15" x2="15" y2="15"></line>
+                </svg>
+                <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                <span>{{ arch.name }} ({{ formatearTamano(arch.size) }})</span>
               </span>
               <button
                 type="button"
@@ -136,8 +150,13 @@
                 @click="quitarArchivo(idx)"
                 :disabled="enviando"
                 title="Quitar archivo"
+                aria-label="Quitar archivo"
+                style="display: inline-flex; align-items: center; justify-content: center;"
               >
-                ✕
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
               </button>
             </li>
           </ul>

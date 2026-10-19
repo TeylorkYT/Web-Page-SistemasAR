@@ -98,8 +98,76 @@
   gap: 14px;
 }
 
-.alerta-triaje-icono {
-  font-size: 1.8rem;
+.alerta-triaje-icono-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: #ffedd5;
+  color: #ea580c;
+  flex-shrink: 0;
+}
+
+.prioridad-indicador-punto {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.tarjeta-titulo-con-icono {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-sidebar-fondo, #071e33);
+  margin: 0;
+}
+
+.tarjeta-titulo-con-icono svg {
+  color: var(--color-primario, #00bba6);
+  flex-shrink: 0;
+}
+
+.kpi-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.kpi-icono.navy {
+  background-color: #e2e8f0;
+  color: #071e33;
+}
+
+.kpi-icono.orange {
+  background-color: #ffedd5;
+  color: #ea580c;
+}
+
+.kpi-icono.blue {
+  background-color: #e0f2fe;
+  color: #0284c7;
+}
+
+.kpi-icono.teal {
+  background-color: #e6f9f6;
+  color: #00bba6;
+}
+
+.kpi-icono.gold {
+  background-color: #fef9c3;
+  color: #d97706;
 }
 
 .alerta-triaje-titulo {

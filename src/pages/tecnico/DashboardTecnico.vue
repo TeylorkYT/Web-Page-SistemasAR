@@ -16,9 +16,14 @@
         <button
           type="button"
           class="btn-ver-tickets-top"
+          style="display: inline-flex; align-items: center; gap: 8px;"
           @click="router.push('/tecnico/tickets')"
         >
-          📋 Ir a Tickets Asignados ({{ tickets.length }}) →
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          <span>Ir a Tickets Asignados ({{ tickets.length }}) →</span>
         </button>
       </header>
 
@@ -27,8 +32,13 @@
         <div class="metrica-card">
           <div class="metrica-card-header">
             <span class="metrica-card-titulo">Total Asignados</span>
-            <span class="metrica-card-icono" style="background-color: #e0f2fe; color: #0369a1;">
-              📋
+            <span class="metrica-card-icono" style="background-color: #e0f2fe; color: #0369a1; display: inline-flex; align-items: center; justify-content: center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
             </span>
           </div>
           <span class="metrica-card-valor">{{ cargando ? '...' : metricas.ticketsAsignados }}</span>
@@ -38,8 +48,10 @@
         <div class="metrica-card">
           <div class="metrica-card-header">
             <span class="metrica-card-titulo">En Atención Activa</span>
-            <span class="metrica-card-icono" style="background-color: #fef3c7; color: #b45309;">
-              ⚙️
+            <span class="metrica-card-icono" style="background-color: #fef3c7; color: #b45309; display: inline-flex; align-items: center; justify-content: center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
             </span>
           </div>
           <span class="metrica-card-valor" style="color: #f59e0b;">
@@ -51,8 +63,11 @@
         <div class="metrica-card">
           <div class="metrica-card-header">
             <span class="metrica-card-titulo">Resueltos</span>
-            <span class="metrica-card-icono" style="background-color: #e6f9f6; color: #007a6c;">
-              ✅
+            <span class="metrica-card-icono" style="background-color: #e6f9f6; color: #007a6c; display: inline-flex; align-items: center; justify-content: center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
             </span>
           </div>
           <span class="metrica-card-valor" style="color: #00bba6;">
@@ -64,8 +79,11 @@
         <div class="metrica-card">
           <div class="metrica-card-header">
             <span class="metrica-card-titulo">Cerrados</span>
-            <span class="metrica-card-icono" style="background-color: #f1f5f9; color: #475569;">
-              🔒
+            <span class="metrica-card-icono" style="background-color: #f1f5f9; color: #475569; display: inline-flex; align-items: center; justify-content: center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
             </span>
           </div>
           <span class="metrica-card-valor" style="color: #556980;">
@@ -138,8 +156,9 @@
 
           <div style="border-top: 1px solid #edf2f7; padding-top: 14px; display: flex; justify-content: space-between; align-items: center;">
             <span style="font-size: 0.85rem; color: #556980;">Estado operativo:</span>
-            <span style="padding: 4px 12px; border-radius: 9999px; font-size: 0.78rem; font-weight: 700; background-color: #e6f9f6; color: #007a6c; border: 1px solid #9ee7dc;">
-              🟢 Activo y disponible
+            <span style="padding: 4px 12px; border-radius: 9999px; font-size: 0.78rem; font-weight: 700; background-color: #e6f9f6; color: #007a6c; border: 1px solid #9ee7dc; display: inline-flex; align-items: center; gap: 6px;">
+              <span style="width: 7px; height: 7px; border-radius: 50%; background-color: #10b981;"></span>
+              <span>Activo y disponible</span>
             </span>
           </div>
         </div>
@@ -167,7 +186,11 @@
             <p class="estado-vacio-texto">Cargando casos prioritarios...</p>
           </div>
           <div v-else-if="ticketsAtencionInmediata.length === 0" class="estado-vacio-tabla">
-            <div class="estado-vacio-icono">✨</div>
+            <div class="estado-vacio-icono" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background-color: #ecfdf5; color: #059669; margin: 0 auto 10px;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
             <p class="estado-vacio-texto">¡Al día! No tienes casos críticos o en proceso pendientes.</p>
             <p class="estado-vacio-subtexto">
               Todos tus tickets asignados están resueltos o cerrados.
@@ -213,7 +236,7 @@
                     class="btn-ver-detalle"
                     title="Gestionar caso"
                   >
-                    Gestionar ➜
+                    Gestionar →
                   </router-link>
                 </td>
               </tr>

@@ -18,11 +18,18 @@
           </p>
         </div>
         <div>
-          <Boton
-            variante="secundario"
+          <button
+            type="button"
+            class="btn btn-secundario"
             @click="router.push(`/tecnico/tickets/${id}`)"
-            texto="⬅ Volver al Ticket"
-          />
+            style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-weight: 500; font-size: 0.9rem; cursor: pointer; border: 1px solid #cbd5e1; background: #fff;"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>Volver al Ticket</span>
+          </button>
         </div>
       </header>
 
@@ -40,8 +47,12 @@
       </section>
 
       <!-- Notificación de Éxito -->
-      <div v-if="mensajeExito" class="alerta-formulario exito" role="status">
-        <span>✅ {{ mensajeExito }} Redirigiendo al detalle...</span>
+      <div v-if="mensajeExito" class="alerta-formulario exito" role="status" style="display: flex; align-items: center; gap: 8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <span>{{ mensajeExito }} Redirigiendo al detalle...</span>
       </div>
 
       <!-- Formulario -->
@@ -99,7 +110,14 @@
               :disabled="guardando"
               @input="errorValidacion = ''"
             ></textarea>
-            <div v-if="errorValidacion" class="campo-error-mensaje">⚠️ {{ errorValidacion }}</div>
+            <div v-if="errorValidacion" class="campo-error-mensaje" style="display: flex; align-items: center; gap: 6px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span>{{ errorValidacion }}</span>
+            </div>
           </div>
 
           <!-- Botones de Acción -->
@@ -111,12 +129,19 @@
               :deshabilitado="guardando"
               texto="Cancelar"
             />
-            <Boton
-              variante="primario"
+            <button
+              class="btn-submit-avance"
               type="submit"
-              :deshabilitado="guardando"
-              :texto="guardando ? 'Guardando avance...' : '💾 Guardar Avance Técnico'"
-            />
+              :disabled="guardando"
+              style="display: inline-flex; align-items: center; gap: 8px; background: var(--color-primario, #00bba6); color: white; border: none; border-radius: 6px; padding: 10px 20px; font-weight: 600; cursor: pointer; font-size: 0.95rem;"
+            >
+              <svg v-if="!guardando" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
+              <span>{{ guardando ? 'Guardando avance...' : 'Guardar Avance Técnico' }}</span>
+            </button>
           </div>
         </form>
       </section>

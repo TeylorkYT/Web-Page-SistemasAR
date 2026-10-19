@@ -859,15 +859,31 @@ export async function despacharPeticionMock(config) {
   // --------------------------------------------------------------------------
   if (pathname === "/usuarios") {
     if (metodo === "get") {
-      return { data: db.usuarios, status: 200 };
+      let lista = [...db.usuarios];
+      if (params.rol && params.rol !== "todos") {
+        lista = lista.filter((u) => u.rol?.toLowerCase() === params.rol.toLowerCase());
+      }
+      if (params.estado && params.estado !== "todos") {
+        lista = lista.filter((u) => u.estado?.toLowerCase() === params.estado.toLowerCase());
+      }
+      return { data: lista, status: 200 };
     }
     if (metodo === "post") {
+      const emailExistente = db.usuarios.some(
+        (u) => u.correo_electronico?.toLowerCase() === (body.correo_electronico || "").toLowerCase().trim()
+      );
+      if (emailExistente) {
+        const err = new Error("Ya existe un usuario registrado con este correo electrónico");
+        err.response = { status: 400, data: { detail: "Ya existe un usuario registrado con este correo electrónico" } };
+        throw err;
+      }
+
       const nuevoId = Math.max(...db.usuarios.map((u) => u.id_usuario), 0) + 1;
       const nuevoUsuario = {
         id_usuario: nuevoId,
-        nombre: body.nombre,
-        apellido: body.apellido,
-        correo_electronico: body.correo_electronico,
+        nombre: (body.nombre || "").trim(),
+        apellido: (body.apellido || "").trim(),
+        correo_electronico: (body.correo_electronico || "").toLowerCase().trim(),
         contrasena: body.contrasena || "Prueba123*",
         rol: body.rol || "Cliente",
         fecha_registro: new Date().toISOString().substring(0, 10),
@@ -878,9 +894,9 @@ export async function despacharPeticionMock(config) {
       if (nuevoUsuario.rol === "Cliente" && !db.clientes.some((c) => c.id_usuario === nuevoId)) {
         db.clientes.push({
           id_usuario: nuevoId,
-          telefono: "3000000000",
-          direccion: "Dirección principal",
-          area_departamento: "General"
+          telefono: body.telefono || "3000000000",
+          direccion: body.direccion || "Dirección principal",
+          area_departamento: body.area_departamento || "General"
         });
       }
       if (nuevoUsuario.rol === "Tecnico" && !db.tecnicos.some((t) => t.id_usuario === nuevoId)) {
@@ -888,6 +904,12 @@ export async function despacharPeticionMock(config) {
           id_usuario: nuevoId,
           especialidad: "Soporte General",
           disponibilidad: "Disponible"
+        });
+      }
+      if (nuevoUsuario.rol === "Administrador" && !db.administradores.some((a) => a.id_usuario === nuevoId)) {
+        db.administradores.push({
+          id_usuario: nuevoId,
+          cargo: "Administrador del Sistema"
         });
       }
 
@@ -901,6 +923,17 @@ export async function despacharPeticionMock(config) {
     const uId = Number(matchUsuarioId[1]);
     const u = db.usuarios.find((user) => user.id_usuario === uId);
     if (u) {
+      if (body.correo_electronico) {
+        const emailDuplicado = db.usuarios.some(
+          (user) => user.id_usuario !== uId && user.correo_electronico?.toLowerCase() === body.correo_electronico.toLowerCase().trim()
+        );
+        if (emailDuplicado) {
+          const err = new Error("Ya existe otro usuario con este correo electrónico");
+          err.response = { status: 400, data: { detail: "Ya existe otro usuario con este correo electrónico" } };
+          throw err;
+        }
+      }
+
       Object.assign(u, body);
       if (body.rol === "Tecnico" && !db.tecnicos.some((t) => t.id_usuario === uId)) {
         db.tecnicos.push({
@@ -909,9 +942,27 @@ export async function despacharPeticionMock(config) {
           disponibilidad: "Disponible"
         });
       }
+      if (body.rol === "Cliente" && !db.clientes.some((c) => c.id_usuario === uId)) {
+        db.clientes.push({
+          id_usuario: uId,
+          telefono: "3000000000",
+          direccion: "Dirección principal",
+          area_departamento: "General"
+        });
+      }
+      if (body.rol === "Administrador" && !db.administradores.some((a) => a.id_usuario === uId)) {
+        db.administradores.push({
+          id_usuario: uId,
+          cargo: "Administrador del Sistema"
+        });
+      }
+
       guardarBaseDeDatos(db);
       return { data: u, status: 200 };
     }
+    const err = new Error("Usuario no encontrado");
+    err.response = { status: 404, data: { detail: "Usuario no encontrado" } };
+    throw err;
   }
 
   if (matchUsuarioId && metodo === "delete") {
@@ -926,7 +977,9 @@ export async function despacharPeticionMock(config) {
       guardarBaseDeDatos(db);
       return { data: { mensaje: "Usuario eliminado correctamente", usuario: eliminado }, status: 200 };
     }
-    return { data: { detail: "Usuario no encontrado" }, status: 404 };
+    const err = new Error("Usuario no encontrado");
+    err.response = { status: 404, data: { detail: "Usuario no encontrado" } };
+    throw err;
   }
 
   // --------------------------------------------------------------------------

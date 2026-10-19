@@ -6,16 +6,24 @@
 
     <div v-else-if="!ticket" style="text-align: center; padding: 40px 0;">
       <p style="color: #dc2626; font-size: 16px; font-weight: bold;">Ticket no encontrado.</p>
-      <button type="button" class="calificar-btn-volver" @click="router.push('/cliente/tickets')">
-        ← Mis tickets
+      <button type="button" class="calificar-btn-volver" @click="router.push('/cliente/tickets')" style="display: inline-flex; align-items: center; gap: 6px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Mis tickets</span>
       </button>
     </div>
 
     <!-- Si ya tiene una calificación registrada -->
     <div v-else-if="ticket.calificacion">
       <div class="calificar-cabecera">
-        <button type="button" id="btn-volver-detalle" class="calificar-btn-volver" @click="volverAlDetalle">
-          ← Volver al ticket
+        <button type="button" id="btn-volver-detalle" class="calificar-btn-volver" @click="volverAlDetalle" style="display: inline-flex; align-items: center; gap: 6px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Volver al ticket</span>
         </button>
       </div>
       <div class="calificar-tarjeta" style="text-align: center;">
@@ -24,8 +32,19 @@
           Ticket <strong>#{{ ticket.id_ticket }}</strong> · Ya has enviado tu opinión sobre esta atención.
         </p>
         <div style="margin: 24px 0; padding: 20px; background: #fefce8; border-radius: 10px; border: 1px solid #fef08a;">
-          <div style="fontSize: 28px; color: #eab308; margin-bottom: 8px;">
-            {{ '★'.repeat(ticket.calificacion.puntuacion || 0) }}{{ '☆'.repeat(5 - (ticket.calificacion.puntuacion || 0)) }}
+          <div style="display: flex; justify-content: center; gap: 4px; margin-bottom: 8px;">
+            <svg
+              v-for="starIndex in 5"
+              :key="starIndex"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              :fill="starIndex <= (ticket.calificacion.puntuacion || 0) ? '#eab308' : '#e2e8f0'"
+              :stroke="starIndex <= (ticket.calificacion.puntuacion || 0) ? '#ca8a04' : '#cbd5e1'"
+              stroke-width="1.5"
+            >
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
           </div>
           <p v-if="ticket.calificacion.comentario" style="font-style: italic; color: #713f12; margin: 0;">
             "{{ ticket.calificacion.comentario }}"
@@ -34,10 +53,14 @@
         <button
           type="button"
           class="calificar-btn-volver"
-          style="display: inline-block;"
+          style="display: inline-flex; align-items: center; gap: 6px;"
           @click="router.push('/cliente/tickets')"
         >
-          Volver al listado de tickets
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Volver al listado de tickets</span>
         </button>
       </div>
     </div>
@@ -45,8 +68,12 @@
     <!-- Si no está en estado Resuelto (ni Cerrado) -->
     <div v-else-if="ticket.estado !== 'Resuelto' && ticket.estado !== 'Cerrado'">
       <div class="calificar-cabecera">
-        <button type="button" id="btn-volver-detalle" class="calificar-btn-volver" @click="volverAlDetalle">
-          ← Volver al ticket
+        <button type="button" id="btn-volver-detalle" class="calificar-btn-volver" @click="volverAlDetalle" style="display: inline-flex; align-items: center; gap: 6px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Volver al ticket</span>
         </button>
       </div>
       <div class="calificar-tarjeta" style="text-align: center;">
@@ -58,10 +85,14 @@
         <button
           type="button"
           class="calificar-btn-volver"
-          style="display: inline-block;"
+          style="display: inline-flex; align-items: center; gap: 6px;"
           @click="volverAlDetalle"
         >
-          ← Volver a los detalles del ticket
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Volver a los detalles del ticket</span>
         </button>
       </div>
     </div>
@@ -74,8 +105,13 @@
           id="btn-volver-detalle"
           class="calificar-btn-volver"
           @click="volverAlDetalle"
+          style="display: inline-flex; align-items: center; gap: 6px;"
         >
-          ← Volver al ticket
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Volver al ticket</span>
         </button>
       </div>
 
@@ -109,8 +145,19 @@
                 :aria-label="`${n} estrella${n > 1 ? 's' : ''}`"
                 @click="puntuacion = n"
                 @mouseenter="hover = n"
+                style="background: none; border: none; cursor: pointer; padding: 4px; display: inline-flex; align-items: center; justify-content: center;"
               >
-                ★
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  :fill="n <= estrellaActiva ? '#eab308' : '#e2e8f0'"
+                  :stroke="n <= estrellaActiva ? '#ca8a04' : '#cbd5e1'"
+                  stroke-width="1.5"
+                  style="transition: transform 0.15s ease, fill 0.15s ease;"
+                >
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
               </button>
             </div>
             <p v-if="puntuacion > 0" class="calificar-puntuacion-texto">

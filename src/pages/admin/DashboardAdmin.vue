@@ -20,8 +20,11 @@
             class="btn-header-accion primario"
             @click="irA('/admin/asignacion')"
           >
-            <span>🛠️</span>
-            Bandeja de Triaje
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+            <span>Bandeja de Triaje</span>
             <span
               v-if="metricas.ticketsSinAsignar > 0"
               style="background-color: #ffffff; color: var(--color-primario-oscuro, #008f7e); padding: 1px 7px; border-radius: 10px; font-size: 11px; font-weight: 800;"
@@ -35,7 +38,14 @@
             class="btn-header-accion"
             @click="irA('/admin/tickets')"
           >
-            <span>📋</span> Historial
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Historial</span>
           </button>
 
           <button
@@ -43,17 +53,27 @@
             class="btn-header-accion"
             @click="irA('/admin/reportes')"
           >
-            <span>📊</span> Reportes
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span>Reportes</span>
           </button>
 
           <button
             type="button"
-            class="btn-header-accion"
+            class="btn-header-accion btn-recargar"
             style="color: #64748b; font-size: 0.8rem;"
             title="Recargar métricas en vivo"
             @click="cargarDatos"
           >
-            🔄 {{ ultimaActualizacion }}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 4v6h-6"></path>
+              <path d="M1 20v-6h6"></path>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            <span>{{ ultimaActualizacion }}</span>
           </button>
         </div>
       </header>
@@ -64,7 +84,13 @@
         class="dashboard-alerta-triaje"
       >
         <div class="alerta-triaje-izq">
-          <span class="alerta-triaje-icono">⚠️</span>
+          <div class="alerta-triaje-icono-wrapper">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
           <div>
             <div class="alerta-triaje-titulo">
               Atención Operativa Requerida
@@ -83,7 +109,10 @@
           class="btn-alerta-accion"
           @click="irA('/admin/asignacion')"
         >
-          <span>🛠️</span> Ir a Asignación de Técnicos →
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+          </svg>
+          <span>Ir a Asignación de Técnicos →</span>
         </button>
       </div>
 
@@ -93,7 +122,12 @@
         <div class="tarjeta-kpi-ejecutiva navy">
           <div class="kpi-encabezado">
             <span class="kpi-etiqueta">Total Tickets</span>
-            <span class="kpi-icono">📋</span>
+            <div class="kpi-icono navy">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+              </svg>
+            </div>
           </div>
           <div class="kpi-valor">
             {{ cargando ? "..." : metricas.ticketsTotales }}
@@ -107,7 +141,12 @@
         <div class="tarjeta-kpi-ejecutiva orange">
           <div class="kpi-encabezado">
             <span class="kpi-etiqueta">Sin Asignar</span>
-            <span class="kpi-icono">⏳</span>
+            <div class="kpi-icono orange">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
           </div>
           <div class="kpi-valor" :style="{ color: metricas.ticketsSinAsignar > 0 ? '#ea580c' : '#059669' }">
             {{ cargando ? "..." : metricas.ticketsSinAsignar }}
@@ -121,7 +160,11 @@
         <div class="tarjeta-kpi-ejecutiva blue">
           <div class="kpi-encabezado">
             <span class="kpi-etiqueta">En Atención</span>
-            <span class="kpi-icono">⚙️</span>
+            <div class="kpi-icono blue">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
+            </div>
           </div>
           <div class="kpi-valor" style="color: #0284c7;">
             {{ cargando ? "..." : metricas.ticketsEnProceso }}
@@ -135,7 +178,12 @@
         <div class="tarjeta-kpi-ejecutiva teal">
           <div class="kpi-encabezado">
             <span class="kpi-etiqueta">Efectividad</span>
-            <span class="kpi-icono">✅</span>
+            <div class="kpi-icono teal">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
           </div>
           <div class="kpi-valor" style="color: #00bba6;">
             {{ cargando ? "..." : metricas.tasaResolucion }}%
@@ -149,10 +197,17 @@
         <div class="tarjeta-kpi-ejecutiva gold">
           <div class="kpi-encabezado">
             <span class="kpi-etiqueta">Satisfacción CSAT</span>
-            <span class="kpi-icono">⭐</span>
+            <div class="kpi-icono gold">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+            </div>
           </div>
-          <div class="kpi-valor" style="color: #d97706;">
-            ★ {{ cargando ? "..." : metricas.promedioCalificacion }}
+          <div class="kpi-valor" style="color: #d97706; display: flex; align-items: center; gap: 4px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            <span>{{ cargando ? "..." : metricas.promedioCalificacion }}</span>
           </div>
           <div class="kpi-subtexto">
             Sobre {{ metricas.totalCalificaciones }} calificaciones recibidas
@@ -166,7 +221,11 @@
         <div class="dashboard-tarjeta-contenedor">
           <div class="tarjeta-header-flex">
             <h2 class="tarjeta-titulo-con-icono">
-              <span>📈</span> Flujo de Incidencias: Ingresados vs Resueltos
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                <polyline points="17 6 23 6 23 12"></polyline>
+              </svg>
+              <span>Flujo de Incidencias: Ingresados vs Resueltos</span>
             </h2>
             <div style="display: flex; gap: 6px;">
               <button
@@ -243,7 +302,12 @@
         <div class="dashboard-tarjeta-contenedor">
           <div class="tarjeta-header-flex">
             <h2 class="tarjeta-titulo-con-icono">
-              <span>🎯</span> Nivel de Criticidad y Áreas de Demanda
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="6"></circle>
+                <circle cx="12" cy="12" r="2"></circle>
+              </svg>
+              <span>Nivel de Criticidad y Áreas de Demanda</span>
             </h2>
             <button
               type="button"
@@ -257,7 +321,10 @@
           <!-- Barras de Prioridad -->
           <div class="prioridad-barras-resumen">
             <div class="prioridad-fila">
-              <span class="prioridad-etiqueta" style="color: #dc2626;">🔴 Crítica</span>
+              <span class="prioridad-etiqueta" style="color: #dc2626;">
+                <span class="prioridad-indicador-punto" style="background-color: #dc2626;"></span>
+                Crítica
+              </span>
               <div class="prioridad-barra-fondo">
                 <div
                   class="prioridad-barra-relleno"
@@ -271,7 +338,10 @@
             </div>
 
             <div class="prioridad-fila">
-              <span class="prioridad-etiqueta" style="color: #ea580c;">🟠 Alta</span>
+              <span class="prioridad-etiqueta" style="color: #ea580c;">
+                <span class="prioridad-indicador-punto" style="background-color: #ea580c;"></span>
+                Alta
+              </span>
               <div class="prioridad-barra-fondo">
                 <div
                   class="prioridad-barra-relleno"
@@ -285,7 +355,10 @@
             </div>
 
             <div class="prioridad-fila">
-              <span class="prioridad-etiqueta" style="color: #00bba6;">🟢 Media</span>
+              <span class="prioridad-etiqueta" style="color: #00bba6;">
+                <span class="prioridad-indicador-punto" style="background-color: #00bba6;"></span>
+                Media
+              </span>
               <div class="prioridad-barra-fondo">
                 <div
                   class="prioridad-barra-relleno"
@@ -299,7 +372,10 @@
             </div>
 
             <div class="prioridad-fila">
-              <span class="prioridad-etiqueta" style="color: #64748b;">🔵 Baja</span>
+              <span class="prioridad-etiqueta" style="color: #64748b;">
+                <span class="prioridad-indicador-punto" style="background-color: #94a3b8;"></span>
+                Baja
+              </span>
               <div class="prioridad-barra-fondo">
                 <div
                   class="prioridad-barra-relleno"
@@ -338,7 +414,10 @@
         <div class="dashboard-tarjeta-contenedor">
           <div class="tarjeta-header-flex">
             <h2 class="tarjeta-titulo-con-icono">
-              <span>⚡</span> Cola de Atención Prioritaria
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+              <span>Cola de Atención Prioritaria</span>
             </h2>
             <div class="pestanas-triaje">
               <button
@@ -368,8 +447,12 @@
             </div>
           </div>
 
-          <div v-if="ticketsTriajeFiltrados.length === 0" style="padding: 32px 16px; text-align: center; color: #64748b;">
-            <span style="font-size: 2rem; display: block; margin-bottom: 6px;">🎉</span>
+          <div v-if="ticketsTriajeFiltrados.length === 0" style="padding: 36px 16px; text-align: center; color: #64748b;">
+            <div style="width: 44px; height: 44px; border-radius: 50%; background-color: #ecfdf5; color: #059669; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
             <strong style="color: #0f172a; display: block;">¡Sin tickets pendientes en esta vista!</strong>
             <span style="font-size: 13px;">Todos los requerimientos están asignados o resueltos.</span>
           </div>
@@ -409,15 +492,19 @@
                   <td>
                     <span
                       v-if="t.tecnico_nombre"
-                      style="font-size: 12px; font-weight: 600; color: var(--color-sidebar-fondo, #071e33);"
+                      style="font-size: 12px; font-weight: 600; color: var(--color-sidebar-fondo, #071e33); display: inline-flex; align-items: center; gap: 4px;"
                     >
-                      🛠️ {{ t.tecnico_nombre }}
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                      </svg>
+                      {{ t.tecnico_nombre }}
                     </span>
                     <span
                       v-else
-                      style="font-size: 11px; font-weight: 700; color: #b91c1c; background-color: #fef2f2; padding: 2px 6px; border-radius: 4px; border: 1px solid #fecaca;"
+                      style="font-size: 11px; font-weight: 700; color: #b91c1c; background-color: #fef2f2; padding: 2px 8px; border-radius: 4px; border: 1px solid #fecaca; display: inline-flex; align-items: center; gap: 4px;"
                     >
-                      ⚠️ Sin Asignar
+                      <span style="width: 6px; height: 6px; border-radius: 50%; background-color: #ef4444;"></span>
+                      Sin Asignar
                     </span>
                   </td>
                   <td style="text-align: right;">
@@ -458,7 +545,14 @@
         <div class="dashboard-tarjeta-contenedor">
           <div class="tarjeta-header-flex">
             <h2 class="tarjeta-titulo-con-icono">
-              <span>📡</span> Despacho de Técnicos en Tiempo Real
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"></path>
+                <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"></path>
+                <circle cx="12" cy="12" r="2"></circle>
+                <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"></path>
+                <path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"></path>
+              </svg>
+              <span>Despacho de Técnicos en Tiempo Real</span>
             </h2>
             <button
               type="button"
@@ -518,7 +612,10 @@
         <div class="tarjeta-header-flex">
           <div>
             <h2 class="tarjeta-titulo-con-icono">
-              <span>⭐</span> Evaluaciones Recientes de Calidad de Servicio
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+              <span>Evaluaciones Recientes de Calidad de Servicio</span>
             </h2>
             <p style="margin: 2px 0 0; font-size: 13px; color: #64748b;">
               Feedback directo de los clientes tras el cierre de requerimientos técnicos.
@@ -546,9 +643,20 @@
           >
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <span style="color: #eab308; font-size: 1rem; letter-spacing: 2px;">
-                  {{ '★'.repeat(cal.puntuacion) }}{{ '☆'.repeat(5 - cal.puntuacion) }}
-                </span>
+                <div style="display: flex; align-items: center; gap: 2px;">
+                  <svg
+                    v-for="n in 5"
+                    :key="n"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    :fill="n <= cal.puntuacion ? '#f59e0b' : '#e2e8f0'"
+                    :stroke="n <= cal.puntuacion ? '#f59e0b' : '#cbd5e1'"
+                    stroke-width="1"
+                  >
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                </div>
                 <span style="font-size: 11px; color: #94a3b8;">
                   {{ cal.fecha_calificacion ? cal.fecha_calificacion.substring(0, 10) : '' }}
                 </span>
@@ -560,8 +668,19 @@
             </div>
 
             <div style="border-top: 1px solid #f1f5f9; padding-top: 8px; font-size: 11px; display: flex; justify-content: space-between; color: #64748b;">
-              <span>👤 <strong>{{ cal.cliente_nombre || 'Cliente' }}</strong></span>
-              <span>🛠️ {{ cal.tecnico_nombre || 'Técnico' }}</span>
+              <span style="display: inline-flex; align-items: center; gap: 4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <strong>{{ cal.cliente_nombre || 'Cliente' }}</strong>
+              </span>
+              <span style="display: inline-flex; align-items: center; gap: 4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                </svg>
+                {{ cal.tecnico_nombre || 'Técnico' }}
+              </span>
             </div>
           </div>
         </div>

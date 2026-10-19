@@ -17,8 +17,13 @@
           type="button"
           class="btn-volver-dashboard-top"
           @click="router.push('/tecnico')"
+          style="display: inline-flex; align-items: center; gap: 6px;"
         >
-          ← Volver al Dashboard
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Volver al Dashboard</span>
         </button>
       </header>
 
@@ -72,7 +77,12 @@
           </div>
 
           <div v-else-if="ticketsFiltrados.length === 0" class="estado-vacio-tabla">
-            <div class="estado-vacio-icono">📭</div>
+            <div class="estado-vacio-icono" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background-color: #f1f5f9; color: #64748b; margin: 0 auto 10px;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 12h-6l-2 3h-4l-2-3H2"></path>
+                <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+              </svg>
+            </div>
             <p class="estado-vacio-texto">No se encontraron tickets con los filtros seleccionados</p>
             <p class="estado-vacio-subtexto">
               {{
@@ -148,7 +158,7 @@
                       class="btn-ver-detalle"
                       title="Ver detalle y gestionar ticket"
                     >
-                      Gestionar ➜
+                      Gestionar →
                     </router-link>
                     <router-link
                       :to="`/tecnico/tickets/${ticket.id_ticket}/avance`"

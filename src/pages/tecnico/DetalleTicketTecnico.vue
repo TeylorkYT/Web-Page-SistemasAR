@@ -22,28 +22,44 @@
           <h1 class="detalle-ticket-titulo">{{ ticket.titulo }}</h1>
         </div>
         <div class="detalle-ticket-acciones-header">
-          <Boton
-            variante="secundario"
+          <button
+            type="button"
+            class="btn btn-secundario"
             @click="router.push('/tecnico/tickets')"
-            texto="⬅ Mis Tickets"
-          />
+            style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-weight: 500; font-size: 0.9rem; cursor: pointer; border: 1px solid #cbd5e1; background: #fff;"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>Mis Tickets</span>
+          </button>
           <Boton
             variante="primario"
             @click="router.push(`/tecnico/tickets/${ticket.id_ticket}/avance`)"
-            texto="📝 Registrar Avance"
+            texto="Registrar Avance"
           />
         </div>
       </header>
 
       <!-- Notificación de éxito al cambiar estado -->
       <div v-if="mensajeExito" class="alerta-exito-flotante" role="alert">
-        <span>✅ {{ mensajeExito }}</span>
+        <span style="display: inline-flex; align-items: center; gap: 6px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          {{ mensajeExito }}
+        </span>
         <button
           type="button"
           @click="mensajeExito = ''"
-          style="background: none; border: none; cursor: pointer; font-weight: bold; color: inherit;"
+          style="background: none; border: none; cursor: pointer; color: inherit; display: flex; align-items: center; padding: 2px;"
+          aria-label="Cerrar notificación"
         >
-          ✕
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
         </button>
       </div>
 
@@ -87,12 +103,15 @@
       <div class="detalle-grid-principal">
         <!-- Columna Izquierda: Chat Prioritario, Descripción, Adjuntos e Historial -->
         <div>
-          <!-- 💬 Chat con el Cliente -->
+          <!-- Chat con el Cliente -->
           <div class="detalle-card">
             <div class="chat-header-flex">
               <div>
-                <h2 class="detalle-card-titulo" style="margin: 0;">
-                  💬 Chat del Ticket con el Cliente
+                <h2 class="detalle-card-titulo" style="margin: 0; display: flex; align-items: center; gap: 8px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  <span>Chat del Ticket con el Cliente</span>
                 </h2>
                 <p style="margin: 4px 0 0; font-size: 0.85rem; color: #556980;">
                   Conversación directa con {{ ticket.cliente?.nombre }} {{ ticket.cliente?.apellido }}.
@@ -112,7 +131,11 @@
                 v-if="!ticket.comentarios || ticket.comentarios.length === 0"
                 class="chat-vacio-box"
               >
-                <span style="font-size: 2rem; display: block; margin-bottom: 8px;">💬</span>
+                <div style="width: 44px; height: 44px; border-radius: 50%; background-color: #f1f5f9; color: #64748b; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </div>
                 <p style="margin: 0; font-size: 0.92rem; font-weight: 700; color: #072137;">
                   No hay mensajes en este chat aún
                 </p>
@@ -137,8 +160,16 @@
                     <span
                       class="chip-rol-autor"
                       :class="(c.rolAutor || c.rol) === 'Tecnico' ? 'chip-tecnico' : 'chip-cliente'"
+                      style="display: inline-flex; align-items: center; gap: 4px;"
                     >
-                      {{ (c.rolAutor || c.rol) === 'Tecnico' ? '🛠️ Técnico' : '👤 Cliente' }}
+                      <svg v-if="(c.rolAutor || c.rol) === 'Tecnico'" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                      </svg>
+                      <svg v-else width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                      </svg>
+                      <span>{{ (c.rolAutor || c.rol) === 'Tecnico' ? 'Técnico' : 'Cliente' }}</span>
                     </span>
                     <span style="font-weight: 700; font-size: 0.88rem; color: #072137;">
                       {{ c.autor || c.usuario_nombre || 'Usuario' }}
@@ -146,8 +177,13 @@
                     <span
                       v-if="c.es_nota_interna"
                       class="chip-nota-interna"
+                      style="display: inline-flex; align-items: center; gap: 4px;"
                     >
-                      🔒 Nota interna
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                      </svg>
+                      <span>Nota interna</span>
                     </span>
                   </div>
                   <span style="font-size: 0.76rem; color: #8ca3ba;">
@@ -190,22 +226,43 @@
                   class="btn-enviar-chat"
                   :style="{
                     backgroundColor: esNotaInterna ? '#854d0e' : 'var(--color-primario, #00bba6)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
                   }"
                   id="btn-enviar-mensaje-chat"
                 >
-                  {{ enviandoMensaje ? 'Enviando...' : esNotaInterna ? '🔒 Guardar nota interna' : '💬 Enviar mensaje' }}
+                  <svg v-if="esNotaInterna" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  </svg>
+                  <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                  </svg>
+                  <span>{{ enviandoMensaje ? 'Enviando...' : esNotaInterna ? 'Guardar nota interna' : 'Enviar mensaje' }}</span>
                 </button>
               </div>
             </form>
 
-            <div v-else style="padding: 10px 14px; background-color: #f8fafc; border: 1px solid #e2ebf1; border-radius: 8px; color: #556980; font-size: 0.85rem; text-align: center;">
-              🔒 Este ticket se encuentra cerrado. No se admiten nuevos mensajes.
+            <div v-else style="padding: 10px 14px; background-color: #f8fafc; border: 1px solid #e2ebf1; border-radius: 8px; color: #556980; font-size: 0.85rem; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <span>Este ticket se encuentra cerrado. No se admiten nuevos mensajes.</span>
             </div>
           </div>
 
           <!-- Descripción del Requerimiento -->
           <div class="detalle-card">
-            <h2 class="detalle-card-titulo">📋 Descripción del Problema</h2>
+            <h2 class="detalle-card-titulo" style="display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+              <span>Descripción del Problema</span>
+            </h2>
             <div class="detalle-descripcion-box">{{ ticket.descripcion }}</div>
 
             <div v-if="ticket.nombresCategorias && ticket.nombresCategorias.length > 0" style="margin-top: 16px;">
@@ -234,15 +291,23 @@
           <!-- Historial de Avances y Acciones -->
           <div class="detalle-card">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <h2 class="detalle-card-titulo" style="margin: 0;">
-                🕒 Historial del Ticket
+              <h2 class="detalle-card-titulo" style="margin: 0; display: flex; align-items: center; gap: 8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>Historial del Ticket</span>
               </h2>
               <button
                 type="button"
                 @click="router.push(`/tecnico/tickets/${ticket.id_ticket}/avance`)"
-                style="background: none; border: none; color: var(--color-primario, #00bba6); font-weight: 700; cursor: pointer; font-size: 0.88rem;"
+                style="background: none; border: none; color: var(--color-primario, #00bba6); font-weight: 700; cursor: pointer; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 4px;"
               >
-                + Agregar nuevo avance
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Agregar nuevo avance</span>
               </button>
             </div>
 
@@ -273,7 +338,13 @@
         <div>
           <!-- Tarjeta del Cliente -->
           <div class="detalle-card">
-            <h2 class="detalle-card-titulo">👤 Datos del Cliente</h2>
+            <h2 class="detalle-card-titulo" style="display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>Datos del Cliente</span>
+            </h2>
             <div class="campo-fila">
               <span class="campo-etiqueta">Nombre:</span>
               <span class="campo-valor">
@@ -289,15 +360,27 @@
           <!-- Tarjeta del Equipo -->
           <div class="detalle-card">
             <div class="detalle-card-header-flex">
-              <h2 class="detalle-card-titulo" style="margin-bottom: 0;">💻 Equipo Registrado</h2>
+              <h2 class="detalle-card-titulo" style="margin-bottom: 0; display: flex; align-items: center; gap: 8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+                <span>Equipo Registrado</span>
+              </h2>
               <button
                 type="button"
                 class="btn-accion-card-tec"
                 @click="abrirModalRegistrarEquipo"
                 id="btn-abrir-modal-equipo"
                 title="Registrar un nuevo equipo para este cliente"
+                style="display: inline-flex; align-items: center; gap: 4px;"
               >
-                + Registrar Equipo
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Registrar Equipo</span>
               </button>
             </div>
 
@@ -339,14 +422,26 @@
                   class="btn-link-tec"
                   @click="abrirModalVincularExistente"
                   id="btn-cambiar-equipo-vinculado"
+                  style="display: inline-flex; align-items: center; gap: 6px;"
                 >
-                  ⇄ Cambiar equipo vinculado
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <polyline points="1 20 1 14 7 14"></polyline>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                  </svg>
+                  <span>Cambiar equipo vinculado</span>
                 </button>
               </div>
             </div>
 
             <div v-else class="equipo-vacio-box">
-              <div class="equipo-vacio-icono">💻</div>
+              <div class="equipo-vacio-icono">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+              </div>
               <p class="equipo-vacio-titulo">Sin equipo asociado</p>
               <p class="equipo-vacio-subtexto">
                 Este ticket aún no tiene un equipo asignado. Puedes registrar uno nuevo para <strong>{{ ticket.cliente?.nombre }} {{ ticket.cliente?.apellido }}</strong> o asociar uno de sus equipos ya registrados.
@@ -357,16 +452,26 @@
                   class="btn-equipo-cta primario"
                   @click="abrirModalRegistrarEquipo"
                   id="btn-cta-registrar-equipo"
+                  style="display: inline-flex; align-items: center; justify-content: center; gap: 6px;"
                 >
-                  + Registrar Nuevo Equipo
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  <span>Registrar Nuevo Equipo</span>
                 </button>
                 <button
                   type="button"
                   class="btn-equipo-cta secundario"
                   @click="abrirModalVincularExistente"
                   id="btn-cta-vincular-equipo"
+                  style="display: inline-flex; align-items: center; justify-content: center; gap: 6px;"
                 >
-                  🔗 Asociar Equipo Existente
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                  </svg>
+                  <span>Asociar Equipo Existente</span>
                 </button>
               </div>
             </div>
@@ -374,7 +479,15 @@
 
           <!-- Tiempos y Fechas -->
           <div class="detalle-card">
-            <h2 class="detalle-card-titulo">📅 Tiempos del Ticket</h2>
+            <h2 class="detalle-card-titulo" style="display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span>Tiempos del Ticket</span>
+            </h2>
             <div class="campo-fila">
               <span class="campo-etiqueta">Creación:</span>
               <span class="campo-valor">{{ ticket.fecha_creacion }}</span>
@@ -414,7 +527,10 @@
             :disabled="guardandoEquipo"
             aria-label="Cerrar modal"
           >
-            ×
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
           </button>
         </div>
 
@@ -425,16 +541,26 @@
             class="modal-tab-btn"
             :class="{ activo: tabModalEquipo === 'nuevo' }"
             @click="tabModalEquipo = 'nuevo'"
+            style="display: inline-flex; align-items: center; justify-content: center; gap: 6px;"
           >
-            + Registrar Nuevo Equipo
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>Registrar Nuevo Equipo</span>
           </button>
           <button
             type="button"
             class="modal-tab-btn"
             :class="{ activo: tabModalEquipo === 'existentes' }"
             @click="cambiarATabExistentes"
+            style="display: inline-flex; align-items: center; justify-content: center; gap: 6px;"
           >
-            📋 Equipos Registrados ({{ listaEquiposCliente.length }})
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+            </svg>
+            <span>Equipos Registrados ({{ listaEquiposCliente.length }})</span>
           </button>
         </div>
 
@@ -612,7 +738,13 @@
               class="item-equipo-cliente-card"
               :class="{ 'item-equipo-actual': ticket?.equipo?.id_equipo === eq.id_equipo }"
             >
-              <div class="item-eq-icono">💻</div>
+              <div class="item-eq-icono">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+              </div>
               <div class="item-eq-detalles">
                 <div class="item-eq-titulo">
                   <strong>{{ eq.marca }} {{ eq.modelo }}</strong>
@@ -628,8 +760,12 @@
                 <span
                   v-if="ticket?.equipo?.id_equipo === eq.id_equipo"
                   class="badge-equipo-actual"
+                  style="display: inline-flex; align-items: center; gap: 4px;"
                 >
-                  ✓ Actualmente Vinculado
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  <span>Actualmente Vinculado</span>
                 </span>
                 <button
                   v-else

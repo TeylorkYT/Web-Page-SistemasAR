@@ -12,8 +12,13 @@
         type="button"
         class="detalle-ticket-btn-volver"
         @click="router.push('/cliente/tickets')"
+        style="display: inline-flex; align-items: center; gap: 6px;"
       >
-        ← Volver a Mis Tickets
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Volver a Mis Tickets</span>
       </button>
     </div>
 
@@ -25,8 +30,13 @@
           id="btn-volver-tickets"
           class="detalle-ticket-btn-volver"
           @click="router.push('/cliente/tickets')"
+          style="display: inline-flex; align-items: center; gap: 6px;"
         >
-          ← Mis tickets
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Mis tickets</span>
         </button>
         <div class="detalle-ticket-cabecera-derecha">
           <EstadoBadge :estado="ticket.estado" />
@@ -36,8 +46,12 @@
             id="btn-calificar"
             class="detalle-ticket-btn-calificar"
             @click="router.push(`/cliente/tickets/${ticket.id_ticket}/calificar`)"
+            style="display: inline-flex; align-items: center; gap: 6px;"
           >
-            ★ Calificar atención
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#eab308" stroke="#ca8a04" stroke-width="1.5">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            <span>Calificar atención</span>
           </button>
         </div>
       </div>
@@ -61,9 +75,10 @@
             <dd>
               <span
                 class="detalle-ticket-prioridad"
-                :style="{ color: colorPrioridad }"
+                :style="{ color: colorPrioridad, display: 'inline-flex', alignItems: 'center', gap: '5px' }"
               >
-                ● {{ ticket.prioridad }}
+                <span :style="{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: colorPrioridad, display: 'inline-block' }"></span>
+                <span>{{ ticket.prioridad }}</span>
               </span>
             </dd>
             <dt>Categorías</dt>
@@ -86,12 +101,26 @@
 
           <!-- Calificación ya enviada -->
           <div v-if="ticket.calificacion" class="calificacion-box">
-            <h3 class="calificacion-titulo">
-              ★ Calificación registrada
+            <h3 class="calificacion-titulo" style="display: flex; align-items: center; gap: 6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#eab308" stroke="#ca8a04" stroke-width="1.5">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+              <span>Calificación registrada</span>
             </h3>
-            <p class="calificacion-estrellas">
-              {{ '★'.repeat(ticket.calificacion.puntuacion || 0) }}{{ '☆'.repeat(5 - (ticket.calificacion.puntuacion || 0)) }}
-            </p>
+            <div class="calificacion-estrellas" style="display: flex; gap: 3px; margin: 6px 0;">
+              <svg
+                v-for="starIndex in 5"
+                :key="starIndex"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                :fill="starIndex <= (ticket.calificacion.puntuacion || 0) ? '#eab308' : '#e2e8f0'"
+                :stroke="starIndex <= (ticket.calificacion.puntuacion || 0) ? '#ca8a04' : '#cbd5e1'"
+                stroke-width="1.5"
+              >
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+            </div>
             <p v-if="ticket.calificacion.comentario" class="calificacion-comentario">
               "{{ ticket.calificacion.comentario }}"
             </p>
@@ -99,8 +128,12 @@
 
           <!-- Informe de cierre del técnico -->
           <div v-if="ticket.reporte" class="solucion-box">
-            <h3 class="solucion-titulo">
-              ✔ Solución aplicada por el técnico
+            <h3 class="solucion-titulo" style="display: flex; align-items: center; gap: 6px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <span>Solución aplicada por el técnico</span>
             </h3>
             <p class="solucion-texto">
               {{ ticket.reporte.solucion_aplicada }}
@@ -112,7 +145,12 @@
         <div style="display: flex; flex-direction: column; gap: 20px;">
           <!-- Comentarios con el técnico -->
           <div class="detalle-ticket-tarjeta">
-            <h2 class="detalle-ticket-seccion">💬 Chat con el Técnico Asignado</h2>
+            <h2 class="detalle-ticket-seccion" style="display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <span>Chat con el Técnico Asignado</span>
+            </h2>
             <p style="margin: 0 0 14px; font-size: 13px; color: #556980;">
               Comunícate de forma directa con el área técnica encargada de tu caso.
             </p>
@@ -139,8 +177,16 @@
                         'rol-tecnico': (c.rolAutor || c.rol || '').toLowerCase() === 'tecnico',
                         'rol-cliente': (c.rolAutor || c.rol || '').toLowerCase() !== 'tecnico',
                       }"
+                      style="display: inline-flex; align-items: center; gap: 4px;"
                     >
-                      {{ (c.rolAutor || c.rol || '').toLowerCase() === 'tecnico' ? '🛠️ Soporte Técnico' : '👤 Tú' }}
+                      <svg v-if="(c.rolAutor || c.rol || '').toLowerCase() === 'tecnico'" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                      </svg>
+                      <svg v-else width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                      </svg>
+                      <span>{{ (c.rolAutor || c.rol || '').toLowerCase() === 'tecnico' ? 'Soporte Técnico' : 'Tú' }}</span>
                     </span>
                     <span class="comentario-autor-nombre">
                       {{ c.autor || c.usuario_nombre }}

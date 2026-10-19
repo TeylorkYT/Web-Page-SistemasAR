@@ -16,7 +16,11 @@
           style="background: linear-gradient(135deg, var(--color-primario, #00bba6) 0%, var(--color-primario-oscuro, #008f7e) 100%); color: white; padding: 10px 20px; border-radius: 20px; border: none; font-weight: 700; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 14px rgba(0, 187, 166, 0.25); display: inline-flex; align-items: center; gap: 8px; transition: transform 0.2s;"
           @click="router.push('/admin/asignacion')"
         >
-          <span>🛠️</span> Bandeja de Asignación ({{ conteo.abiertos }})
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+          <span>Bandeja de Asignación ({{ conteo.abiertos }})</span>
         </button>
       </header>
 
@@ -27,7 +31,15 @@
             <span style="font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase;">Total Tickets</span>
             <h3 style="margin: 4px 0 0; font-size: 24px; color: #071e33; font-weight: 800;">{{ conteo.total }}</h3>
           </div>
-          <span style="font-size: 24px; opacity: 0.85;">📋</span>
+          <div style="width: 36px; height: 36px; border-radius: 10px; background-color: #f1f5f9; color: #071e33; display: flex; align-items: center; justify-content: center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
         </div>
 
         <div class="kpi-card-admin" :style="{ borderLeft: '4px solid #eab308' }">
@@ -35,7 +47,12 @@
             <span style="font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase;">Abiertos (Pendientes)</span>
             <h3 style="margin: 4px 0 0; font-size: 24px; color: #eab308; font-weight: 800;">{{ conteo.abiertos }}</h3>
           </div>
-          <span style="font-size: 24px; opacity: 0.85;">⏳</span>
+          <div style="width: 36px; height: 36px; border-radius: 10px; background-color: #fef9c3; color: #ca8a04; display: flex; align-items: center; justify-content: center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
         </div>
 
         <div class="kpi-card-admin" :style="{ borderLeft: '4px solid #0284c7' }">
@@ -43,7 +60,11 @@
             <span style="font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase;">En Atención Técnica</span>
             <h3 style="margin: 4px 0 0; font-size: 24px; color: #0284c7; font-weight: 800;">{{ conteo.enProceso }}</h3>
           </div>
-          <span style="font-size: 24px; opacity: 0.85;">⚙️</span>
+          <div style="width: 36px; height: 36px; border-radius: 10px; background-color: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+          </div>
         </div>
 
         <div class="kpi-card-admin" :style="{ borderLeft: '4px solid #00bba6' }">
@@ -51,7 +72,12 @@
             <span style="font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase;">Resueltos</span>
             <h3 style="margin: 4px 0 0; font-size: 24px; color: #00bba6; font-weight: 800;">{{ conteo.resueltos }}</h3>
           </div>
-          <span style="font-size: 24px; opacity: 0.85;">✅</span>
+          <div style="width: 36px; height: 36px; border-radius: 10px; background-color: #e6f9f6; color: #00bba6; display: flex; align-items: center; justify-content: center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
         </div>
 
         <div class="kpi-card-admin" :style="{ borderLeft: '4px solid #475569' }">
@@ -59,7 +85,12 @@
             <span style="font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase;">Cerrados / Archivados</span>
             <h3 style="margin: 4px 0 0; font-size: 24px; color: #475569; font-weight: 800;">{{ conteo.cerrados }}</h3>
           </div>
-          <span style="font-size: 24px; opacity: 0.85;">🔒</span>
+          <div style="width: 36px; height: 36px; border-radius: 10px; background-color: #f1f5f9; color: #475569; display: flex; align-items: center; justify-content: center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
         </div>
       </div>
 
@@ -93,7 +124,7 @@
               style="padding: 8px 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 0.85rem; background-color: #ffffff; color: #334155; font-weight: 600; outline: none;"
             >
               <option value="Todos">Todos los Técnicos</option>
-              <option value="sin_asignar">⚠️ Sin Asignar</option>
+              <option value="sin_asignar">Sin Asignar (Pendientes)</option>
               <option v-for="t in tecnicos" :key="t.id_usuario" :value="String(t.id_usuario)">
                 {{ t.nombre }} {{ t.apellido }}
               </option>
@@ -131,8 +162,13 @@
           Cargando historial de tickets...
         </div>
 
-        <div v-else-if="ticketsFiltrados.length === 0" style="padding: 40px 20px; text-align: center;">
-          <span style="font-size: 2rem; display: block; margin-bottom: 8px;">📭</span>
+        <div v-else-if="ticketsFiltrados.length === 0" style="padding: 48px 20px; text-align: center;">
+          <div style="width: 48px; height: 48px; border-radius: 50%; background-color: #f1f5f9; color: #64748b; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12h-6l-2 3h-4l-2-3H2"></path>
+              <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+            </svg>
+          </div>
           <p style="margin: 0; font-weight: 600; color: #1e293b;">No se encontraron tickets con los criterios indicados.</p>
           <button
             type="button"
@@ -179,16 +215,20 @@
                   <div style="font-size: 12px; color: #64748b;">{{ t.cliente_correo || "" }}</div>
                 </td>
                 <td style="padding: 14px 16px;">
-                  <span v-if="t.tecnico_nombre" style="font-weight: 600; color: var(--color-sidebar-fondo, #071e33); display: inline-flex; align-items: center; gap: 4px;">
-                    🛠️ {{ t.tecnico_nombre }}
+                  <span v-if="t.tecnico_nombre" style="font-weight: 600; color: var(--color-sidebar-fondo, #071e33); display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                    </svg>
+                    {{ t.tecnico_nombre }}
                   </span>
                   <button
                     v-else
                     type="button"
-                    style="padding: 4px 10px; border-radius: 6px; background-color: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; font-size: 12px; font-weight: 700; cursor: pointer;"
+                    style="padding: 4px 10px; border-radius: 6px; background-color: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;"
                     @click="router.push(`/admin/tickets/${t.id_ticket}/asignar`)"
                   >
-                    ⚠️ Sin asignar (Asignar →)
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background-color: #ef4444;"></span>
+                    Sin asignar (Asignar →)
                   </button>
                 </td>
                 <td style="padding: 14px 16px;">
@@ -205,10 +245,14 @@
                 <td style="padding: 14px 16px; text-align: right;">
                   <button
                     type="button"
-                    style="padding: 6px 14px; border-radius: 8px; background-color: #f8fafc; color: var(--color-sidebar-fondo, #071e33); border: 1px solid #cbd5e1; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;"
+                    style="padding: 6px 14px; border-radius: 8px; background-color: #f8fafc; color: var(--color-sidebar-fondo, #071e33); border: 1px solid #cbd5e1; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;"
                     @click="abrirAuditoria(t.id_ticket)"
                   >
-                    🔍 Ver Auditoría
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <span>Ver Auditoría</span>
                   </button>
                 </td>
               </tr>
@@ -235,17 +279,22 @@
                   v-if="!ticketAuditoria.id_tecnico"
                   style="padding: 3px 10px; border-radius: 9999px; background-color: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;"
                 >
-                  ⚠️ Sin Asignar
+                  <span style="width: 6px; height: 6px; border-radius: 50%; background-color: #ef4444;"></span>
+                  Sin Asignar
                 </span>
               </div>
               <h2 style="margin: 4px 0 0; font-size: 1.25rem; color: #1e293b;">{{ ticketAuditoria.titulo }}</h2>
             </div>
             <button
               type="button"
-              style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b;"
+              style="background: none; border: none; cursor: pointer; color: #64748b; padding: 4px; display: flex; align-items: center; justify-content: center;"
+              aria-label="Cerrar modal"
               @click="cerrarAuditoria"
             >
-              ✕
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
             </button>
           </div>
 
@@ -257,7 +306,13 @@
               style="margin-bottom: 20px; padding: 14px 18px; border-radius: 12px; background-color: #fff7ed; border: 1.5px solid #fed7aa; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;"
             >
               <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 1.75rem;">⚠️</span>
+                <div style="width: 36px; height: 36px; border-radius: 8px; background-color: #ffedd5; color: #ea580c; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                </div>
                 <div>
                   <div style="font-weight: 700; color: #9a3412; font-size: 0.95rem;">
                     Ticket Pendiente de Asignación Técnica
@@ -272,7 +327,10 @@
                 style="padding: 8px 18px; border-radius: 20px; background-color: #ea580c; color: #ffffff; border: none; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(234, 88, 12, 0.25); transition: opacity 0.2s;"
                 @click="irAAsignar(ticketAuditoria.id_ticket)"
               >
-                <span>🛠️</span> Asignar Técnico Ahora →
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                </svg>
+                <span>Asignar Técnico Ahora →</span>
               </button>
             </div>
 
@@ -286,15 +344,19 @@
                 <span style="font-size: 12px; color: #64748b; display: block;">Técnico Asignado:</span>
                 <strong
                   v-if="ticketAuditoria.tecnico_nombre"
-                  style="font-size: 14px; color: var(--color-sidebar-fondo, #071e33);"
+                  style="font-size: 14px; color: var(--color-sidebar-fondo, #071e33); display: inline-flex; align-items: center; gap: 6px;"
                 >
-                  🛠️ {{ ticketAuditoria.tecnico_nombre }}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                  </svg>
+                  {{ ticketAuditoria.tecnico_nombre }}
                 </strong>
                 <span
                   v-else
-                  style="font-size: 13px; font-weight: 700; color: #b91c1c; display: inline-flex; align-items: center; gap: 4px;"
+                  style="font-size: 13px; font-weight: 700; color: #b91c1c; display: inline-flex; align-items: center; gap: 6px;"
                 >
-                  ⚠️ Sin Asignar (Pendiente de triaje)
+                  <span style="width: 6px; height: 6px; border-radius: 50%; background-color: #ef4444;"></span>
+                  Sin Asignar (Pendiente de triaje)
                 </span>
               </div>
               <div>
@@ -322,7 +384,10 @@
             >
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
                 <strong style="color: #007a6c; font-size: 14px; display: flex; align-items: center; gap: 6px;">
-                  <span>🛠️</span> Reporte de Solución Técnica (Cierre de Atención)
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  <span>Reporte de Solución Técnica (Cierre de Atención)</span>
                 </strong>
                 <span style="font-size: 12px; color: #007a6c; font-weight: 600;">
                   {{ ticketAuditoria.reporte.fecha_reporte }}
@@ -339,9 +404,20 @@
               style="margin-bottom: 20px; padding: 14px; border-radius: 8px; background-color: #fefce8; border: 1px solid #fef08a;"
             >
               <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                <span style="color: #eab308; font-size: 1.1rem;">
-                  {{ '★'.repeat(ticketAuditoria.calificacion.puntuacion || 0) }}{{ '☆'.repeat(5 - (ticketAuditoria.calificacion.puntuacion || 0)) }}
-                </span>
+                <div style="display: flex; align-items: center; gap: 2px;">
+                  <svg
+                    v-for="n in 5"
+                    :key="n"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    :fill="n <= (ticketAuditoria.calificacion.puntuacion || 0) ? '#f59e0b' : '#e2e8f0'"
+                    :stroke="n <= (ticketAuditoria.calificacion.puntuacion || 0) ? '#f59e0b' : '#cbd5e1'"
+                    stroke-width="1"
+                  >
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                </div>
                 <strong style="font-size: 14px; color: #854d0e;">
                   Calificación del Cliente ({{ ticketAuditoria.calificacion.puntuacion }}/5)
                 </strong>
@@ -353,7 +429,13 @@
 
             <!-- Historial de Trazabilidad -->
             <div>
-              <h4 style="margin: 0 0 12px; font-size: 0.95rem; color: var(--color-sidebar-fondo, #071e33);">📜 Historial de Eventos y Trazabilidad</h4>
+              <h4 style="margin: 0 0 12px; font-size: 0.95rem; color: var(--color-sidebar-fondo, #071e33); display: flex; align-items: center; gap: 6px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>Historial de Eventos y Trazabilidad</span>
+              </h4>
               <p v-if="!ticketAuditoria.historial || ticketAuditoria.historial.length === 0" style="color: #64748b; font-size: 13px;">
                 Sin historial registrado.
               </p>
@@ -394,10 +476,13 @@
               <button
                 v-if="!ticketAuditoria.id_tecnico"
                 type="button"
-                style="padding: 8px 18px; border-radius: 20px; background-color: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; font-weight: 700; font-size: 0.85rem; cursor: pointer;"
+                style="padding: 8px 18px; border-radius: 20px; background-color: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;"
                 @click="irAAsignar(ticketAuditoria.id_ticket)"
               >
-                ⚠️ Asignar a un técnico →
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                </svg>
+                <span>Asignar a un técnico →</span>
               </button>
             </div>
             <button

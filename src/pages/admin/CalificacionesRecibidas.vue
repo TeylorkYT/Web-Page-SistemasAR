@@ -34,7 +34,12 @@
         <div class="filtros-contenedor-flex" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
           <!-- Filtro: Técnico -->
           <div class="filtro-caja-select">
-            <span class="filtro-icono">👤</span>
+            <span class="filtro-icono" style="display: flex; align-items: center;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </span>
             <select
               v-model="filtroTecnico"
               class="filtro-select-nativo"
@@ -50,7 +55,14 @@
 
           <!-- Filtro: Rango de Fechas -->
           <div class="filtro-caja-select">
-            <span class="filtro-icono">📅</span>
+            <span class="filtro-icono" style="display: flex; align-items: center;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </span>
             <select
               v-model="filtroRango"
               class="filtro-select-nativo"
@@ -82,7 +94,11 @@
 
           <!-- Filtro: Puntaje de 1 a 5 -->
           <div class="filtro-caja-select">
-            <span class="filtro-icono">⭐</span>
+            <span class="filtro-icono" style="display: flex; align-items: center; color: #f59e0b;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+            </span>
             <select
               v-model="filtroPuntaje"
               class="filtro-select-nativo"
@@ -90,11 +106,11 @@
               @change="paginaActual = 1"
             >
               <option value="todos">[Todos los puntajes]</option>
-              <option value="5">★★★★★ (5 estrellas)</option>
-              <option value="4">★★★★ (4 estrellas)</option>
-              <option value="3">★★★ (3 estrellas)</option>
-              <option value="2">★★ (2 estrellas - Alerta)</option>
-              <option value="1">★ (1 estrella - Alerta crítica)</option>
+              <option value="5">5 estrellas (Excelente)</option>
+              <option value="4">4 estrellas (Muy bueno)</option>
+              <option value="3">3 estrellas (Aceptable)</option>
+              <option value="2">2 estrellas (Deficiente - Alerta)</option>
+              <option value="1">1 estrella (Crítico - Alerta)</option>
             </select>
           </div>
         </div>
@@ -106,7 +122,11 @@
 
         <div class="metricas-cards-grid">
           <div class="tarjeta-satisfaccion">
-            <div class="icono-caja-satisfaccion estrella">⭐</div>
+            <div class="icono-caja-satisfaccion estrella" style="display: flex; align-items: center; justify-content: center;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+            </div>
             <div class="satisfaccion-info">
               <span class="satisfaccion-label">Promedio general</span>
               <span class="satisfaccion-valor">
@@ -116,7 +136,15 @@
           </div>
 
           <div class="tarjeta-satisfaccion">
-            <div class="icono-caja-satisfaccion trofeo">🏆</div>
+            <div class="icono-caja-satisfaccion trofeo" style="display: flex; align-items: center; justify-content: center;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                <path d="M4 22h16"></path>
+                <path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path>
+                <path d="M6 4h12v7a6 6 0 0 1-12 0V4z"></path>
+              </svg>
+            </div>
             <div class="satisfaccion-info">
               <span class="satisfaccion-label">Mejor valorado</span>
               <span class="satisfaccion-valor">
@@ -128,7 +156,13 @@
           </div>
 
           <div class="tarjeta-satisfaccion">
-            <div class="icono-caja-satisfaccion alerta">⚠️</div>
+            <div class="icono-caja-satisfaccion alerta" style="display: flex; align-items: center; justify-content: center;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </div>
             <div class="satisfaccion-info">
               <span class="satisfaccion-label">Alertas de baja calificación</span>
               <span class="satisfaccion-valor">
@@ -178,12 +212,20 @@
                 </td>
                 <td>{{ item.tecnico }}</td>
                 <td>
-                  <span
-                    class="estrellas-contenedor"
-                    :style="{ color: item.puntuacion <= 2 || item.esAlerta ? '#dc2626' : '#f59e0b' }"
-                  >
-                    {{ '★'.repeat(item.puntuacion) }}
-                  </span>
+                  <div style="display: flex; align-items: center; gap: 2px;">
+                    <svg
+                      v-for="n in 5"
+                      :key="n"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      :fill="n <= item.puntuacion ? (item.puntuacion <= 2 || item.esAlerta ? '#dc2626' : '#f59e0b') : '#e2e8f0'"
+                      :stroke="n <= item.puntuacion ? (item.puntuacion <= 2 || item.esAlerta ? '#dc2626' : '#f59e0b') : '#cbd5e1'"
+                      stroke-width="1"
+                    >
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                  </div>
                 </td>
                 <td>
                   <span :class="['comentario-texto', { alerta: item.puntuacion <= 2 || item.esAlerta }]">
@@ -251,7 +293,10 @@
               aria-label="Cerrar modal"
               @click="ticketModal = null"
             >
-              ×
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
             </button>
           </div>
 
@@ -271,8 +316,22 @@
 
               <div class="modal-dato-fila">
                 <span class="modal-dato-clave">Calificación:</span>
-                <span :class="['modal-dato-valor', { 'modal-calif-roja': ticketModal.puntuacion <= 2 }]">
-                  {{ '★'.repeat(ticketModal.puntuacion) }} ({{ ticketModal.puntuacion }}/5)
+                <span :class="['modal-dato-valor', { 'modal-calif-roja': ticketModal.puntuacion <= 2 }]" style="display: inline-flex; align-items: center; gap: 4px;">
+                  <span style="display: inline-flex; align-items: center; gap: 2px;">
+                    <svg
+                      v-for="n in 5"
+                      :key="n"
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      :fill="n <= ticketModal.puntuacion ? (ticketModal.puntuacion <= 2 ? '#dc2626' : '#f59e0b') : '#e2e8f0'"
+                      :stroke="n <= ticketModal.puntuacion ? (ticketModal.puntuacion <= 2 ? '#dc2626' : '#f59e0b') : '#cbd5e1'"
+                      stroke-width="1"
+                    >
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                  </span>
+                  <span>({{ ticketModal.puntuacion }}/5)</span>
                 </span>
               </div>
 
@@ -291,9 +350,12 @@
 
             <div
               v-if="correoEnviado"
-              style="margin-top: 12px; padding: 10px 14px; background: #ecfdf5; color: #065f46; border-radius: 6px; font-size: 0.85rem;"
+              style="margin-top: 12px; padding: 10px 14px; background: #ecfdf5; color: #065f46; border-radius: 6px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;"
             >
-              ✓ Correo de seguimiento enviado exitosamente al cliente ({{ ticketModal.correo_cliente || ticketModal.contacto }}).
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>Correo de seguimiento enviado exitosamente al cliente ({{ ticketModal.correo_cliente || ticketModal.contacto }}).</span>
             </div>
 
             <!-- Historial completo del ticket -->

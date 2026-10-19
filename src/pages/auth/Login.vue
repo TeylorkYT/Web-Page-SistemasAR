@@ -2,8 +2,12 @@
   <div class="login-pantalla">
     <div class="login-tarjeta">
       <div class="login-cabecera">
-        <div class="login-logo-badge">
-          <span>⚙️ SistemasAR</span>
+        <div class="login-logo-badge" style="display: inline-flex; align-items: center; gap: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>SistemasAR Enterprise</span>
         </div>
         <h1 class="login-titulo">Iniciar sesión</h1>
         <p class="login-subtitulo">
@@ -26,7 +30,20 @@
             :style="{ backgroundColor: cuenta.bg, borderColor: cuenta.borde }"
           >
             <div class="login-demo-info">
-              <span class="login-demo-icono">{{ cuenta.icono }}</span>
+              <span class="login-demo-icono" :style="{ color: cuenta.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }">
+                <svg v-if="cuenta.rol === 'Administrador'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                  <path d="M2 17l10 5 10-5"></path>
+                  <path d="M2 12l10 5 10-5"></path>
+                </svg>
+                <svg v-else-if="cuenta.rol === 'Tecnico'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                </svg>
+                <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </span>
               <div class="login-demo-texto">
                 <div class="login-demo-rol" :style="{ color: cuenta.color }">
                   {{ cuenta.rol }} • {{ cuenta.nombre }}
@@ -60,8 +77,11 @@
         </div>
       </div>
 
-      <div v-if="mensajeExito" class="login-alerta login-alerta-exito">
-        ✓ {{ mensajeExito }}
+      <div v-if="mensajeExito" class="login-alerta login-alerta-exito" style="display: flex; align-items: center; gap: 6px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span>{{ mensajeExito }}</span>
       </div>
 
       <div v-if="error" class="login-alerta login-alerta-error">
@@ -103,8 +123,17 @@
       </form>
 
       <div class="login-pie">
-        <div class="login-pie-info">
-          <span>🏢</span>
+        <div class="login-pie-info" style="display: flex; align-items: center; gap: 6px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+            <path d="M9 22v-4h6v4"></path>
+            <path d="M8 6h.01"></path>
+            <path d="M16 6h.01"></path>
+            <path d="M8 10h.01"></path>
+            <path d="M16 10h.01"></path>
+            <path d="M8 14h.01"></path>
+            <path d="M16 14h.01"></path>
+          </svg>
           <span>¿Nuevo cliente? <strong>Solicita tu cuenta al administrador</strong></span>
         </div>
 
@@ -136,7 +165,6 @@ const CUENTAS_DEMO = [
     rol: 'Administrador',
     nombre: 'Carlos Administrador',
     correo: 'admin@prueba.com',
-    icono: '👑',
     color: '#072137',
     bg: '#f0f5fa',
     borde: '#cbe0f0',
@@ -146,7 +174,6 @@ const CUENTAS_DEMO = [
     rol: 'Tecnico',
     nombre: 'Diana Paz',
     correo: 'tecnico@prueba.com',
-    icono: '🛠️',
     color: '#008b7a',
     bg: '#e6f9f6',
     borde: '#9ee7dc',
@@ -156,7 +183,6 @@ const CUENTAS_DEMO = [
     rol: 'Cliente',
     nombre: 'Laura Ramírez',
     correo: 'cliente@prueba.com',
-    icono: '👤',
     color: '#0284c7',
     bg: '#f0f9ff',
     borde: '#bae6fd',
